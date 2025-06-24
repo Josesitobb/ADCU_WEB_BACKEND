@@ -5,22 +5,22 @@ const mongoose = require('mongoose');
 const contractorsSchema = new mongoose.Schema({
     post:{
         type :String,
-        require:[true,'El cargo es obligatorio'],
+        required:[true,'El cargo es obligatorio'],
     },
     state:{
         type:String,
         enum:['Activo','Inactivo'],
         default:'Activo'
     },
-    Users:{
+    User:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Users',
-        require:[true,'Selecione un usuario para asociarlo']
+        ref:'User',
+        required:[true,'Selecione un usuario para asociarlo']
     },
-    Contracts:{
+    Contract:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'Contratos',
-        require:[true,'El usuario tiene que tener un contrato']
+        required:[true,'El usuario tiene que tener un contrato']
     }
 
 })

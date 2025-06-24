@@ -1,6 +1,7 @@
-const { type } = require('express/lib/response');
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+
 const UsersSchemna = new mongoose.Schema({
     name:{
         type:String,
@@ -27,7 +28,7 @@ const UsersSchemna = new mongoose.Schema({
     },
     password:{
         type:String,
-        require:[true,'La contraseña es requerida']
+        required:[true,'La contraseña es requerida']
     },
     role:{
         type:String,
@@ -38,16 +39,18 @@ const UsersSchemna = new mongoose.Schema({
 
 // Hashear la contraseña antes de guardar
 
-UsersSchemna.pre('save',async (next)=>{
-    if(!this.isModifies('password')) return next();
-    try{
-        const salt = await bcrypt.genSalt(10);
-        this.password=await bcrypt.hash(this.password,salt);
-        next();
-    }catch(error){
-        next(error);
-    }
+UsersSchemna.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
 });
 
+
+// Metodo para comparar contraseña
+UsersSchemna.methods.VerifyPassword = async function(candidatePassword) {
+  console.log("Candidata:", candidatePassword, "\nDel modelo:", this.password);
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 module.exports=mongoose.model('User',UsersSchemna);

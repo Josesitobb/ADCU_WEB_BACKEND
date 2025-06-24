@@ -6,13 +6,21 @@ const morgan = require('morgan');
 const config = require('./config');
 const { MongoClient, ObjecId } = require('mongodb');
 
-// Importar rutas 
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const subcategoryRoutes = require('./routes/subcategoryRoutes');
-const productRoutes = require('./routes/productRoutes');
+//Importar ruta Jose
+// Inicio de sesion
+const authRoutes = require('./routes/Login/authRoutes');
+// Usuarios 
+const UserRoutes = require('./routes/Users/userRoutes');
+
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
+
+// Importar rutas 
+//const authRoutes = require('./routes/authRoutes');
+//const userRoutes = require('./routes/userRoutes');
+//const categoryRoutes = require('./routes/categoryRoutes');
+//const subcategoryRoutes = require('./routes/subcategoryRoutes');
+//const productRoutes = require('./routes/productRoutes');
+
 
 (async () => {
     await mongoClient.connect();
@@ -31,12 +39,18 @@ app.use(express.urlencoded({ extended: true }));
 // Conexion a mongo db
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB conectado')).catch(err => console.error('x Erro de MongoDB', err));
 
+//Rutas Jose
+// Inicio de sesion
+app.use('/api/auth',authRoutes);
+// Usuarios
+app.use('/api/Users',UserRoutes);
+
 // Rutas 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes)
-app.use('/api/subcategories', subcategoryRoutes);
-app.use('/api/product', productRoutes);
+//app.use('/api/auth', authRoutes);
+//app.use('/api/users', userRoutes);
+//app.use('/api/categories', categoryRoutes)
+//app.use('/api/subcategories', subcategoryRoutes);
+//app.use('/api/product', productRoutes);
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;
