@@ -7,11 +7,7 @@ const config = require('./config');
 const { MongoClient, ObjecId } = require('mongodb');
 
 // Importar rutas 
-const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
-const categoryRoutes = require('./routes/categoryRoutes');
-const subcategoryRoutes = require('./routes/subcategoryRoutes');
-const productRoutes = require('./routes/productRoutes');
+const gestionDocumentalRoutes = require('./routes/gestionDocumentalRoutes');
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
 (async () => {
@@ -32,11 +28,7 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB conectado')).catch(err => console.error('x Erro de MongoDB', err));
 
 // Rutas 
-app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes)
-app.use('/api/subcategories', subcategoryRoutes);
-app.use('/api/product', productRoutes);
+app.use('/api/gestionDocumental', gestionDocumentalRoutes);
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;
