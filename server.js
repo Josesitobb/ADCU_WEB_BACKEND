@@ -12,6 +12,8 @@ const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const productRoutes = require('./routes/productRoutes');
+const dataRoutes = require('./routes/dataRoutes');
+const resultRoutes = require('./routes/resultRoutes');
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
 (async () => {
@@ -37,6 +39,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes)
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/product', productRoutes);
+app.use('/api/data', dataRoutes);
+app.use('/api/results', resultRoutes);
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;
