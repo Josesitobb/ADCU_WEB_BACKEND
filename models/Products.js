@@ -51,6 +51,22 @@ productSchema.post('save',function(error,doc,next){
         next(error)
     }
 })
+productSchema.statics.generateReportData = async function(filters = {}) {
+    const products = await this.find(filters)
+        .populate('category', 'name')
+        .populate('subcategory', 'name')
+        .lean();
+
+    return products.map(product => ({
+        Nombre: product.name,
+        Descripción: product.description,
+        Precio: `$${product.price.toFixed(2)}`,
+        Stock: product.stock,
+        Categoría: product.category?.name || 'N/A',
+        Subcategoría: product.subcategory?.name || 'N/A',
+        Fecha_Creación: new Date(product.createdAt).toLocaleDateString()
+    }))
+}
 
 module.exports = mongoose.model('product', productSchema);
 

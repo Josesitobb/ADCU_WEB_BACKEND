@@ -38,6 +38,10 @@ router.put('/:id', verifyToken,
 router.delete('/:id', verifyToken,
     checkRole('admin'), productController.deleteProduct);
 
+    const { generateProductReport } = require('../controllers/reportController');
+router.get('/report/excel', generateProductReport); 
+    
+
 module.exports = router;
 
 
