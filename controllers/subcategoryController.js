@@ -4,6 +4,14 @@ const Category = require('../models/Category');
 // Crear subcategoria
 exports.createSubcategory = async (req, res) => {
     try {
+        if (req.userRole !== "admin" && req.userRole !== "coordinador") {
+            return res.status(403).json({
+                success: false,
+                message: "Solo administradores o coordinadores pueden crear subcategorías"
+            });
+        }
+
+
         const { name, description, category } = req.body;
         // Validar que la categoria existe
         const parentCategory = await Category.findById(category);
@@ -86,6 +94,14 @@ exports.getSubcategoryById = async (req, res) => {
 // Actualizar Subcategoria
 exports.updateSubcategory = async (req, res) => {
     try {
+
+        if (req.userRole !== "admin" && req.userRole !== "coordinador") {
+            return res.status(403).json({
+                success: false,
+                message: "Solo administradores o coordinadores pueden actualizar"
+            });
+        }
+
         const { name, description, category } = req.body;
 
         // Veriricar si se cambia la categoria
@@ -132,6 +148,14 @@ exports.updateSubcategory = async (req, res) => {
 
 exports.deleteSubcategory = async (req, res) => {
     try {
+        // validad si es admin en dado caso que no,no lo puede eliminar
+        if (req.userRole !== "admin") {
+            return res.status(403).json({
+                success: false,
+                message: 'No tienes permiso para esta accion'
+            })
+        }
+
         const deletedSubcategory = await Subcategory.findByIdAndDelete(req.params.id);
         if (!deletedSubcategory) {
             return res.status(404).json({
