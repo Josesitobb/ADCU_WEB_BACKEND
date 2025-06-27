@@ -134,12 +134,6 @@ exports.getProductById = async (req, res) => {
 
 exports.updateProduct = async (req, res) => {
     try {
-        if (req.userRole !== "admin" && req.userRole !== "coordinador") {
-            return res.status(403).json({
-                success: false,
-                message: "Solo administradores o coordinadores pueden actualizar"
-            });
-        }
         const { name, description, price, stock, category, subcategory } = req.body;
         const updateData = {};
 
@@ -216,13 +210,6 @@ exports.updateProduct = async (req, res) => {
 
 exports.deleteProduct = async (req, res) => {
     try {
-        // validad si es admin en dado caso que no,no lo puede eliminar
-        if (req.userRole !== "admin") {
-            return res.status(403).json({
-                success: false,
-                message: 'No tienes permiso para esta accion'
-            })
-        }
 
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {

@@ -2,14 +2,6 @@ const Category = require('../models/Category');
 
 exports.createCategory = async (req, res) => {
     try {
-
-        if (req.userRole !== "admin" && req.userRole !== "coordinador") {
-            return res.status(403).json({
-                success: false,
-                message: "Solo administradores o coordinadores pueden crear categoria"
-            });
-        }
-
         const { name, description } = req.body;
 
         //Validacion
@@ -114,13 +106,6 @@ exports.getCategoryById = async (req, res) => {
 
 exports.updateCategory = async (req, res) => {
     try {
-        if (req.userRole !== "admin" && req.userRole !== "coordinador") {
-            return res.status(403).json({
-                success: false,
-                message: "Solo administradores o coordinadores pueden actualizar"
-            });
-        }
-
         const { name, description } = req.body;
         const updateData = {};
 
@@ -172,14 +157,6 @@ exports.updateCategory = async (req, res) => {
 
 exports.deleteCategory = async (req, res) => {
     try {
-
-        if (req.userRole !== "admin") {
-            return res.status(403).json({
-                success: false,
-                message: 'No tienes permiso para esta accion'
-            })
-        }
-
         const deleteCategory = await Category.findByIdAndDelete(req.
             params.id);
         if (!deleteCategory) {
