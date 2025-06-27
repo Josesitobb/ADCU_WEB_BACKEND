@@ -12,14 +12,14 @@ const contractorsSchema = new mongoose.Schema({
         enum:['Activo','Inactivo'],
         default:'Activo'
     },
-    User:{
+    user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User',
         required:[true,'Selecione un usuario para asociarlo']
     },
-    Contract:{
+    contract:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:'Contratos',
+        ref:'ContactManagement',
         required:[true,'El usuario tiene que tener un contrato']
     }
 

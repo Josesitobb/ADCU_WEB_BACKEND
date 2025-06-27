@@ -12,6 +12,9 @@ const authRoutes = require('./routes/Login/authRoutes');
 // Usuarios 
 const UserRoutes = require('./routes/Users/userRoutes');
 
+// Contratos
+const ContractManagementRoutes = require('./routes/Contracto/ContractManagementRoutes');
+
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
 // Importar rutas 
@@ -44,6 +47,8 @@ mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB con
 app.use('/api/auth',authRoutes);
 // Usuarios
 app.use('/api/Users',UserRoutes);
+// Contratos
+app.use('/api/Contracts',ContractManagementRoutes);
 
 // Rutas 
 //app.use('/api/auth', authRoutes);
