@@ -2,354 +2,321 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
+const  ObjectId  = require('mongodb');
 
 // Roles del sistema
 const ROLES = {
-  ADMIN: 'admin',
-  COORDINADOR: 'coordinador',
-  AUXILIAR: 'auxiliar'
+    ADMIN: 'admin',
+    COORDINADOR: 'coordinador',
+    AUXILIAR: 'auxiliar'
 };
 
 // Función para verificar permisos
 const checkPermission = (userRole, allowedRoles) => {
-  return allowedRoles.includes(userRole);
+    return allowedRoles.includes(userRole);
 };
 
 // 1. Registro de usuarios (SOLO ADMIN)
 exports.signup = async (req, res) => {
-  try {
-    // Validación manual adicional
-    if (!req.body.username || req.body.username.trim() === '') {
-      return res.status(400).json({
-        success: false,
-        message: "El nombre de usuario es requerido",
-        field: "username"
-      });
-    }
-
-    // Crear instancia de usuario
-    const user = new User({
-      username: req.body.username.trim(),
-      email: req.body.email.toLowerCase().trim(),
-      password: req.body.password,
-      role: req.body.role || 'auxiliar'
-    });
-
-    // Guardar usuario en la base de datos
-    const savedUser = await user.save();
-    
-    // Generar token JWT
-    const token = jwt.sign(
-      { 
-        id: savedUser._id,
-        role: savedUser.role 
-      },
-      config.secret,
-      { expiresIn: config.jwtExpiration }
-    );
-
-    // Preparar respuesta sin datos sensibles
-    const userData = savedUser.toObject();
-    delete userData.password;
-
-    res.status(201).json({
-      success: true,
-      message: "Usuario registrado exitosamente",
-      token: token,
-      user: userData
-    });
-
-  } catch (error) {
-    console.error('[AuthController] Error en registro:', error);
-
-    // Manejo especial de errores de MongoDB
-    if (error.code === 11000) {
-      const field = Object.keys(error.keyPattern)[0];
-      return res.status(400).json({
-        success: false,
-        message: `El ${field} ya está en uso`,
-        field: field
-      });
-    }
-
-    // Manejo de otros errores de validación
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(val => val.message);
-      return res.status(400).json({
-        success: false,
-        message: messages.join(', '),
-        errors: error.errors
-      });
-    }
-
-    res.status(500).json({
-      success: false,
-      message: "Error al registrar usuario",
-      error: error.message
-    });
-  }
-};
-
-// INICIO DE SESION
-exports.signin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // 1. Validación básica
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email y contraseña son requeridos"
-      });
-    }
-
-    // 2. Buscar usuario incluyendo el password (que normalmente está oculto)
-    const user = await User.findOne({ email }).select('+password');
-    
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "Usuario no encontrado"
-      });
-    }
-
-    // 3. Comparar contraseñas
-    const isMatch = await user.comparePassword(password);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Credenciales inválidas"
-      });
-    }
-
-    // 4. Generar token JWT
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      config.secret,
-      { expiresIn: config.jwtExpiration }
-    );
-
-    // 5. Preparar respuesta sin datos sensibles
-    const userData = user.toObject();
-    delete userData.password;
-
-    res.status(200).json({
-      success: true,
-      message: "Autenticación exitosa",
-      token,
-      user: userData
-    });
-
-  } catch (error) {
-    console.error('[AuthController] Error en login:', error);
-    res.status(500).json({
-      success: false,
-      message: "Error en el servidor",
-      error: error.message
-    });
-  }
-};
-
-// 4. Obtener usuario por ID (Admin y Coordinador)
-exports.getUserById = async (req, res) => {
-    console.log('\n=== INICIO CONSULTA POR ID - SOLUCIÓN DEFINITIVA ===');
-    
     try {
-        // 1. Validación extrema del ID
-        const id = req.params.id;
-        console.log('[1] ID recibido:', id);
+        console.log('[AuthController] Registro iniciado', req.body);
         
-        if (!id || typeof id !== 'string' || id.length !== 24) {
-            console.log('[ERROR] ID inválido');
-            return res.status(400).json({ 
+        if(!req.body.email || !req.body.password) {
+            return res.status(400).json({
                 success: false,
-                message: "ID de usuario no válido" 
+                message: 'Email y contraseña son requeridos'
             });
         }
 
-        // 2. Control de acceso (como en otros endpoints)
-        console.log('[2] Verificando permisos...');
-        const isAllowed = req.roles.includes('admin') || 
-                        req.roles.includes('coordinador') || 
-                        req.userId === id;
+        // Hashear la contraseña
+        const hashedPassword = bcrypt.hashSync(req.body.password, 8);
+
+        const user = new User({
+            email: req.body.email,
+            password: hashedPassword,
+            role: req.body.role || ROLES.AUXILIAR
+        });
+
+        const savedUser = await user.save();
+        console.log('[AuthController] Usuario registrado', savedUser.email);
+
+        const token = jwt.sign({ id: savedUser._id }, config.secret, {
+            expiresIn: config.jwtExpiration
+        });
+
+        const userData = savedUser.toObject();
+        delete userData.password;
+
+        res.status(200).json({
+            success: true,
+            message: 'Usuario registrado correctamente',
+            token: token,
+            user: userData
+        });
+    } catch(error) {
+        console.error('[AuthController] Error en registro:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error al registrar usuario',
+            error: error.message
+        });
+    }
+};
+
+// 2. Login común para todos
+exports.signin = async (req, res) => {
+    try {
+        console.log('[AuthController] Body recibido:', req.body);
         
-        if (!isAllowed) {
-            console.log('[PERMISO DENEGADO]');
-            return res.status(403).json({
+        if(!req.body.email || !req.body.password) {
+            return res.status(400).json({
                 success: false,
-                message: "No autorizado"
+                message: 'Email y contraseña son requeridos'
             });
         }
 
-        // 3. Consulta directa a MongoDB (sin relaciones)
-        console.log('[3] Ejecutando consulta directa...');
-        const db = req.app.get('mongoDb'); // Conexión directa a MongoDB
+        const user = await User.findOne({ email: req.body.email }).select('+password');
         
-        // 3.1 Buscar usuario
-        const user = await db.collection('users').findOne(
-            { _id: new ObjectId(id) },
-            { projection: { _id: 1, username: 1, email: 1, createdAt: 1, updatedAt: 1 } }
-        );
-        
-        console.log('[4] Usuario encontrado:', user);
-        if (!user) {
-            console.log('[ERROR] Usuario no existe');
+        if(!user) {
+            console.log('[AuthController] Usuario no encontrado');
             return res.status(404).json({
                 success: false,
-                message: "Usuario no encontrado"
+                message: 'Usuario no encontrado'
             });
         }
 
-        // 3.2 Buscar roles en dos pasos explícitos
-        console.log('[5] Buscando roles...');
-        const userRoles = await db.collection('user_roles').find(
-            { userId: new ObjectId(id) }
-        ).toArray();
+        console.log('[AuthController] Comparando contraseña para', user.email);
+        const isMatch = await bcrypt.compare(req.body.password, user.password);
         
-        const roleIds = userRoles.map(ur => ur.roleId);
-        const roles = await db.collection('roles').find(
-            { _id: { $in: roleIds } }
-        ).toArray();
+        if(!isMatch) {
+            console.log('[AuthController] Contraseña no coincide');
+            return res.status(401).json({
+                success: false,
+                message: 'Credenciales inválidas'
+            });
+        }
 
-        console.log('[6] Roles encontrados:', roles.map(r => r.name));
-
-        // 4. Formatear respuesta (igual que otros endpoints)
-        const response = {
-            success: true,
-            data: {
+        // Generar token
+        const token = jwt.sign(
+            {  
                 id: user._id,
-                username: user.username,
                 email: user.email,
-                roles: roles.map(r => r.name),
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
+                role: user.role
+            },
+            config.secret,
+            {
+                expiresIn: config.jwtExpiration
             }
-        };
+        );
 
-        console.log('[7] CONSULTA EXITOSA');
-        return res.json(response);
-
-    } catch (error) {
-        console.error('[ERROR CRÍTICO]', {
-            message: error.message,
-            stack: error.stack,
-            timestamp: new Date().toISOString(),
-            details: {
-                errorCode: error.code || 'N/A',
-                errorType: error.name
+        res.status(200).json({
+            success: true,
+            token,
+            user: {
+                id: user._id,
+                email: user.email,
+                role: user.role
             }
         });
         
+    } catch(error) {
+        console.error('[AuthController] Error en login:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Error en el servidor',
+            error: error.message
+        });
+    }
+};
+
+// 3. Obtener todos los usuarios (Admin y coordinador)
+exports.getAllUsers = async (req, res) => {
+    try {
+        // Verificar permisos
+        if(!checkPermission(req.user.role, [ROLES.ADMIN, ROLES.COORDINADOR])) {
+            return res.status(403).json({
+                success: false,
+                message: 'No tienes permisos para ver usuarios'
+            });
+        }
+
+        const users = await User.find({}).select('-password -__v');
+        return res.status(200).json({
+            success: true,
+            count: users.length,
+            data: users
+        });
+    } catch(error) {
+        console.error('Error en getAllUsers:', error);
         return res.status(500).json({
             success: false,
-            message: "Error al obtener usuario",
+            message: 'Error al consultar usuarios'
+        });
+    }
+};
+
+// 4. Obtener usuario por id (admin y coordinador)
+exports.getUserById = async (req, res) => {
+    console.log('\n=== INICIO DE CONSULTA POR ID ===');
+    try {
+        // 1. Validación del ID
+        const id = req.params.id;
+        console.log('[1] ID Recibido:', id);
+
+        if(!id || typeof id !== 'string' || id.length !== 24) {
+            console.log('[ERROR] ID inválido');
+            return res.status(400).json({
+                success: false,
+                message: 'ID de usuario no válido'
+            });
+        }
+
+        // 2. Control de acceso
+        console.log('[2] Verificando permisos...');
+        const isAllowed = req.user.role === ROLES.ADMIN || 
+                         req.user.role === ROLES.COORDINADOR || 
+                         req.user.id === id;
+
+        if(!isAllowed) {
+            console.log('[PERMISO DENEGADO]');
+            return res.status(403).json({
+                success: false,
+                message: 'No autorizado'
+            });
+        }
+
+        // 3. Consulta a MongoDB
+        const user = await User.findById(id).select('-password -__v');
+        
+        if(!user) {
+            console.log('[ERROR] Usuario no existe');
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        console.log('[3] Usuario encontrado:', user.email);
+
+        return res.status(200).json({
+            success: true,
+            data: user
+        });
+
+    } catch(error) {
+        console.error('[ERROR CRITICO]', {
+            message: error.message,
+            stack: error.stack,
+            timestamp: new Date().toISOString()
+        });
+
+        return res.status(500).json({
+            success: false,
+            message: 'Error al obtener usuario',
             error: process.env.NODE_ENV === 'development' ? {
                 type: error.name,
-                message: error.message,
-                code: error.code
+                message: error.message
             } : undefined
         });
     }
 };
 
-// 5. Actualizar usuario (Admin puede actualizar todos, Coordinador solo auxiliares, Auxiliar solo sí mismo)
+// 5. Actualizar usuario
 exports.updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
-    const currentUserRole = req.userRole;
-    const currentUserId = req.userId;
+    try {
+        const { id } = req.params;
+        const updates = req.body;
+        const currentUserRole = req.user.role;
+        const currentUserId = req.user.id;
 
-    // Buscar usuario a actualizar
-    const userToUpdate = await User.findById(id);
-    if (!userToUpdate) {
-      return res.status(404).json({
-        success: false,
-        message: 'Usuario no encontrado'
-      });
+        // Buscar usuario a actualizar
+        const userToUpdate = await User.findById(id);
+        if(!userToUpdate) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        // Verificar permisos
+        if(currentUserRole === ROLES.AUXILIAR && userToUpdate._id.toString() !== currentUserId) {
+            return res.status(403).json({
+                success: false,
+                message: 'Solo puedes modificar tu propio perfil'
+            });
+        }
+
+        if(currentUserRole === ROLES.COORDINADOR && userToUpdate.role === ROLES.ADMIN) {
+            return res.status(403).json({
+                success: false,
+                message: 'No puedes modificar administradores' 
+            });   
+        }
+
+        // Actualizar campos permitidos
+        const allowedFields = ['name', 'email'];
+        if(currentUserRole === ROLES.ADMIN) {
+            allowedFields.push('role');
+        }
+
+        const filteredUpdates = {};
+        Object.keys(updates).forEach(key => {
+            if(allowedFields.includes(key)) {
+                filteredUpdates[key] = updates[key];
+            }
+        });
+
+        // Si se actualiza password, hacer hash
+        if(updates.password) {
+            filteredUpdates.password = bcrypt.hashSync(updates.password, 8);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, filteredUpdates, { new: true }).select('-password -__v');
+
+        return res.status(200).json({
+            success: true,
+            message: 'Usuario actualizado',
+            data: updatedUser
+        });
+    } catch(error) {
+        console.error('Error en updateUser:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al actualizar usuario',
+            error: error.message
+        });
     }
-
-    // Verificar permisos
-    if (currentUserRole === ROLES.AUXILIAR && userToUpdate._id.toString() !== currentUserId) {
-      return res.status(403).json({
-        success: false,
-        message: 'Solo puedes modificar tu propio perfil'
-      });
-    }
-
-    if (currentUserRole === ROLES.COORDINADOR && userToUpdate.role === ROLES.ADMIN) {
-      return res.status(403).json({
-        success: false,
-        message: 'No puedes modificar administradores'
-      });
-    }
-
-    // Actualizar campos permitidos
-    const allowedFields = ['name', 'email'];
-    if (currentUserRole === ROLES.ADMIN) {
-      allowedFields.push('role');
-    }
-
-    const filteredUpdates = {};
-    Object.keys(updates).forEach(key => {
-      if (allowedFields.includes(key)) {
-        filteredUpdates[key] = updates[key];
-      }
-    });
-
-    // Si se actualiza password, hacer hash
-    if (updates.password) {
-      filteredUpdates.password = bcrypt.hashSync(updates.password, 8);
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(id, filteredUpdates, { new: true }).select('-password -__v');
-
-    return res.status(200).json({
-      success: true,
-      message: 'Usuario actualizado',
-      data: updatedUser
-    });
-
-  } catch (error) {
-    console.error('Error en updateUser:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Error al actualizar usuario'
-    });
-  }
 };
 
 // 6. Eliminar usuario (SOLO ADMIN)
 exports.deleteUser = async (req, res) => {
-  try {
-    // Verificar que sea admin
-    if (!checkPermission(req.userRole, [ROLES.ADMIN])) {
-      return res.status(403).json({
-        success: false,
-        message: 'Solo administradores pueden eliminar usuarios'
-      });
+    try {
+        // Verificar que sea admin
+        if(!checkPermission(req.user.role, [ROLES.ADMIN])) {
+            return res.status(403).json({
+                success: false,
+                message: 'Solo administradores pueden eliminar usuarios'
+            });
+        }
+
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+        if(!deletedUser) {
+            return res.status(404).json({
+                success: false,
+                message: 'Usuario no encontrado'
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Usuario eliminado correctamente'
+        });
+    } catch(error) {
+        console.error('Error en deleteUser:', error);
+        return res.status(500).json({
+            success: false,
+            message: 'Error al eliminar usuario',
+            error: error.message
+        });
     }
-
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-    
-    if (!deletedUser) {
-      return res.status(404).json({
-        success: false,
-        message: 'Usuario no encontrado'
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: 'Usuario eliminado correctamente'
-    });
-
-  } catch (error) {
-    console.error('Error en deleteUser:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Error al eliminar usuario'
-    });
-  }
 };

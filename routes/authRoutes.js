@@ -1,57 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const authController= require('../controllers/authController');
+const authController = require('../controllers/authController');
 const verifySignUp = require('../middlewares/verifySignUp');
-// const { methods } = require('express/lib/utils');
 
-// Importarcion de verificacio
+// Importación de verificación con manejo de errores mejorado
 let verifyToken;
 
-try{
-    const authJwt= require('../middlewares/authJwt');
+try {
+    const authJwt = require('../middlewares/authJwt');
     verifyToken = authJwt.verifyToken;
-    console.log('[AuthRoutes] verifyToken importando  correctamente :',typeof verifyToken);
-}catch(error){
-    console.error('[AuthRoutes] ERROR al importar verifyToken',error);
-    throw error;
+    console.log('[AuthRoutes] verifyToken importado correctamente:', typeof verifyToken);
+} catch (error) {
+    console.error('[AuthRoutes] ERROR al importar verifyToken:', error);
+    process.exit(1); // Detener la aplicación si no se puede cargar este middleware crítico
 }
 
-
-// Middleware de  diagnostico
-router.use((req,res,next)=>{
-console.log('\n[AuthRoutes] Peticion recibida:',{
-    method:req.method,
-    path:req.path,
-    Headers:{
-        authorization:req.headers.authorization ? '***':'NO',
-        'x-access-token':req.headers['x-access-token']?'***':'NO'
-    }
-});
-next();
-});
-
-
-// Rutas de lign (sin proteccion)
-router.post('/signin',authController.signin);
-
-// Ruta de registro 
-router.post('/signup',(req,res,next)=>{
-    console.log('[AuthRoutes] Middleware de verificacion de registro');
+// Middleware de diagnóstico mejorado
+router.use((req, res, next) => {
+    console.log('\n[AuthRoutes] Petición recibida:', {
+        method: req.method,
+        path: req.path,
+        ip: req.ip,
+        timestamp: new Date().toISOString()
+    });
     next();
-},
+});
 
+// Ruta de login (sin protección)
+router.post('/signin', authController.signin);
 
-verifySignUp.checkDuplicateUsernameOrEmail,
-verifySignUp.checkRolesExisted,
-authController.signup
+// Ruta de registro con middlewares
+router.post('/signup',
+    (req, res, next) => {
+        console.log('[AuthRoutes] Verificando datos de registro');
+        next();
+    },
+    verifySignUp.checkDuplicateUsernameOrEmail,
+    verifySignUp.checkRolesExisted,
+    authController.signup
 );
 
-// Verificacion final de rutas
-console.log('[AuthRotes] Rutas  configuradas:',router.stack.map(layer =>{
-    return {
-        path:layer.route?.path,
-        methods:layer.route?.methods
-    };
-}));
+// Verificación final de rutas (versión mejorada)
+const registeredRoutes = router.stack
+    .filter(layer => layer.route)
+    .map(layer => ({
+        path: layer.route.path,
+        methods: Object.keys(layer.route.methods).filter(method => layer.route.methods[method])
+    }));
+
+console.log('[AuthRoutes] Rutas configuradas:', registeredRoutes);
 
 module.exports = router;
