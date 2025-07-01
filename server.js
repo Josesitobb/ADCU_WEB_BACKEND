@@ -4,21 +4,31 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config');
-const { MongoClient, ObjecId } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
+const fs = require('fs');
+const path = require('path');
 
-// Importar rutas 
+// Crear directorio uploads si no existe
+const uploadsDir = path.join(__dirname, 'uploads/pdfs');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+  console.log('Directorio uploads/pdfs creado exitosamente');
+}
+
+// Importar rutas
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const productRoutes = require('./routes/productRoutes');
-const mongoClient = new MongoClient(process.env.MONGODB_URI);
+const reportRoutes = require('./routes/reportRoutes');
+const mongoclient = new MongoClient(process.env.MONGOODB_URL);
 
 (async () => {
-    await mongoClient.connect();
-    app.set('mongoDB', mongoClient.db());
-    console.log('Conexion directa a mongoDB establecida')
-});
+  await mongoclient.connect();
+  app.set('mongoDB', mongoclient.db());
+  console.log('Conexion directa a mongoDB establecida');
+})();
 
 const app = express();
 
@@ -29,18 +39,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Conexion a mongo db
-mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB conectado')).catch(err => console.error('x Erro de MongoDB', err));
+mongoose.connect(process.env.MONGOODB_URL).then(() => console.log('Ok Mongo'));
 
-// Rutas 
+// Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/categories', categoryRoutes)
+app.use('/api/categories', categoryRoutes);
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/product', productRoutes);
+app.use('/api/reports', reportRoutes);
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`);
+  console.log(`Servidor en http://localhost:${PORT}`);
 });
-
