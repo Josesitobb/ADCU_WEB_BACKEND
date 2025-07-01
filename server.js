@@ -5,6 +5,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config');
 const { MongoClient, ObjecId } = require('mongodb');
+// Llamar funcion para inactivar los contratos
+require('./controllers/Contracto/inactivarContratos')
 
 //Importar ruta Jose
 // Inicio de sesion

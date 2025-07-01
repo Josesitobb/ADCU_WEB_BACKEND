@@ -40,7 +40,7 @@ exports.getAllUsers = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      date: userAll,
+      data: userAll,
     });
   } catch (error) {
     console.log("[CONTROLLER USER] Error en getAllUsers", error.message);
@@ -248,6 +248,7 @@ exports.updateUser = async (req, res) => {
       { new: true }
     ).select("-password");
 
+    //  Si no existe el usuario mandar mensaje
     if (!updatedUser) {
       return res.status(404).json({
         success: false,
@@ -281,7 +282,6 @@ exports.updateUser = async (req, res) => {
     let mesaje = state || "No hay en el estado ";
 
     // Cambiar el contrato de un contratista
-
     if ("contractId" in req.body && updatedUser.role === "contratista") {
       try {
         // const contractId = await ContractManagement.findOne({user:updatedUser._id});
@@ -300,6 +300,14 @@ exports.updateUser = async (req, res) => {
         );
       }
     }
+
+    // Cambiar la contraseña del usuario
+   if ("password" in req.body) {
+    updatedUser.password = req.body.password; 
+    await updatedUser.save(); 
+  
+}
+
 
     return res.status(200).json({
       success: true,
@@ -335,7 +343,6 @@ exports.deleteUser = async (req, res) => {
     }
 
     // Contratista
-
     if (deletedUser.role === "contratista") {
       try {
         const deletedContract = await Contractor.findOneAndDelete({
