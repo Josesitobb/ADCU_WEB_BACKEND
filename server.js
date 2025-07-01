@@ -1,38 +1,22 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const morgan = require('morgan');
-const config = require('./config');
-const { MongoClient, ObjecId } = require('mongodb');
-
-// Importar rutas 
-const gestionDocumentalRoutes = require('./routes/gestionDocumentalRoutes');
-const mongoClient = new MongoClient(process.env.MONGODB_URI);
-
-(async () => {
-    await mongoClient.connect();
-    app.set('mongoDB', mongoClient.db());
-    console.log('Conexion directa a mongoDB establecida')
-});
-
 const app = express();
+const gestionRoutes = require('./routes/gestionDocumentalRoutes');
 
 // Middlewares
-app.use(cors());
-app.use(morgan('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Conexion a mongo db
-mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB conectado')).catch(err => console.error('x Erro de MongoDB', err));
+// Conexión a MongoDB
+mongoose.connect('mongodb://localhost:27017/gestiondocumental')
+.then(() => console.log('Conectado a MongoDB'))
+.catch(err => console.error('Error de conexión:', err));
 
-// Rutas 
-app.use('/api/gestionDocumental', gestionDocumentalRoutes);
+// Rutas
+app.use('/api/documentos', gestionRoutes);
 
-// Inicio del servidor
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`);
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });
-
