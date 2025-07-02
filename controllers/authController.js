@@ -1,21 +1,25 @@
-const User = require('../models/User');
+// 1. Importación CORRECTA del modelo User (asegúrate que la ruta sea exacta)
+const User = require('../models/User1');
+
+// 2. Importación de dependencias
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const config = require('../config/auth.config');
-const  ObjectId  = require('mongodb');
+const { ObjectId } = require('mongodb');
 
-// Roles del sistema
+// 3. Importación de configuración (verifica que auth.config.js exista)
+const config = require('../config/auth.config');
+
+// 4. Definición de roles
 const ROLES = {
     ADMIN: 'admin',
     COORDINADOR: 'coordinador',
     AUXILIAR: 'auxiliar'
 };
 
-// Función para verificar permisos
+// 5. Función para verificar permisos (completada)
 const checkPermission = (userRole, allowedRoles) => {
     return allowedRoles.includes(userRole);
 };
-
 // 1. Registro de usuarios (SOLO ADMIN)
 exports.signup = async (req, res) => {
     try {

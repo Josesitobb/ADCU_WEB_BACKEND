@@ -17,7 +17,7 @@ if (!fs.existsSync(uploadsDir)) {
 
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
+const UserRoutes1 = require('./routes/UserRoutes1');
 const categoryRoutes = require('./routes/categoryRoutes');
 const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const productRoutes = require('./routes/productRoutes');
@@ -44,13 +44,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Conexión a MongoDB con Mongoose
-mongoose.connect(process.env.MONGODB_URL)
-    .then(() => console.log('Conexión a MongoDB exitosa'))
-    .catch(err => console.error('Error de conexión a MongoDB:', err));
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tudb', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
 
 // Rutas
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/users', UserRoutes1);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/products', productRoutes);

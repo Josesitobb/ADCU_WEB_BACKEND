@@ -5,8 +5,8 @@
   "scripts": {
     "test": "jest --detectOpenHandles --forceExit",
     "init": "node scripts/init.js",
-  "start": "npm run init && node server.js",
-  "dev": "nodemon server.js"
+    "start": "npm run init && node server.js",
+    "dev": "nodemon server.js"
   },
   "keywords": [],
   "author": "",

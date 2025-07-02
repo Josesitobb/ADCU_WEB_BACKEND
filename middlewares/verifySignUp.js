@@ -1,5 +1,5 @@
 const { json } = require('express/lib/response');
-const User = require('../models/User');
+const User = require('../models/User1');
 const checkDuplicateUsernameOrEmail = async(req,res,next)=>{
     try{
         const user = await User.findOne({

@@ -1,5 +1,5 @@
 const ExcelJS = require('exceljs');
-const db = require('../models');
+const db = require('../models/Report');
 
 exports.generateReport = async (req, res) => {
     try {

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config/auth.config');
-const { User } = require('../models/User');
+const { User } = require('../models/User1');
 
 console.log('[AuthJWT] Configuracion cargada', config.secret ? '***' + config.secret.slice(-5) : 'NO CONFIGURADO');
 
