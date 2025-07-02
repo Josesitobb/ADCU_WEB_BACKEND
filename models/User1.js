@@ -5,7 +5,8 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: [true, 'El nombre de usuario es requerido'],
-        trim: true
+        trim: true,
+        unique: true
     },
     email: {
         type: String,
@@ -35,7 +36,7 @@ const userSchema = new mongoose.Schema({
     toJSON: {
         virtuals: true,
         transform: function(doc, ret) {
-            delete ret.password; // Nunca enviar password en las respuestas
+            delete ret.password;
             return ret;
         }
     }
@@ -53,6 +54,13 @@ userSchema.pre('save', async function(next) {
     try {
         const salt = await bcrypt.genSalt(10);
         this.password = await bcrypt.hash(this.password, salt);
+        
+        // Auto-asignar rol admin si es el primer usuario
+        const userCount = await this.constructor.countDocuments();
+        if (userCount === 0) {
+            this.role = 'admin';
+        }
+        
         next();
     } catch (error) {
         next(error);
