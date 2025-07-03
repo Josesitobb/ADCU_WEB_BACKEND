@@ -1,24 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/reportController');
-const authJwt = require('../middlewares/authJwt');
 
-// Ruta para consultar y generar reportes
-router.get('/generate', 
-    authJwt.verifyToken, 
-    reportController.generateReport
-);
+// Ruta para consultar y generar reportes (sin autenticación)
+router.get('/generate', reportController.generateReport);
 
-// Ruta para obtener reportes históricos
-router.get('/history', 
-    authJwt.verifyToken, 
-    reportController.getReportHistory
-);
+// Ruta para obtener reportes históricos (sin autenticación)
+router.get('/history', reportController.getReportHistory);
 
-// Ruta para obtener detalles de un reporte específico
-router.get('/:reportId', 
-    authJwt.verifyToken, 
-    reportController.getReportDetails
-);
+// Ruta para obtener detalles de un reporte específico (sin autenticación)
+router.get('/:reportId', reportController.getReportDetails);
 
 module.exports = router;
