@@ -72,6 +72,14 @@ exports.creatContract = async (req, res) => {
       });
     }
 
+    const contractDuplicate = await ContracManagement.findOne({contractNumber});
+    if(contractDuplicate){
+      return res.status(400).json({
+        success:false,
+        message:'No se puede aver 2 contratos con el mismo numero de contrato',
+      });
+    } 
+
     const contract = new ContracManagement({
       typeofcontract,
       starteDate: new Date(starteDate),
