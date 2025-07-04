@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const reportController = require('../controllers/reportController');
 
-// Rutas de reportes
-router.get('/generate', reportController.generateReport);
-router.get('/history', reportController.getReportHistory);
-router.get('/:reportId', reportController.getReportDetails);
+router.get('/generate', reportController.generateReport);       // Crear
+router.get('/history', reportController.getReportHistory);     // Historial
+router.get('/excel', reportController.downloadExcel);          // Descargar Excel
+router.get('/:reportId', reportController.getReportDetails);   // Por ID
+router.delete('/:reportId', reportController.deleteReport);    // Eliminar
 
-// Exportación CORRECTA (asegúrate de que esta línea esté exactamente así)
 module.exports = router;
