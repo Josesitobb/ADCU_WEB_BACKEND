@@ -9,19 +9,20 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { createServer } = require('http');
 const { Server } = require('socket.io');
+const config = require('./config'); // Asegúrate que el path sea correcto
 
 // Configuración inicial
 const app = express();
 const httpServer = createServer(app);
 
-// Configuración mejorada de Socket.IO con manejo de errores
+// Socket.IO
 let io;
 try {
   io = new Server(httpServer, {
     cors: {
       origin: process.env.FRONTEND_URL ? 
-             process.env.FRONTEND_URL.split(',') : 
-             ['http://localhost:3001'],
+        process.env.FRONTEND_URL.split(',') : 
+        ['http://localhost:3001'],
       methods: ['GET', 'POST'],
       credentials: true
     },
@@ -35,69 +36,58 @@ try {
   process.exit(1);
 }
 
-// Configuración de directorios
+// Crear carpeta de uploads si no existe
 const uploadsDir = path.join(__dirname, 'uploads/pdfs');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Middlewares de seguridad
+// Middlewares
 app.use(helmet());
 app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   credentials: true
 }));
 
-// Limitar peticiones
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100
 });
 app.use(limiter);
 
-// Middlewares básicos
 app.use(morgan('dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Conexión optimizada a MongoDB con verificación de modelos
+// 🧠 CONEXIÓN A MONGODB usando config.js
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/crudAsadero2', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 10000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 10,
-      minPoolSize: 2
-    });
+    await mongoose.connect(config.DB.URL, config.DB.OPTIONS);
     
     console.log('✅ MongoDB conectado en:', mongoose.connection.host);
     console.log('📌 Modelos disponibles:', mongoose.modelNames());
-    
+
     mongoose.connection.on('connected', () => {
       console.log('📌 Mongoose conectado');
     });
-    
+
     mongoose.connection.on('error', (err) => {
       console.error('❌ Error de Mongoose:', err);
     });
-    
+
     mongoose.connection.on('disconnected', () => {
       console.log('⚠️  Mongoose desconectado');
     });
-    
   } catch (error) {
     console.error('❌ Error de conexión a MongoDB:', error.message);
     process.exit(1);
   }
 };
 
-// Importación segura de rutas
+// Rutas
 const loadRoutes = () => {
   const apiRoutes = express.Router();
-  
-  // Verificación de rutas
+
   const routes = {
     auth: './routes/authRoutes',
     users: './routes/UserRoutes1',
@@ -121,7 +111,7 @@ const loadRoutes = () => {
 
 app.use('/api/v1', loadRoutes());
 
-// Manejo de errores global mejorado
+// Manejo global de errores
 app.use((err, req, res, next) => {
   console.error('🔥 Error:', err.stack);
   res.status(500).json({
@@ -134,47 +124,45 @@ app.use((err, req, res, next) => {
   });
 });
 
-// WebSockets con manejo de errores
+// WebSockets
 io.on('connection', (socket) => {
-  console.log('🔌 Nuevo cliente conectado:', socket.id);
-  
+  console.log('🔌 Cliente conectado:', socket.id);
+
   socket.on('error', (err) => {
     console.error('❌ Error en Socket:', err);
   });
-  
+
   socket.on('disconnect', (reason) => {
     console.log(`🔌 Cliente ${socket.id} desconectado:`, reason);
   });
 });
 
-// Iniciar servidor con verificación
+// Iniciar servidor
 const startServer = async () => {
   try {
     await connectDB();
-    
     const PORT = process.env.PORT || 3000;
     httpServer.listen(PORT, () => {
-      console.log(`🚀 Servidor escuchando en puerto ${PORT}`);
-      console.log(`🌍 URL Frontend permitida: ${process.env.FRONTEND_URL || 'http://localhost:3001'}`);
+      console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
+      console.log(`🌍 Frontend permitido: ${process.env.FRONTEND_URL || 'http://localhost:3001'}`);
     });
-    
   } catch (error) {
     console.error('❌ Error al iniciar servidor:', error);
     process.exit(1);
   }
 };
 
-// Manejo de cierre mejorado
+// Manejo de cierre
 const shutdown = async () => {
   try {
     await mongoose.connection.close();
-    console.log('⏏️  Conexión a MongoDB cerrada');
+    console.log('⏏️  MongoDB desconectado');
     httpServer.close(() => {
-      console.log('🛑 Servidor HTTP detenido');
+      console.log('🛑 Servidor detenido');
       process.exit(0);
     });
   } catch (err) {
-    console.error('❌ Error durante el cierre:', err);
+    console.error('❌ Error al cerrar:', err);
     process.exit(1);
   }
 };
