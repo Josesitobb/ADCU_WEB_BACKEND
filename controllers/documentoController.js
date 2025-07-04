@@ -3,9 +3,13 @@ const GestionDocumental = require('../models/documento.js');
 
 exports.createNewDocument = async (req, res) => {
     try {
-        const archivos = req.files;
+        const archivos = req.files || {};
         const datos = req.body;
+
         console.log('[CREACION DE EL DOCUMENTOS]');
+        console.log('[REQ BODY]', datos);
+        console.log('[REQ FILES]', archivos);
+
         const nuevoDoc = new GestionDocumental({
             Fecha_De_Creacion: new Date(datos.Fecha_De_Creacion),
             Tiempo_De_Retencion: Number(datos.Tiempo_De_Retencion),
@@ -17,54 +21,54 @@ exports.createNewDocument = async (req, res) => {
             Usuario_De_Edicion: datos.Usuario_De_Edicion,
             gestion_de_contratos: datos.gestion_de_contratos,
 
-            // Archivos en Buffer
-            carta_radicacion_cuenta_de_cobro: archivos.carta_radicacion_cuenta_de_cobro?.[0]?.buffer,
-            ceritificado_de_cumplimiento: archivos.ceritificado_de_cumplimiento?.[0]?.buffer,
-            certificado_de_cumplimiento_firmado: archivos.certificado_de_cumplimiento_firmado?.[0]?.buffer,
-            informes_de_actividades: archivos.informes_de_actividades?.[0]?.buffer,
-            informe_de_actividades_firmado: archivos.informe_de_actividades_firmado?.[0]?.buffer,
-            certificado_de_calidad_contributiva: archivos.certificado_de_calidad_contributiva?.[0]?.buffer,
-            copia_de_planilla_pago_seguridad_social: archivos.copia_de_planilla_pago_seguridad_social?.[0]?.buffer,
-            rut: archivos.rut?.[0]?.buffer,
-            rit: archivos.rit?.[0]?.buffer,
-            capacitaciones_SST: archivos.capacitaciones_SST?.[0]?.buffer,
-            acta_de_inicio: archivos.acta_de_inicio?.[0]?.buffer,
-            certificado_de_cuenta: archivos.certificado_de_cuenta?.[0]?.buffer
+            // Archivos en Buffer (ya sin error por undefined)
+            carta_radicacion_cuenta_de_cobro: archivos?.carta_radicacion_cuenta_de_cobro?.[0]?.buffer,
+            ceritificado_de_cumplimiento: archivos?.ceritificado_de_cumplimiento?.[0]?.buffer,
+            certificado_de_cumplimiento_firmado: archivos?.certificado_de_cumplimiento_firmado?.[0]?.buffer,
+            informes_de_actividades: archivos?.informes_de_actividades?.[0]?.buffer,
+            informe_de_actividades_firmado: archivos?.informe_de_actividades_firmado?.[0]?.buffer,
+            certificado_de_calidad_contributiva: archivos?.certificado_de_calidad_contributiva?.[0]?.buffer,
+            copia_de_planilla_pago_seguridad_social: archivos?.copia_de_planilla_pago_seguridad_social?.[0]?.buffer,
+            rut: archivos?.rut?.[0]?.buffer,
+            rit: archivos?.rit?.[0]?.buffer,
+            capacitaciones_SST: archivos?.capacitaciones_SST?.[0]?.buffer,
+            acta_de_inicio: archivos?.acta_de_inicio?.[0]?.buffer,
+            certificado_de_cuenta: archivos?.certificado_de_cuenta?.[0]?.buffer
         });
 
-            await nuevoDoc.save();
+        await nuevoDoc.save();
 
-            return res.status(200).json({
-                sucess:true,
-                message:'Creacion del documento',
-                data:nuevoDoc
-            });
-    }catch(error){
-        console.log(error)
+        return res.status(200).json({
+            success: true,
+            message: 'Creación del documento',
+            data: nuevoDoc
+        });
+    } catch (error) {
+        console.error('[ERROR CREACION DOCUMENTO]', error);
         return res.status(500).json({
-            success:false,
-            message:'Error al crear el documentos',
+            success: false,
+            message: 'Error al crear el documento',
             error: error.message
         });
     }
 };
 
-exports.getDocument = async (req, res) =>{
-    try {
-        const documentos = await GestionDocumental.find().sort({createdAt: -1});
-        res.status(200).json({
-            success: true,
-            data: documentos
-        });
 
-    }catch(error){
-        console.error('Error al obtener los documentos: ', error);
-        res.status(500).json({
-            success:false,
-            message: 'Error al obtener los documentos',
-            error: error.message
-        });
-    }
+exports.getDocument = async (req, res) => {
+  try {
+    const documentos = await GestionDocumental.find();
+    res.status(200).json({
+      success: true,
+      data: documentos
+    });
+  } catch (error) {
+    console.error('Error al obtener documentos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener documentos',
+      error: error.message
+    });
+  }
 };
 
 exports.getDocumentById = async (req, res) => {
