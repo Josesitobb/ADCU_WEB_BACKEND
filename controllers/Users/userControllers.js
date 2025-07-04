@@ -315,10 +315,22 @@ exports.updateUser = async (req, res) => {
       data: { ...updatedUser.toObject(), mesaje },
     });
   } catch (error) {
+    // Manejar errores
+    if (error.code === 11000) {
+      
+      const campo = Object.keys(error.keyValue);
+      const valor = error.keyValue[campo]; 
+      return res.status(400).json({
+        success: false,
+        message: `Ya existe un ${campo} con : ${valor} `,
+      });
+    }
+
+    
+
     console.log(
       "[CONTROLLLERS USER] Erro al actualizar el usuario",
-      error.message
-    );
+      error    );
 
     return res.status(500).json({
       success: false,

@@ -72,13 +72,15 @@ exports.creatContract = async (req, res) => {
       });
     }
 
-    const contractDuplicate = await ContracManagement.findOne({contractNumber});
-    if(contractDuplicate){
+    const contractDuplicate = await ContracManagement.findOne({
+      contractNumber,
+    });
+    if (contractDuplicate) {
       return res.status(400).json({
-        success:false,
-        message:'No se puede aver 2 contratos con el mismo numero de contrato',
+        success: false,
+        message: "No se puede aver 2 contratos con el mismo numero de contrato",
       });
-    } 
+    }
 
     const contract = new ContracManagement({
       typeofcontract,
@@ -157,6 +159,7 @@ exports.updateContract = async (req, res, next) => {
     // Verificar que cambie el estado del contrato a activo
     if (updateContract.state === "Activo") {
       const contract = await Contract.findOne({ contract: updateContract._id });
+
       if (contract) {
         contract.state = "Activo";
         try {
@@ -176,7 +179,6 @@ exports.updateContract = async (req, res, next) => {
         );
       }
     }
-
     // Verificar la fecha inicio no puede ser mayor a fecha fin
     if (updateContract.endDate < updateContract.starteDate) {
       return res.status(400).json({
@@ -196,8 +198,18 @@ exports.updateContract = async (req, res, next) => {
       date: updateContract,
     });
   } catch (error) {
+    // Manejar errores
+    if (error.code === 11000) {
+      console.log("Campo duplicado:", error.keyValue);
+      return res.status(400).json({
+        success: false,
+        message: `Ya existe un contrato con ese número: ${error.keyValue.contractNumber}`,
+      });
+    }
+
     console.log(
-      "[CONTROLLER CONTRACTMANAGEMENT] Error al actualizar un contrato"
+      "[CONTROLLER CONTRACTMANAGEMENT] Error al actualizar un contrato",
+      error
     );
     return res.status(500).json({
       success: false,
