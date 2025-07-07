@@ -1,7 +1,6 @@
 const mongoose = require('mongoose')
 
 const GestionDocumentalSchema = new mongoose.Schema({
-  Fecha_De_Creacion: { type: Date, required: true },
   Tiempo_De_Retencion: { type: Number, required: true },
   Ip_De_Modificacion: { type: Number, required: true },
   Estado: { type: String, required: true },
@@ -32,4 +31,6 @@ const GestionDocumentalSchema = new mongoose.Schema({
 }, {
   timestamps: true
 });
+
+
 module.exports = mongoose.model('GestionDocumental', GestionDocumentalSchema);
