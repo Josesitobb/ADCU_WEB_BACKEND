@@ -1,38 +1,35 @@
-const ExcelJS = require('exceljs');
 const Report = require('../models/Report');
+const ExcelJS = require('exceljs');
 
-// 1. Crear y guardar reporte
 exports.generateReport = async (req, res) => {
   try {
     const reportData = {
       type: 'Comparativo',
       dataRange: 'Enero 2025',
-      generatedBy: req.user?._id || null,
+      generatedBy: req.user?._id || null, // puede ser null
       filePath: '',
-      datos: {
-        firmas: {
-          contratista: "ALBA STELLA FALKONERTH ROZO",
-          supervisorInicio: "ANDREA MELISSA MORALES CANO",
-          supervisorOtros: "ALEXANDRA MEJIA GUZMÁN"
-        },
-        fechas: {
-          actaInicio: "2025-01-03",
-          certificado: "2025-02-03"
-        },
-        datosContratista: {
-          nombre: "ALBA STELLA FALKONERTH ROZO",
-          identificacion: "52779382",
-          contrato: "422-2024-CPS-P(124427)"
-        },
-        valores: {
-          totalContrato: 17082000,
-          primerPago: 7971600
-        },
-        observaciones: {
-          firma: "Inconsistencia en firmas de supervisor",
-          fechas: "Fechas consistentes",
-          identificacion: "Formato consistente con/sin puntos"
-        }
+      firmas: {
+        contratista: "ALBA STELLA FALKONERTH ROZO",
+        supervisorInicio: "ANDREA MELISSA MORALES CANO",
+        supervisorOtros: "ALEXANDRA MEJIA GUZMÁN"
+      },
+      fechas: {
+        actaInicio: new Date("2025-01-03"),
+        certificado: new Date("2025-02-03")
+      },
+      datosContratista: {
+        nombre: "ALBA STELLA FALKONERTH ROZO",
+        identificacion: "52779382",
+        contrato: "422-2024-CPS-P(124427)"
+      },
+      valores: {
+        totalContrato: 17082000,
+        primerPago: 7971600
+      },
+      observaciones: {
+        firma: "Inconsistencia en firmas de supervisor",
+        fechas: "Fechas consistentes",
+        identificacion: "Formato consistente con/sin puntos"
       }
     };
 
@@ -41,11 +38,16 @@ exports.generateReport = async (req, res) => {
     res.status(201).json({
       success: true,
       message: '✅ Reporte creado exitosamente',
-      reportId: nuevoReporte._id
+      reportId: nuevoReporte._id,
+      data: {
+        type: nuevoReporte.type,
+        dataRange: nuevoReporte.dataRange,
+        createdAt: nuevoReporte.createdAt
+      }
     });
 
   } catch (error) {
-    console.error('Error en generateReport:', error);
+    console.error('❌ Error en generateReport:', error);
     res.status(500).json({
       success: false,
       message: '❌ Error al generar el reporte',
@@ -54,60 +56,108 @@ exports.generateReport = async (req, res) => {
   }
 };
 
-// 2. Historial
+// 2. Obtener historial
 exports.getReportHistory = async (req, res) => {
   try {
     const reports = await Report.find()
       .sort({ createdAt: -1 })
       .limit(50)
+      .select('_id type dataRange createdAt generatedBy filePath')
       .lean();
 
-    res.json(reports.map(r => ({
-      id: r._id,
-      type: r.type,
-      createdAt: r.createdAt,
-      dataRange: r.dataRange || '',
-      generatedBy: r.generatedBy || 'Sistema',
-      filePath: r.filePath || null
-    })));
-  } catch (error) {
-    console.error('Error en getReportHistory:', error);
-    res.status(500).json({ error: 'Error al obtener historial' });
-  }
-};
-
-// 3. Detalles por ID
-exports.getReportDetails = async (req, res) => {
-  try {
-    const report = await Report.findById(req.params.reportId).lean();
-
-    if (!report) {
-      return res.status(404).json({ error: '⚠️ Reporte no encontrado' });
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '⚠️ No se encontraron reportes'
+      });
     }
 
     res.json({
-      id: report._id,
-      type: report.type,
-      dataRange: report.dataRange,
-      createdAt: report.createdAt,
-      generatedBy: report.generatedBy || 'Sistema',
-      filePath: report.filePath,
-      datos: report.datos
+      success: true,
+      count: reports.length,
+      data: reports.map(r => ({
+        id: r._id,
+        type: r.type,
+        createdAt: r.createdAt,
+        dataRange: r.dataRange || '',
+        generatedBy: r.generatedBy || 'Sistema',
+        filePath: r.filePath || null
+      }))
     });
 
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener detalles' });
+    console.error('❌ Error en getReportHistory:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener historial',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// 3. Obtener detalles por ID
+exports.getReportDetails = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+
+    if (!reportId?.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'ID de reporte inválido',
+        details: `Formato recibido: ${reportId || 'nulo'}`
+      });
+    }
+
+    const report = await Report.findById(reportId).lean();
+    if (!report) {
+      return res.status(404).json({ 
+        success: false,
+        message: '⚠️ Reporte no encontrado',
+        reportId 
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: report._id,
+        type: report.type,
+        dataRange: report.dataRange,
+        createdAt: report.createdAt,
+        generatedBy: report.generatedBy || 'Sistema',
+        filePath: report.filePath,
+        datos: report.datos
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error en getReportDetails:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error al obtener detalles',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 // 4. Descargar Excel del historial
 exports.downloadExcel = async (req, res) => {
   try {
-    const reports = await Report.find().lean();
+    const reports = await Report.find()
+      .select('_id type dataRange createdAt')
+      .lean();
+
+    if (!reports || reports.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No hay reportes para exportar'
+      });
+    }
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Historial Reportes');
 
+    // Configuración de columnas
     worksheet.columns = [
       { header: 'ID', key: '_id', width: 25 },
       { header: 'Tipo', key: 'type', width: 20 },
@@ -115,6 +165,7 @@ exports.downloadExcel = async (req, res) => {
       { header: 'Fecha Creación', key: 'createdAt', width: 20 }
     ];
 
+    // Agregar datos
     reports.forEach(report => {
       worksheet.addRow({
         _id: report._id,
@@ -124,31 +175,67 @@ exports.downloadExcel = async (req, res) => {
       });
     });
 
+    // Estilo para la cabecera
     worksheet.getRow(1).eachCell(cell => {
       cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFD3D3D3' }
+      };
     });
 
+    // Configurar respuesta
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=historial_reportes.xlsx');
+    
     await workbook.xlsx.write(res);
     res.end();
 
   } catch (error) {
     console.error('Error al descargar Excel:', error);
-    res.status(500).json({ error: 'No se pudo generar el archivo' });
+    res.status(500).json({ 
+      success: false,
+      message: 'No se pudo generar el archivo',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
 // 5. Eliminar por ID
 exports.deleteReport = async (req, res) => {
   try {
-    const deleted = await Report.findByIdAndDelete(req.params.reportId);
-    if (!deleted) {
-      return res.status(404).json({ success: false, message: '⚠️ Reporte no encontrado para eliminar' });
+    const { reportId } = req.params;
+
+    if (!reportId?.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({ 
+        success: false,
+        message: 'ID de reporte inválido'
+      });
     }
-    res.json({ success: true, message: '🗑️ Reporte eliminado correctamente' });
+
+    const deleted = await Report.findByIdAndDelete(reportId);
+    if (!deleted) {
+      return res.status(404).json({ 
+        success: false, 
+        message: '⚠️ Reporte no encontrado para eliminar',
+        reportId
+      });
+    }
+
+    res.json({ 
+      success: true, 
+      message: '🗑️ Reporte eliminado correctamente',
+      deletedId: deleted._id
+    });
+
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar' });
+    console.error('Error al eliminar reporte:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error al eliminar',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
@@ -160,7 +247,8 @@ exports.generateStaticComparisonExcel = async (req, res) => {
 
     const headerStyle = {
       font: { bold: true, color: { argb: 'FFFFFFFF' } },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF305496' } }
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF305496' } },
+      alignment: { horizontal: 'center' }
     };
 
     const datos = {
@@ -200,57 +288,58 @@ exports.generateStaticComparisonExcel = async (req, res) => {
       ]
     };
 
-    sheet.addRow(['1. Comparación de Firmas']).eachCell(cell => Object.assign(cell, headerStyle));
-    sheet.addRow(['Contratista', datos.firmas.contratista]);
-    sheet.addRow(['Supervisor Acta de Inicio', datos.firmas.supervisorInicio]);
-    sheet.addRow(['Supervisor Otros Documentos', datos.firmas.supervisorOtros]);
-    sheet.addRow(['Observación', datos.firmas.observacion]);
-    sheet.addRow([]);
+    // Función para agregar secciones
+    const addSection = (title, data) => {
+      sheet.addRow([title]).eachCell(cell => Object.assign(cell, headerStyle));
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'observacion') {
+          sheet.addRow([key, value]);
+        }
+      });
+      if (data.observacion) {
+        sheet.addRow(['Observación', data.observacion]);
+      }
+      sheet.addRow([]);
+    };
 
-    sheet.addRow(['2. Comparación de Fechas']).eachCell(cell => Object.assign(cell, headerStyle));
-    sheet.addRow(['Acta de Inicio', datos.fechas.actaInicio]);
-    sheet.addRow(['Certificado', datos.fechas.certificado]);
-    sheet.addRow(['Periodo Reportado', datos.fechas.periodo]);
-    sheet.addRow(['Observación', datos.fechas.observacion]);
-    sheet.addRow([]);
+    // Construir el reporte
+    addSection('1. Comparación de Firmas', datos.firmas);
+    addSection('2. Comparación de Fechas', datos.fechas);
+    addSection('3. Datos del Contratista', datos.contratista);
+    addSection('4. Verificación de Soportes', datos.soportes);
+    addSection('5. Comparación de Valores', datos.valores);
 
-    sheet.addRow(['3. Datos del Contratista']).eachCell(cell => Object.assign(cell, headerStyle));
-    sheet.addRow(['Nombre', datos.contratista.nombre]);
-    sheet.addRow(['Cédula', datos.contratista.cedula]);
-    sheet.addRow(['Contrato', datos.contratista.contrato]);
-    sheet.addRow(['Observación', datos.contratista.observacion]);
-    sheet.addRow([]);
-
-    sheet.addRow(['4. Verificación de Soportes']).eachCell(cell => Object.assign(cell, headerStyle));
-    sheet.addRow(['RIT', datos.soportes.RIT]);
-    sheet.addRow(['Planilla Seguridad Social', datos.soportes.Planilla]);
-    sheet.addRow(['RUT', datos.soportes.RUT]);
-    sheet.addRow(['Certificado Cuenta', datos.soportes.CertificadoCuenta]);
-    sheet.addRow(['Observación', datos.soportes.observacion]);
-    sheet.addRow([]);
-
-    sheet.addRow(['5. Comparación de Valores']).eachCell(cell => Object.assign(cell, headerStyle));
-    sheet.addRow(['Total Contrato', datos.valores.total]);
-    sheet.addRow(['Primer Pago', datos.valores.primerPago]);
-    sheet.addRow(['Observación', datos.valores.observacion]);
-    sheet.addRow([]);
-
+    // Problemas detectados
     sheet.addRow(['6. Problemas Detectados']).eachCell(cell => Object.assign(cell, headerStyle));
     datos.problemas.forEach(p => sheet.addRow([`⚠️ ${p}`]));
     sheet.addRow([]);
 
+    // Resultado final
     sheet.addRow(['7. Resultado Final']).eachCell(cell => Object.assign(cell, headerStyle));
-    const aprobado = datos.firmas.observacion.includes('✔️') && datos.soportes.observacion.includes('✔️');
+    const aprobado = datos.firmas.observacion.includes('✔️') && 
+                     datos.soportes.observacion.includes('✔️');
     sheet.addRow(['Estado del Reporte', aprobado ? '✅ Aprobado' : '❌ No Aprobado']);
 
+    // Ajustar ancho de columnas
+    sheet.columns = [
+      { width: 30 },
+      { width: 50 }
+    ];
+
+    // Configurar respuesta
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', `attachment; filename=ReporteComparativo.xlsx`);
+    res.setHeader('Content-Disposition', 'attachment; filename=ReporteComparativo.xlsx');
+    
     await workbook.xlsx.write(res);
     res.end();
 
   } catch (error) {
     console.error('Error al generar Excel fijo:', error);
-    res.status(500).json({ success: false, message: 'Error al generar Excel' });
+    res.status(500).json({ 
+      success: false, 
+      message: 'Error al generar Excel',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
