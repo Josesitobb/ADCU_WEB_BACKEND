@@ -38,7 +38,7 @@ router.post(
 );
 
 router.put(
-  "/:id/:user_contract",
+  "/:user_contract",
   verifyToken,
   checkRole("admin", "funcionario", "contratista"),
   VerifyUserContract,

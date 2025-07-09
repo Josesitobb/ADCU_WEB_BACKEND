@@ -192,13 +192,17 @@ exports.CreateDocument_Management = async (req, res) => {
 
 exports.UpdateDocument_Management = async (req, res) => {
   try {
-    const documentId = req.params.id;
-    const document = await Document_Management.findById(documentId);
-    if (!document) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Documento no encontrado" });
-    }
+
+    const VerificarUsuario = await Document_Management.findOne({ user_create: req.params.user_contract });
+  
+   if (!VerificarUsuario) {
+  return res.status(404).json({
+    success: false,
+    message: 'No hay gestión documental relacionada con este usuario',
+  });
+}
+   const documentId = VerificarUsuario._id; // mejor usar _id directamente
+console.log("📄 ID del documento:", documentId);
 
     const newFiles = req.files;
     const updatedFields = {};
