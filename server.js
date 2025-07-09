@@ -15,14 +15,17 @@ const config = require('./config'); // Asegúrate que el path sea correcto
 const app = express();
 const httpServer = createServer(app);
 
+// Variables de entorno
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+
 // Socket.IO
 let io;
 try {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.FRONTEND_URL ? 
-        process.env.FRONTEND_URL.split(',') : 
-        ['http://localhost:3001'],
+      origin: Array.isArray(process.env.FRONTEND_URL)
+        ? process.env.FRONTEND_URL.split(',')
+        : [FRONTEND_URL],
       methods: ['GET', 'POST'],
       credentials: true
     },
@@ -45,7 +48,7 @@ if (!fs.existsSync(uploadsDir)) {
 // Middlewares
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  origin: process.env.FRONTEND_URL, // ya tomado de .env
   credentials: true
 }));
 
@@ -63,7 +66,6 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const connectDB = async () => {
   try {
     await mongoose.connect(config.DB.URL, config.DB.OPTIONS);
-    
     console.log('✅ MongoDB conectado en:', mongoose.connection.host);
     console.log('📌 Modelos disponibles:', mongoose.modelNames());
 
@@ -87,7 +89,6 @@ const connectDB = async () => {
 // Rutas
 const loadRoutes = () => {
   const apiRoutes = express.Router();
-
   const routes = {
     auth: './routes/authRoutes',
     users: './routes/UserRoutes1',
@@ -96,19 +97,16 @@ const loadRoutes = () => {
     products: './routes/productRoutes',
     reports: './routes/reportRoutes'
   };
-
-  Object.entries(routes).forEach(([name, path]) => {
+  Object.entries(routes).forEach(([name, routePath]) => {
     try {
-      apiRoutes.use(`/${name}`, require(path));
+      apiRoutes.use(`/${name}`, require(routePath));
       console.log(`✅ Ruta ${name} cargada correctamente`);
     } catch (err) {
       console.error(`❌ Error cargando ruta ${name}:`, err.message);
     }
   });
-
   return apiRoutes;
 };
-
 app.use('/api/v1', loadRoutes());
 
 // Manejo global de errores
@@ -127,11 +125,9 @@ app.use((err, req, res, next) => {
 // WebSockets
 io.on('connection', (socket) => {
   console.log('🔌 Cliente conectado:', socket.id);
-
   socket.on('error', (err) => {
     console.error('❌ Error en Socket:', err);
   });
-
   socket.on('disconnect', (reason) => {
     console.log(`🔌 Cliente ${socket.id} desconectado:`, reason);
   });
@@ -141,10 +137,10 @@ io.on('connection', (socket) => {
 const startServer = async () => {
   try {
     await connectDB();
-    const PORT = process.env.PORT || 3000;
+    const PORT = process.env.PORT || 3001;
     httpServer.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
-      console.log(`🌍 Frontend permitido: ${process.env.FRONTEND_URL || 'http://localhost:3001'}`);
+      console.log(`🌍 Frontend permitido: ${FRONTEND_URL}`);
     });
   } catch (error) {
     console.error('❌ Error al iniciar servidor:', error);
@@ -166,8 +162,8 @@ const shutdown = async () => {
     process.exit(1);
   }
 };
-
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
 startServer();
+
