@@ -4,8 +4,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 const config = require('./config');
-const { MongoClient, ObjecId } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 const path = require("path");
+
+const app = express(); // MOVIDO ARRIBA para que esté disponible antes de app.set()
 
 // Llamar funcion para inactivar los contratos
 require('./controllers/Contracto/inactivarContratos')
@@ -26,15 +28,20 @@ const DocumentManagementRoutes = require('./routes/Document_Management/DocumentM
 //Gestion de datos
 const DataManagement = require('./routes/DataManagement/DataManagementRouter');
 
+// reportes
+const reportRouter = require('./routes/reportes/reportRoutes');
+
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
 (async () => {
-    await mongoClient.connect();
-    app.set('mongoDB', mongoClient.db());
-    console.log('Conexion directa a mongoDB establecida')
-});
-
-const app = express();
+    try {
+        await mongoClient.connect();
+        app.set('mongoDB', mongoClient.db());
+        console.log('Conexion directa a mongoDB establecida');
+    } catch (error) {
+        console.error('Error conectando a mongoClient:', error);
+    }
+})();
 
 // Middlewares
 app.use(cors());
@@ -43,31 +50,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Conexion a mongo db
-mongoose.connect(process.env.MONGODB_URI).then(() => console.log('Ok MongoDB conectado')).catch(err => console.error('x Erro de MongoDB', err));
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log('Ok MongoDB conectado'))
+    .catch(err => console.error('x Error de MongoDB', err));
 
 //Rutas Jose
 // Inicio de sesion
-app.use('/api/auth',authRoutes);
+app.use('/api/auth', authRoutes);
 // Usuarios
-app.use('/api/Users',UserRoutes);
+app.use('/api/Users', UserRoutes);
 // Contratos
-app.use('/api/Contracts',ContractManagementRoutes);
+app.use('/api/Contracts', ContractManagementRoutes);
 // Gestion documental
-app.use('/api/Documents',DocumentManagementRoutes)
+app.use('/api/Documents', DocumentManagementRoutes);
+//reportes
+app.use('/api/reports', reportRouter);
 // Ver pdf
-app.use('./Files', express.static(path.join(__dirname, 'uploads')));
-
-
-
+app.use('/Files', express.static(path.join(__dirname, 'uploads'))); // CORREGIDO './Files' a '/Files'
 
 // Gestion de datos
-app.use('/api/Data',DataManagement)
-
-
+app.use('/api/Data', DataManagement);
 
 // Inicio del servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor en http://localhost:${PORT}`);
 });
-
