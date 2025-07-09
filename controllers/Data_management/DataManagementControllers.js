@@ -1,5 +1,6 @@
 const express = require("express");
 const DataManagements = require("../../models/DataManagements/DataManagements");
+const Document_Management = require("../../models/DocumentManagement/DocumentManagement")
 const path = require("path");
 const { exec } = require("child_process");
 
@@ -50,15 +51,26 @@ exports.getDataById = async (req, res) => {
 exports.CreateData = async (req, res) => {
   try {
      const document_management = req.body.document_management;
-     const carpeta = req.body.carpeta
 
-    // Verificar que los datos no venga vacios
-     if (!document_management || !carpeta) {
+     if (!document_management) {
        return res.status(400).json({ message: "Faltan datos: ID o carpeta" });
      }
+     
+     const DocumentosExistente = await Document_Management.findOne({_id:document_management});
+     console.log("📄 Documento encontrado:", DocumentosExistente);
 
-    console.log(req.body);
-    console.log(" Ejecutando script con:", req.body.document_management, req.body.carpeta);
+     if(!DocumentosExistente){
+      return res.status(404).json({
+        success:false,
+        message:'Error no existe una gestion documental'
+      });
+     }
+
+     const carpeta = DocumentosExistente.user_create;
+     
+
+    // console.log(req.body);
+    // console.log(" Ejecutando script con:", document_management, carpeta);
 
 
     // Ruta del python entra a la carpeta

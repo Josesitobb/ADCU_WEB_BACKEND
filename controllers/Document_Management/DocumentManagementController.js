@@ -100,65 +100,33 @@ exports.CreateDocument_Management = async (req, res) => {
       signed_certificate_of_compliance?.[0]?.path
     );
     // Reporte de actividad
-    const File4 = path.relative(
-      Base_Url,
-      activity_report?.[0]?.path
-    );
+    const File4 = path.relative(Base_Url, activity_report?.[0]?.path);
     // Certificado de calidad tributaria
-    const File5 = path.relative(
-      Base_Url,
-      tax_quality_certificate?.[0]?.path
-    );
+    const File5 = path.relative(Base_Url, tax_quality_certificate?.[0]?.path);
     // social security
-    const File6 = path.relative(
-      Base_Url,
-      social_security?.[0]?.path
-    );
+    const File6 = path.relative(Base_Url, social_security?.[0]?.path);
     //rut
-    const File7 = path.relative(
-      Base_Url,
-      rut?.[0]?.path
-    );
+    const File7 = path.relative(Base_Url, rut?.[0]?.path);
     // rit
-    const File8 = path.relative(
-      Base_Url,
-      rit?.[0]?.path
-    );
+    const File8 = path.relative(Base_Url, rit?.[0]?.path);
     // Capacitaciones
-    const File9 = path.relative(
-      Base_Url,
-      Trainings?.[0]?.path
-    );
+    const File9 = path.relative(Base_Url, Trainings?.[0]?.path);
     // Acta de inicio
-    const File10 = path.relative(
-      Base_Url,
-      initiation_record?.[0]?.path
-    );
+    const File10 = path.relative(Base_Url, initiation_record?.[0]?.path);
     // Certificacion de cuenta
-    const File11 = path.relative(
-      Base_Url,
-      account_certification?.[0]?.path
-    );
+    const File11 = path.relative(Base_Url, account_certification?.[0]?.path);
 
     // console.log("ola" + archivoNew);
     // Fecha de creacion
     const creation_date = new Date();
 
     // Lo que viene del usuario
-    const {
-      description,
-      ip,
-      retention_time,
-      state,
-      version,
-    } = req.body;
+    const { description, ip, retention_time, state, version } = req.body;
     console.log(description);
 
     // Usuario contratista
     const user = req.params.user_contract;
-    const user_contrac = await Contractor.findOne({user:user});
- 
-
+    const user_contrac = await Contractor.findOne({ user: user });
 
     if (
       !description ||
@@ -167,7 +135,6 @@ exports.CreateDocument_Management = async (req, res) => {
       !state ||
       !version ||
       !user_contrac
-
     ) {
       return res.status(400).json({
         success: false,
@@ -175,16 +142,14 @@ exports.CreateDocument_Management = async (req, res) => {
       });
     }
 
-
-
     const newDocumentManagement = new Document_Management({
       creation_date,
-      retention_time:'20 añops',
-      ip:req.ip,
-      state :"Activo",
+      retention_time: "20 añops",
+      ip: req.ip,
+      state: "Activo",
       description,
       version,
-      user_create :user,
+      user_create: user,
       user_edition: "No se ha editado",
       user_contrac,
       filing_letter: File1,
@@ -235,7 +200,6 @@ exports.UpdateDocument_Management = async (req, res) => {
         .json({ success: false, message: "Documento no encontrado" });
     }
 
-    const userId = req.params.user_contract;
     const newFiles = req.files;
     const updatedFields = {};
 
@@ -249,7 +213,8 @@ exports.UpdateDocument_Management = async (req, res) => {
       updatedFields[field] = relativePath;
     }
 
-    updatedFields.user_edition = "usuario que edita"; // Aquí puedes poner el nombre real si lo tienes
+    updatedFields.user_edition = "usuario que edita";
+    updatedFields.state = req.body.state;
 
     const updatedDoc = await Document_Management.findByIdAndUpdate(
       documentId,
@@ -273,9 +238,21 @@ exports.UpdateDocument_Management = async (req, res) => {
 };
 
 exports.DeleteDocument_Management = async (req, res) => {
-  const { id, user_contract } = req.params;
+  const { id} = req.params;
 
   try {
+    // Primera buscar el id del usuario
+    const BuscarUsuarioContrato = await Document_Management.findById(id);
+    if (!BuscarUsuarioContrato) {
+      return res.status(404).json({
+        success: false,
+        message: "No se encontró el documento con ese ID",
+      });
+    }
+
+    const user_contrac = BuscarUsuarioContrato.user_create;
+    console.log(user_contrac)
+
     // 1. Buscar y eliminar el documento en la base de datos
     const deletedDoc = await Document_Management.findByIdAndDelete(id);
 
@@ -287,7 +264,7 @@ exports.DeleteDocument_Management = async (req, res) => {
     }
 
     // 2. Eliminar la carpeta del usuario
-    const folderPath = path.join(__dirname, `../../Files/${user_contract}`);
+    const folderPath = path.join(__dirname, `../../Files/${user_contrac}`);
 
     if (fs.existsSync(folderPath)) {
       fs.rmSync(folderPath, { recursive: true, force: true }); // elimina la carpeta y todo su contenido

@@ -47,7 +47,7 @@ router.put(
 );
 
 router.delete(
-  "/:id/:user_contract",
+  "/:id",
    verifyToken,
   checkRole("admin", "funcionario"),
   Document_Management_Controller.DeleteDocument_Management
