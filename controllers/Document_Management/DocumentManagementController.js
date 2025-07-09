@@ -242,11 +242,11 @@ console.log("📄 ID del documento:", documentId);
 };
 
 exports.DeleteDocument_Management = async (req, res) => {
-  const { id} = req.params;
 
   try {
     // Primera buscar el id del usuario
-    const BuscarUsuarioContrato = await Document_Management.findById(id);
+    const BuscarUsuarioContrato = await Document_Management.findOne({ user_create: req.params.user_contract });
+
     if (!BuscarUsuarioContrato) {
       return res.status(404).json({
         success: false,
@@ -258,7 +258,7 @@ exports.DeleteDocument_Management = async (req, res) => {
     console.log(user_contrac)
 
     // 1. Buscar y eliminar el documento en la base de datos
-    const deletedDoc = await Document_Management.findByIdAndDelete(id);
+    const deletedDoc = await Document_Management.findByIdAndDelete(BuscarUsuarioContrato._id);
 
     if (!deletedDoc) {
       return res.status(404).json({
