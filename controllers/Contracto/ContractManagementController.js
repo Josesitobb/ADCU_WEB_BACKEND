@@ -1,7 +1,6 @@
 const express = require("express");
 const ContracManagement = require("../../models/Contracto/ContractManagement");
 const Contract = require("../../models/Users/Contractor");
-const User = require("../../models/Users/User");
 const cron = require("node-cron");
 
 // Ver todos los contratos
@@ -55,8 +54,8 @@ exports.getContractById = async (req, res) => {
 // Crear el contrato
 exports.createContract = async (req, res) => {
   try {
-    const { typeofcontract, startDate, endDate, contractNumber, state, price } =
-      req.body;
+    console.log("[CONTROLLER CONTRACTMANAGEMENT] Contrato para crear ");
+    const { typeofcontract, startDate, endDate, contractNumber, state, price } = req.body;
 
     if (
       !typeofcontract ||
@@ -95,7 +94,7 @@ exports.createContract = async (req, res) => {
       startDate,
       endDate,
       contractNumber,
-      state,
+      state: state || true,
       price,
     });
 
@@ -124,6 +123,7 @@ exports.updateContract = async (req, res, next) => {
     // Consulta a la base de datos
     const contractUpdate = await ContracManagement.findById(req.params.id);
 
+
     // Verificar si el contrato existe
     if (!contractUpdate) {
       return res.status(404).json({
@@ -133,31 +133,29 @@ exports.updateContract = async (req, res, next) => {
     }
 
     // Si el estado del contrato cambia el estado del usuario que este ligado tambien
-    if (state) {
+    if (state !== undefined) {
       // Buscar el usuario  que este ligado a este contrato
       const userContract = await Contract.findOne({
         contract: contractUpdate._id,
       }).populate("user");
-      if (!userContract)
-        return console.log(
-          "Usuario no existe o este contrato no tiene usuarios"
-        );
-      userContract.user.status = state;
-      userContract.user.save();
+      if (userContract ) {
+        userContract.user.state = state;
+        await userContract.user.save();
+      }
     }
 
-    if (typeofcontract) contractUpdate.typeofcontract = typeofcontract;
-    if (startDate) contractUpdate.startDate = startDate;
-    if (endDate) contractUpdate.endDate = endDate;
-    if (state) contractUpdate.state = state;
-    if (price) contractUpdate.price = price;
+    if (typeofcontract  !== undefined) contractUpdate.typeofcontract = typeofcontract;
+    if (startDate  !== undefined) contractUpdate.startDate = startDate;
+    if (endDate  !== undefined) contractUpdate.endDate = endDate;
+    if (state !== undefined) contractUpdate.state = state;
+    if (price !== undefined) contractUpdate.price = price;
 
     await contractUpdate.save();
 
     return res.status(200).json({
       success: true,
       message: "Contracto actualizado",
-      date: updateContract,
+      date: contractUpdate,
     });
   } catch (error) {
     console.log(

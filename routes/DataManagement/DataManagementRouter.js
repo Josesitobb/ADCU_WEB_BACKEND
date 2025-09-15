@@ -9,7 +9,7 @@ router.get(
   "/",
   verifyToken,
   checkRole("admin", "funcionario"),
-  DataManagementControllers.getData
+  DataManagementControllers.getAllDataManagemente
 );
 
 // Obtener una comparacion por id

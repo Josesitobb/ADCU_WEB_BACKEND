@@ -10,7 +10,7 @@ router.get(
   "/",
   verifyToken,
   checkRole("admin", "funcionario"),
-  ContactManagement.getAllContract
+ContactManagement.getAllContract
 );
 
 // Crear un contrato
@@ -18,7 +18,7 @@ router.post(
   "/",
   verifyToken,
   checkRole("admin", "funcionario"),
-  ContactManagement.creatContract
+  ContactManagement.createContract
 );
 
 // Contrato espesifico

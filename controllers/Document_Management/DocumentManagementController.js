@@ -54,14 +54,14 @@ exports.CreateDocument_Management = async (req, res) => {
   //  Lo que viene de los archivos
     const {filing_letter,certificate_of_compliance,signed_certificate_of_compliance,activity_report,tax_quality_certificate,social_security,rut,rit,Trainings,initiation_record,account_certification} = req.files;
     // Lo que viene del usuario
-    const { description, ip, retention_time, state, version } = req.body;
+    const { description, ip, retention_time, state } = req.body;
     // Id del usuario contratista
     const userContract = req.params.userContract;
     // Fecha de creacion
     const creation_date = new Date();
 
     // Verificar que los datos del usuario vengan
-     if (!description ||!ip || !retention_time || !state ||!version ||!userContract) {
+     if (!description ||!ip || !retention_time || !state  ||!userContract) {
       return res.status(400).json({
         success: false,
         message: "Falta datos",
@@ -136,7 +136,7 @@ exports.CreateDocument_Management = async (req, res) => {
       ip,
       state: true || state,
       description,
-      version,
+      version: 1,
       user_create:userContract,
       user_edition:userContract,
       user_contrac:userContract,

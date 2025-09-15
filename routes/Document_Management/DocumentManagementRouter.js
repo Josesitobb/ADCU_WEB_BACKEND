@@ -5,7 +5,6 @@ const middlewaresFiles = require("../../middlewares/DocumentManagementController
 const {
   VerifyUserContract,
 } = require("../../middlewares/DocumentManagementController/verifyUserContract");
-
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
 
@@ -24,7 +23,7 @@ router.get(
   "/:id",
   verifyToken,
   checkRole("admin", "funcionario", "contratista"),
-  Document_Management_Controller.getAllDocumentManagementById
+  Document_Management_Controller.getDocumentManagementById
 );
 
 // Crear la gestion documental

@@ -269,22 +269,23 @@ exports.createUser = async (req, res) => {
       //Pasar el estado del contrato a el contratista
       const stateContract = verifyContract.state;
 
-      usercreate = await createContractor({
+      usercreate = await createContractor(
         firsName,
         lastname,
         idcard,
         telephone,
         email,
         password,
-        state: stateContract,
+        stateContract,
         post,
         role,
         contractId,
         residentialaddress,
-      });
+      );
+      
     }
 
-    return res.status(200).json({
+     res.status(200).json({
       success: true,
       message: "Usuario creado",
       data: usercreate,
