@@ -101,7 +101,7 @@ const Document_Management = new mongoose.Schema({
     required: [true, "Usuario contratista es obligatorio"],
   },
   version: {
-    type: String,
+    type: Number,
     required: [true, "La version es requeridad"],
   },
 });

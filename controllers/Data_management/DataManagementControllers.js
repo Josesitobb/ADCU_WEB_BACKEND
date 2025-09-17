@@ -47,7 +47,7 @@ exports.getDataById = async (req, res) => {
 exports.CreateData = async (req, res) => {
   try {
     // Buscar la gestion documetal
-    const exitingdocumentManagement  = await Document_Management.findById(req.params.id);
+    const exitingdocumentManagement  = await Document_Management.findById(req.params.management);
 
     // Si no existe mensaje de respuesta
     if (!exitingdocumentManagement) {
@@ -58,9 +58,10 @@ exports.CreateData = async (req, res) => {
     }
 
     // Busqueda del usuario para traer NOMBRE CEDULA ,NUMERO DE CELULAR, FECHA DEL CONTRATO, VALOR Y NUMERO
-    const UserContract = await Contractor.findById(exitingdocumentManagement.user_contrac).populate('user','firsName lastName idcard telephone email').populate('contract', 'typeofcontract  startDate endDate contractNumber price');
-
-    if (!UserContract) {
+    const ContractUser = await Contractor.findById(exitingdocumentManagement.user_contrac).populate('user','firsName lastName idcard telephone email').populate('contract', 'typeofcontract  startDate endDate contractNumber price');
+    
+    // Si no existe mensaje de respuesta
+    if (!ContractUser) {
       return res.status(404).json({
         success: false,
         message:
@@ -68,16 +69,21 @@ exports.CreateData = async (req, res) => {
       });
     }
 
+    // Crear un documento en memoria con el id de la gestion documental
+    const UserContractAll=ContractUser.toObject();
+    // Se agregar el document management al usuario para enviarlo al python
+    UserContractAll.documentManagement=exitingdocumentManagement._id
+    
     //  Correr el primer archivo python(Prueba one)
-    await OneFile("Primer_Archivo.py",UserContract);
+    await OneFile("Primer_Archivo", UserContractAll);
 
-  
- 
+    return res.status(200).json({ success: true, message: "Script ejecutado correctamente" });
+
   } catch (error) {
-    console.log(error);
+    console.error("[CreateData] Error al crear una comparacion:", error);
     return res.status(500).json({
       success: false,
-      message: "Erro en el servidor",
+      message: error.message,
     });
   }
 };

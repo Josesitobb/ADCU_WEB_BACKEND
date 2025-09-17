@@ -20,7 +20,7 @@ router.get(
 
 // Gestion documental por id
 router.get(
-  "/:id",
+  "/:userContract",
   verifyToken,
   checkRole("admin", "funcionario", "contratista"),
   Document_Management_Controller.getDocumentManagementById

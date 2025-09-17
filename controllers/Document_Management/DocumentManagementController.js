@@ -7,9 +7,7 @@ const convertPdfToImages = require("../../utils/convertPdfToImages");
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
-    const documentManagementId = await Document_Management.findById(
-      req.params.id
-    );
+    const documentManagementId = await Document_Management.findById(req.params.userContract);
     // Verificar que existe el id del documento
     if (!documentManagementId) {
       return res.status(404).json({
@@ -181,7 +179,7 @@ exports.CreateDocument_Management = async (req, res) => {
 exports.UpdateDocument_Management = async (req, res) => {
   try {
     // Consulta para ver si existe la gestion documental
-        const documenteMangementeUser = await Document_Management.findOne({user_create: req.params.user_contract});
+        const documenteMangementeUser = await Document_Management.findOne({user_create: req.params.userContract});
       if (!documenteMangementeUser) {
       return res.status(404).json({
         success: false,
@@ -296,7 +294,7 @@ exports.UpdateDocument_Management = async (req, res) => {
     // Usuario que edita
     documenteMangementeUser.user_edition = req.userId;
     // Version
-    documenteMangementeUser.version +1;
+    documenteMangementeUser.version += 1;
 
     // Varibles que pueden editar el usuario que no son documentos
     if(ip) documenteMangementeUser.ip = ip; 

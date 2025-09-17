@@ -4,7 +4,7 @@ const path = require("path");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const userId = req.params.user_contract;
+    const userId = req.params.userContract;
 
     if (!userId) {
       return cb(new Error("Falta el ID del contratista"), null);
