@@ -107,23 +107,29 @@ exports.SavedData = async (req, res) => {
     } = req.body;
 
     console.log(IdDocumentManagement);
-    // Verificar que vengas todas antes de hacer la peticion
-    if (
-      !Field ||
-      !Status ||
-      !Usercomparasion ||
-      !Description ||
-      !IdUserComparasion ||
-      !IdDocumentManagement
-    ) {
-      return res.status(400).json({
-        success: false,
-        message: "Falta datos para terminanar la comparacion",
-      });
-    }
 
-    // Verificar que el usuario contratisa existas en la tabla contraitsa
+    console.log(req.body);
+    console.log("Entrado a la verificacion")
+    // Verificar que vengas todas antes de hacer la peticion
+    // if (
+    //   !Field ||
+    //   !Status ||
+    //   !Usercomparasion ||
+    //   !Description ||
+    //   !IdUserComparasion ||
+    //   !IdDocumentManagement
+    // ) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Falta datos para terminanar la comparacion",
+    //   });
+    // }
+
+    console.log("Paso la verificacion");
+    // Verificar que el usuario contratista exista en la tabla contratistas
     const UserContractorExisting = await Contractor.findById(IdUserComparasion);
+
+  
 
     if (!UserContractorExisting) {
       return res.status(400).json({
@@ -131,6 +137,7 @@ exports.SavedData = async (req, res) => {
         message: "Usuario contratista no existe porfa volver a intentar",
       });
     }
+    console.log("Paso la verificacion del contratista");
 
     // Buscar Si el contratita ya tiene un usuario en data por contratista
     let dataManagementContractor = await DataManagements.findOne({
@@ -144,6 +151,9 @@ exports.SavedData = async (req, res) => {
       });
     }
 
+    console.log("Paso la verificacion de data");
+
+
     dataManagementContractor[Field] = {
       status: Status,
       description: Description,
@@ -152,12 +162,16 @@ exports.SavedData = async (req, res) => {
       contractorId: IdUserComparasion,
     };
 
+
+
     const saved = await dataManagementContractor.save();
+    console.log("Documento guardado correctamente:", saved);
     return res.status(201).json({
       success: true,
       message: `Campo ${Field} actualizado correctamente`,
       data: saved,
     });
+
   } catch (error) {
     console.error("[SavedData] Error al guardar documento:", error);
     return res.status(500).json({

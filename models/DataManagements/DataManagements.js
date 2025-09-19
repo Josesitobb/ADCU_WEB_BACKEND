@@ -10,11 +10,9 @@ const StateDescriptionSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: "",
     },
     usercomparasion: {
       type: String,
-      default: ""
     },
     documentManagement: {
       type: mongoose.Schema.Types.ObjectId,

@@ -6,7 +6,7 @@ function pythonExecute(scriptName, data = []) {
   //Ejecuta el comando
   const campodepython ="C:/Users/JoseD/AppData/Local/Programs/Python/Python313/python.exe";
   // Ruta del python entra a la carpeta
-  const scriptPath = path.resolve(__dirname, `../controllers/Data_management/${scriptName}.py`);
+  const scriptPath = path.resolve(__dirname, `../pythonFiles/${scriptName}.py`);
 
   const comando = `"${campodepython}" "${scriptPath}" ${data.map(a => `"${a}"`).join(" ")}`;
 

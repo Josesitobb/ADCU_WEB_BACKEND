@@ -1,3 +1,4 @@
+from anyio import Path
 import cv2
 import base64
 from skimage.metrics import structural_similarity as ssim
@@ -5,21 +6,26 @@ import pytesseract
 from openai import OpenAI
 import json
 import sys
-import requests
-import os
+import sys, os
 from dotenv import load_dotenv
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from utils.ApiPython.ApiResponse import ApiResponse
 
 # Acceder a la variables .env
 load_dotenv()
 
-# Variable para iniciar esa mierda
+# Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-# # Parametro que va recibir desde Node.JS
-if len(sys.argv) <12:
-    print('falta argumentos por recibir')
-    raise FileNotFoundError(f"No se recibieron los parametros suficientes para el analisis porfavor volver a intentar")
+
 
 try:
+    #Parametro que va recibir desde Node.JS
+    if len(sys.argv) <12:
+        print('falta argumentos por recibir')
+        raise FileNotFoundError(f"No se recibieron los parametros suficientes para el analisis porfavor volver a intentar")
+    
+    # Variables que viene de Node.js
     firsName = sys.argv[1]
     lastName = sys.argv[2]
     idcard = sys.argv[3]
@@ -33,28 +39,20 @@ try:
     price = sys.argv[11]
     idUserContract = sys.argv[12]
     idDocumentManagement = sys.argv[13]
-    
-    print("Firsname:", firsName)
-    print("LastName:", lastName)
-    print("IdCard:", idcard)
-    print("Telephone:", telephone)
-    print("Email:", email)
-    print("TypeOfContract:", typeofcontract)
-    print("ResidentialAddress:", residentialaddress)
-    print("StartDate:", startDate)
-    print("EndDate:", endDate)
-    print("Price:", price)
-    print("Id:", id)
-    print("IdDocumentManagement:", idDocumentManagement)
+    # Nombre completo del contratista
+    nameComplete = firsName + " " + lastName
+
 except Exception as e:
     print("Error al recibir los parametros:", str(e))
     
 
 # Imagen costante
 Imagen1 = r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\filing_letter.jpg"
+# Imagen del usuario a comparar
 Imagen2 = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\filing_letter.jpg"
 
 def primerFiltro(Imagen1, Imagen2):
+    # Cargar imágenes en escala de grises
     img1 = cv2.imread(Imagen1, cv2.IMREAD_GRAYSCALE)
     img2 = cv2.imread(Imagen2, cv2.IMREAD_GRAYSCALE)
     # Validar lectura
@@ -66,6 +64,7 @@ def primerFiltro(Imagen1, Imagen2):
     score, diff = ssim(img1, img2, full=True)
     return score
 
+# Función para convertir imagen a base64
 def encode_image(image_path):
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode("utf-8")
@@ -80,9 +79,9 @@ def ComparararChatgpt(Imagen1, Imagen2, price, telephone, startDate, endDate, na
         # Encode de las imágenes
         ImagenGuia = encode_image(Imagen1)
         ImagenUsuario = encode_image(Imagen2)
+        ApiKey="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"
 
-        client = OpenAI(api_key="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")
-        # client = OpenAI(api_key="sk-64345f64880449baacb90d02a617628d", base_url="https://api.deepseek.com")
+        client = OpenAI(api_key=ApiKey)
         response = client.chat.completions.create(
             model="gpt-5",
             messages = [
@@ -176,32 +175,16 @@ def ComparararChatgpt(Imagen1, Imagen2, price, telephone, startDate, endDate, na
         estado = arguments.get("estado")
 
         if estado == "aprobado":
-            UrlApi("aprobado", nameContract, "OK", idUserContract, idDocumentManagement)
+            ApiResponse(True, nameComplete, "OK","certificate_of_compliance", idUserContract, idDocumentManagement)
         else:
             razon = arguments.get("razon", "Documento alterado o inválido")
-            UrlApi("rechazado", nameContract, razon, idUserContract, idDocumentManagement)
+            ApiResponse(False, nameComplete, razon, "certificate_of_compliance", idUserContract, idDocumentManagement)
     except Exception as e:
-        UrlApi(False,lastName,"Error en el procesamiento del documento",idUserContract,idDocumentManagement)
+        ApiResponse(False,nameComplete,"Error en el procesamiento del documento","certificate_of_compliance",idUserContract,idDocumentManagement)
         print("Error en ComparararChatgpt:", str(e))
 
      
-def UrlApi(State,Usercomparasion,Description,IdUserComparasion,IdDocumentManagement):
-    url = "http://localhost:3000/api/Data/Saved"
-    data = {
-     "Field":str('certificate_of_compliance'),
-     "Status":bool(State),
-     "Usercomparasion":str(Usercomparasion),
-     "Description":Description,
-     "IdUserComparasion":str(IdUserComparasion),
-     "IdDocumentManagement":str(IdDocumentManagement)   
-    }
-    try:
-        response = requests.post(url,json=data,headers={"Content-Type": "application/json; charset=utf-8"})
-        # print("Data enviada:", data)
-        # print("Respuesta:", response.status_code, response.text)
-        return response.json()
-    except requests.exceptions.RequestException as error:
-        return {"success": False, "message": str(error)}
+
     
     
 # -------------- MAIN ----------------------------------------#
@@ -219,4 +202,4 @@ if resultado >= 0.90:
 )
 
 else:
-    UrlApi("rechazado",firsName,'El documento no cumple con el esquema',idUserContract,idDocumentManagement)
+    ApiResponse(False,firsName,"Documento no cumple con el esquema","certificate_of_compliance",idUserContract,idDocumentManagement)
