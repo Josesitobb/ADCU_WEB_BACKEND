@@ -14,7 +14,7 @@ const contractorSchema = new mongoose.Schema({
     unique: true,
     require: [true, "El usuario tiene que tener un contrato"],
   },
-  residentialaddress: {
+  residentialAddress: {
     type: String,
     require: [
       true,
@@ -22,6 +22,16 @@ const contractorSchema = new mongoose.Schema({
     ],
     require: [true, "El contratista necesita una direccion"],
   },
+  institutionalEmail: {
+    type: String,
+    require: [true, "El contratista necesita un correo institucional"],
+    unique: true,
+  },
+  EconomicaActivityNumber: {
+    type: String,
+    require: [true, "El contratista necesita una actividad economica"],
+  },
+
 });
 
 module.exports = mongoose.model("Contractor", contractorSchema);

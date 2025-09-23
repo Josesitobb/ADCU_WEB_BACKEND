@@ -1,14 +1,16 @@
 const mongoose = require("mongoose");
+const { extensions } = require("sequelize/lib/utils/validator-extras");
 
 const ContracSchema = new mongoose.Schema({
   typeofcontract: {
     type: String,
     require: [true, "El tipo de contrato es requerido"],
     enum: [
-      "Contrato termino fijo",
-      "Contrato indefinodo",
-      "Contrato obra labor",
-      "Contrato de prestacion de servicios",
+      "Termino fijo",
+      "Termino indefinido",
+      "Obra o labor",
+      "Aprendizaje",
+      "Ocasional o transitorio",
     ],
   },
   startDate: {
@@ -28,19 +30,39 @@ const ContracSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  price: {
+  periodValue: {
+    type: String,
+    require: [true, "El periodo de cobro es requerido"],
+  },
+  totalValue: {
     type: Number,
-    require: [true, "Ingrese un valor para el contracto"],
+    require: [true, "Ingrese el valor total del contrato"],
+  },
+  objectiveContract: {
+    type: String,
+    require: [true, "El objetivo del contrato es requerido"],
+  },
+  extension: {
+    type: Boolean,
+    default: false,
+  },
+  addiction: {
+    type: Boolean,
+    default: false,
+  },
+  suspension: {
+    type: Boolean,
+    default: false,
   },
 });
 
-
-ContracSchema.pre('save',function(next){
-  if(new Date(this.startDate) > new Date(this.endDate)){
-    throw next (Error("La fecha de fin no puede ser menor a la fecha de inicio"))
+ContracSchema.pre("save", function (next) {
+  if (new Date(this.startDate) > new Date(this.endDate)) {
+    throw next(
+      Error("La fecha de fin no puede ser menor a la fecha de inicio")
+    );
   }
   next();
-})
-
+});
 
 module.exports = mongoose.model("ContactManagement", ContracSchema);

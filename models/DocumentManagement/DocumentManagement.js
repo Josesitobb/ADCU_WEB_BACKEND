@@ -2,7 +2,7 @@ const { type } = require("express/lib/response");
 const { default: mongoose } = require("mongoose");
 
 const Document_Management = new mongoose.Schema({
-  creation_date: {
+  creationdate: {
     type: Date,
     required: [true, "Fecha de creacion requerida"],
   },

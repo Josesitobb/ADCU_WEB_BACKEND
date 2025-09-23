@@ -2,8 +2,17 @@ const express = require("express");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
 const Document_Management = require("../../models/DocumentManagement/DocumentManagement");
-const {OneFile} = require("../../services/FunctionDataPython");
-
+const {
+  OneFile,
+  TwoFile,
+  ThreeFile,
+  FourFile,
+  FiveFile,
+  SixFile,
+  SevenFile,
+  EightFile,
+  NineFile,
+} = require("../../services/FunctionDataPython");
 
 exports.getAllDataManagemente = async (req, res) => {
   try {
@@ -47,7 +56,9 @@ exports.getDataById = async (req, res) => {
 exports.CreateData = async (req, res) => {
   try {
     // Buscar la gestion documetal
-    const exitingdocumentManagement  = await Document_Management.findById(req.params.management);
+    const exitingdocumentManagement = await Document_Management.findById(
+      req.params.management
+    );
 
     // Si no existe mensaje de respuesta
     if (!exitingdocumentManagement) {
@@ -58,8 +69,15 @@ exports.CreateData = async (req, res) => {
     }
 
     // Busqueda del usuario para traer NOMBRE CEDULA ,NUMERO DE CELULAR, FECHA DEL CONTRATO, VALOR Y NUMERO
-    const ContractUser = await Contractor.findById(exitingdocumentManagement.user_contrac).populate('user','firsName lastName idcard telephone email').populate('contract', 'typeofcontract  startDate endDate contractNumber price');
-    
+    const ContractUser = await Contractor.findById(
+      exitingdocumentManagement.user_contrac
+    )
+      .populate("user", "firsName lastName idcard telephone email")
+      .populate(
+        "contract",
+        "typeofcontract  startDate endDate contractNumber periodValue totalValue objectivecontract extension addiction suspension"
+      );
+
     // Si no existe mensaje de respuesta
     if (!ContractUser) {
       return res.status(404).json({
@@ -70,15 +88,43 @@ exports.CreateData = async (req, res) => {
     }
 
     // Crear un documento en memoria con el id de la gestion documental
-    const UserContractAll=ContractUser.toObject();
+    const UserContractAll = ContractUser.toObject();
     // Se agregar el document management al usuario para enviarlo al python
-    UserContractAll.documentManagement=exitingdocumentManagement._id
+    UserContractAll.documentManagement = exitingdocumentManagement._id;
+
+    // Correr archivos python
+
+    // Carta de radicacion
     
-    //  Correr el primer archivo python(Prueba one)
     await OneFile("Primer_Archivo", UserContractAll);
 
-    return res.status(200).json({ success: true, message: "Script ejecutado correctamente" });
+    // // Certificado de cumplimiento no firmado
+    await TwoFile("Segundo_Archivo", UserContractAll);
 
+    // // Certificado de cumplimiento firmado
+    await ThreeFile("Tercer_Archivo", UserContractAll);
+
+    // // Informe de actividad
+    await FourFile("Cuarto_Archivo", UserContractAll);
+
+    // // Certificado de calidad tributaria
+    await FiveFile("Quinto_Archivo", UserContractAll);
+
+    // // Rut
+    await SixFile("Sexto_Archivo", UserContractAll);
+
+    // // RIT
+    await SevenFile("Septimo_Archivo", UserContractAll);
+
+    // // Acta de inicio
+    await EightFile("Octavo_Archivo", UserContractAll);
+
+    // // Certificacion bancaria
+    await NineFile("Noveno_Archivo", UserContractAll);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Script ejecutado correctamente" });
   } catch (error) {
     console.error("[CreateData] Error al crear una comparacion:", error);
     return res.status(500).json({
@@ -109,7 +155,7 @@ exports.SavedData = async (req, res) => {
     console.log(IdDocumentManagement);
 
     console.log(req.body);
-    console.log("Entrado a la verificacion")
+    console.log("Entrado a la verificacion");
     // Verificar que vengas todas antes de hacer la peticion
     // if (
     //   !Field ||
@@ -128,8 +174,6 @@ exports.SavedData = async (req, res) => {
     console.log("Paso la verificacion");
     // Verificar que el usuario contratista exista en la tabla contratistas
     const UserContractorExisting = await Contractor.findById(IdUserComparasion);
-
-  
 
     if (!UserContractorExisting) {
       return res.status(400).json({
@@ -153,7 +197,6 @@ exports.SavedData = async (req, res) => {
 
     console.log("Paso la verificacion de data");
 
-
     dataManagementContractor[Field] = {
       status: Status,
       description: Description,
@@ -162,8 +205,6 @@ exports.SavedData = async (req, res) => {
       contractorId: IdUserComparasion,
     };
 
-
-
     const saved = await dataManagementContractor.save();
     console.log("Documento guardado correctamente:", saved);
     return res.status(201).json({
@@ -171,7 +212,6 @@ exports.SavedData = async (req, res) => {
       message: `Campo ${Field} actualizado correctamente`,
       data: saved,
     });
-
   } catch (error) {
     console.error("[SavedData] Error al guardar documento:", error);
     return res.status(500).json({
