@@ -149,7 +149,7 @@ def ComparararChatgpt(Imagen1, Imagen2, periodValue, telephone, startDate, endDa
                         "parameters": {
                             "type": "object",
                             "properties": {
-                                "id": {"type": "string", "description": "ID del documento analizado"},
+                                "id": {"type": "string", "description": "ID del documento "},
                                 "estado": {
                                     "type": "string",
                                     "enum": ["aprobado", "rechazado"],
