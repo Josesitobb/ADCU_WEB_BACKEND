@@ -80,7 +80,7 @@ def CompareChatgpt(Imagen1, Imagen2, contractNumber, typeofcontract, objectiveCo
         # Cargar variables de entorno
         ImagenGuia = encode_image_to_base64(Imagen1)
         ImagenUsuario = encode_image_to_base64(Imagen2)
-        ApiKey="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"
+        # ApiKey=""
         
         # Cliente de chat GPT
         cliente = OpenAI(api_key=ApiKey)
