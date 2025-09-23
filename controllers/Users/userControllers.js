@@ -85,7 +85,7 @@ exports.getAllFuncionary = async (req, res) => {
   }
 };
 
-// Obtener solo los funcionarios
+// Obtener solo los Contratistas
 exports.getAllContractor = async (req, res) => {
   try {
     // Consulta a la base de datos
@@ -235,11 +235,11 @@ exports.createUser = async (req, res) => {
     }
 
     if (role === "contratista") {
-      // Id del contrato verificar si existe
-      const { contractId, residentialaddress } = req.body;
+      //  Datos obligatorios del contratista
+      const { contractId, residentialAddress, institutionalEmail, EconomicaActivityNumber } = req.body;
 
       // Verificar que no vengan vacio
-      if (!contractId || !residentialaddress) {
+      if (!contractId || !residentialAddress || !institutionalEmail || !EconomicaActivityNumber) {
         return res.status(400).json({
           success: false,
           message: "Falta datos para crear el usuario contratista",
@@ -247,7 +247,7 @@ exports.createUser = async (req, res) => {
       }
       // Verificar que el contrato exista
       const verifyContract = await ContractManagement.findById(contractId);
-      
+
       if (!verifyContract) {
         return res.status(400).json({
           success: false,
@@ -280,12 +280,13 @@ exports.createUser = async (req, res) => {
         post,
         role,
         contractId,
-        residentialaddress,
+        residentialAddress,
+        institutionalEmail,
+        EconomicaActivityNumber
       );
-      
     }
 
-     res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Usuario creado",
       data: usercreate,
@@ -369,7 +370,7 @@ exports.updateUser = async (req, res) => {
     }
 
     // No permitir editar el state del contratista
-    if (state !==undefined && updatedUser.role ==="contratista") {
+    if (state !== undefined && updatedUser.role === "contratista") {
       return res.status(400).json({
         success: false,
         message: "No se puede actualizar el estado del contratista",
@@ -413,7 +414,7 @@ exports.updateUser = async (req, res) => {
     if (telephone) updatedUser.telephone = telephone;
     if (email) updatedUser.email = email;
     if (password) updatedUser.password = password;
-    if (state !==undefined) updatedUser.state = state;
+    if (state !== undefined) updatedUser.state = state;
     if (post) updatedUser.post = post;
 
     await updatedUser.save();

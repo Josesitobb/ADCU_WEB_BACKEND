@@ -10,17 +10,17 @@ const storage = multer.diskStorage({
     }
     // Verificar si vienen los campos completos
     const nameFiles = [
-      "filing_letter",
-      "certificate_of_compliance",
-      "signed_certificate_of_compliance",
-      "activity_report",
-      "tax_quality_certificate",
-      "social_security",
+      "filingLetter",
+      "certificateOfCompliance",
+      "signedCertificateOfCompliance",
+      "activityReport",
+      "taxQualityCertificate",
+      "socialSecurity",
       "rut",
       "rit",
-      "Trainings",
-      "initiation_record",
-      "account_certification",
+      "trainings",
+      "initiationRecord",
+      "accountCertification",
     ];
     if (!nameFiles.includes(file.fieldname)) {
       return cd(new Error("Faltan archivos"));

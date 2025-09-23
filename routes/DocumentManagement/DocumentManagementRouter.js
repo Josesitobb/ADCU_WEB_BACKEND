@@ -1,39 +1,43 @@
 const express = require("express");
 const router = express.Router();
-const Document_Management_Controller = require("../../controllers/Document_Management/DocumentManagementController");
+const {
+  getDocumentManagementById,
+  getAllDocumentManagement,
+  createDocumentManagement,
+  updateDocumentManagement,
+  deleteDocumentManagement,
+} = require("../../controllers/DocumentManagement/DocumentManagementController");
+
 const middlewaresFiles = require("../../middlewares/DocumentManagementController/Files");
 const {
   VerifyUserContract,
+  VerifyExistingDocumentManagement,
 } = require("../../middlewares/DocumentManagementController/verifyUserContract");
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
 
 const updateFiles = require("../../middlewares/DocumentManagementController/FilesMulterUpdate");
 
+router.use(verifyToken);
+
 // Ver todas las gestione documental
-router.get(
-  "/",
-  verifyToken,
-  checkRole("admin", "funcionario"),
-  Document_Management_Controller.getAllDocumentManagement
-);
+router.get("/", checkRole("admin", "funcionario"), getAllDocumentManagement);
 
 // Gestion documental por id
 router.get(
   "/:userContract",
-  verifyToken,
   checkRole("admin", "funcionario", "contratista"),
-  Document_Management_Controller.getDocumentManagementById
+  getDocumentManagementById
 );
 
 // Crear la gestion documental
 router.post(
   "/:userContract",
-  verifyToken,
   checkRole("admin", "funcionario", "contratista"),
   VerifyUserContract,
+  VerifyExistingDocumentManagement,
   middlewaresFiles,
-  Document_Management_Controller.CreateDocument_Management
+  createDocumentManagement
 );
 
 router.put(
@@ -42,14 +46,14 @@ router.put(
   checkRole("admin", "funcionario", "contratista"),
   VerifyUserContract,
   updateFiles,
-  Document_Management_Controller.UpdateDocument_Management
+  updateDocumentManagement
 );
 
 router.delete(
   "/:userContract",
-   verifyToken,
+  verifyToken,
   checkRole("admin", "funcionario"),
-  Document_Management_Controller.DeleteDocument_Management
+  deleteDocumentManagement
 );
 
 module.exports = router;

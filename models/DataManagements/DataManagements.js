@@ -7,12 +7,15 @@ const StateDescriptionSchema = new mongoose.Schema(
     status: {
       type: Boolean,
       default: false,
+      require: [true, "El estado es requerido"],
     },
     description: {
       type: String,
+      require: [true, "La descripcion es requerida"],
     },
     usercomparasion: {
       type: String,
+      require: [true, "El usuario de comparacion es requerido"],
     },
     documentManagement: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,19 +34,22 @@ const StateDescriptionSchema = new mongoose.Schema(
 // Esquema principal
 const DataManagementsSchema = new mongoose.Schema(
   {
-    certificate_of_compliance: {
+    filingLetter:{
+      type: StateDescriptionSchema,
+    },
+    certificateOfCompliance: {
       type: StateDescriptionSchema
     },
-    signed_certificate_of_compliance: {
+    signedCertificateOfCompliance: {
       type: StateDescriptionSchema
     },
-    activity_report: {
+    activityReport: {
       type: StateDescriptionSchema
     },
-    tax_quality_certificate: {
+    taxQualityCertificate: {
       type: StateDescriptionSchema
     },
-    social_security: {
+    socialSecurity: {
       type: StateDescriptionSchema
     },
     rut: {
@@ -52,13 +58,13 @@ const DataManagementsSchema = new mongoose.Schema(
     rit: {
       type: StateDescriptionSchema
     },
-    Trainings: {
+    trainings: {
       type: StateDescriptionSchema
     },
-    initiation_record: {
+    initiationRecord: {
       type: StateDescriptionSchema
     },
-    account_certification: {
+    accountCertification: {
       type: StateDescriptionSchema
     },
   },
@@ -68,4 +74,4 @@ const DataManagementsSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Data_Managements", DataManagementsSchema);
+module.exports = mongoose.model("dataManagements", DataManagementsSchema);

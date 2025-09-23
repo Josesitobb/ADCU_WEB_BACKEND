@@ -10,7 +10,7 @@ async function convertPdfToImages(pathDocument, outputDir, baseName) {
 
     for await (const image of document) {
       // const pathSaved = path.join(outputDir, `${baseName}_page${counter}.jpg`);
-      const pathSaved = path.join(outputDir, `${baseName}.jpg`);
+      const pathSaved = path.join(outputDir, `${baseName}${counter}.jpg`);
       await fs.writeFile(pathSaved, image);
       counter++;
     }

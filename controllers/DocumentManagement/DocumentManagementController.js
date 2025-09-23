@@ -1,4 +1,4 @@
-const Document_Management = require("../../models/DocumentManagement/DocumentManagement");
+const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
 const Contractor = require("../../models/Users/Contractor");
 const User = require("../../models/Users/Functionary");
 const fs = require("fs");
@@ -7,7 +7,7 @@ const convertPdfToImages = require("../../utils/convertPdfToImages");
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
-    const documentManagementId = await Document_Management.findById(req.params.userContract);
+    const documentManagementId = await DocumentManagement.findById(req.params.userContract);
     // Verificar que existe el id del documento
     if (!documentManagementId) {
       return res.status(404).json({
@@ -32,7 +32,7 @@ exports.getDocumentManagementById = async (req, res) => {
 // Todos los documentos
 exports.getAllDocumentManagement = async (req, res) => {
   try {
-    const documentManagement = await Document_Management.find();
+    const documentManagement = await DocumentManagement.find();
     return res.status(200).json({
       success: true,
       message: "Cargado con exito los documentos",
@@ -47,19 +47,19 @@ exports.getAllDocumentManagement = async (req, res) => {
   }
 };
 
-exports.CreateDocument_Management = async (req, res) => {
+exports.createDocumentManagement = async (req, res) => {
   try {
   //  Lo que viene de los archivos
-    const {filing_letter,certificate_of_compliance,signed_certificate_of_compliance,activity_report,tax_quality_certificate,social_security,rut,rit,Trainings,initiation_record,account_certification} = req.files;
+    const {filingLetter,certificateOfCompliance,signedCertificateOfCompliance,activityReport,taxQualityCertificate,socialSecurity,rut,rit,trainings,initiationRecord,accountCertification} = req.files;
     // Lo que viene del usuario
-    const { description, ip, retention_time, state } = req.body;
+    const { description, ip, retentionTime, state } = req.body;
     // Id del usuario contratista
     const userContract = req.params.userContract;
     // Fecha de creacion
-    const creation_date = new Date();
+    const creationDate = new Date();
 
     // Verificar que los datos del usuario vengan
-     if (!description ||!ip || !retention_time || !state  ||!userContract) {
+     if (!description ||!ip || !retentionTime || !state  ||!userContract) {
       return res.status(400).json({
         success: false,
         message: "Falta datos",
@@ -67,7 +67,7 @@ exports.CreateDocument_Management = async (req, res) => {
     }
 
     // verificar que los archivos se subiero correctos
-    if (!filing_letter ||!certificate_of_compliance ||!signed_certificate_of_compliance ||!activity_report ||!tax_quality_certificate ||!social_security ||!rut ||!rit ||!Trainings ||!initiation_record ||!account_certification) {
+    if (!filingLetter ||!certificateOfCompliance ||!signedCertificateOfCompliance ||!activityReport ||!taxQualityCertificate ||!socialSecurity ||!rut ||!rit ||!trainings ||!initiationRecord ||!accountCertification) {
       res.status(400).json({
         success: false,
         message: "Le falta archivos",
@@ -83,28 +83,28 @@ exports.CreateDocument_Management = async (req, res) => {
     // baseUrl = "C:\\Users\\JoseD\\OneDrive\\Documentos\\ADCU_WEB_BACKEND";
     const baseUrl = "C:/Users/SENA/OneDrive/Documentos/ADCU/ADCU_WEB_BACKEND";
     // Carta de radicacion de cuenta de cobro
-    const File1 = path.relative(baseUrl, filing_letter?.[0]?.path);
-    const file1 = await convertPdfToImages(File1, directory, "filing_letter");
+    const File1 = path.relative(baseUrl, filingLetter?.[0]?.path);
+    const file1 = await convertPdfToImages(File1, directory, "filingLetter");
 
     // Certificado de cumplimiento
-    const File2 = path.relative(baseUrl, certificate_of_compliance?.[0]?.path);
-     const file2 = await convertPdfToImages(File2,directory,"certificate_of_compliance");
+    const File2 = path.relative(baseUrl, certificateOfCompliance?.[0]?.path);
+     const file2 = await convertPdfToImages(File2,directory,"certificateOfCompliance");
 
     // Ceritifcado de cumplimiento firmado
-    const File3 = path.relative(baseUrl,signed_certificate_of_compliance?.[0]?.path);
-    const file3 = await convertPdfToImages(File3,directory,"signed_certificate_of_compliance");
+    const File3 = path.relative(baseUrl,signedCertificateOfCompliance?.[0]?.path);
+    const file3 = await convertPdfToImages(File3,directory,"signedCertificateOfCompliance");
 
     // Reporte de actividad
-    const File4 = path.relative(baseUrl, activity_report?.[0]?.path);
-    const file4 = await convertPdfToImages(File4, directory, "activity_report");
+    const File4 = path.relative(baseUrl, activityReport?.[0]?.path);
+    const file4 = await convertPdfToImages(File4, directory, "activityReport");
 
     // Certificado de calidad tributaria
-    const File5 = path.relative(baseUrl, tax_quality_certificate?.[0]?.path);
-    const file5 = await convertPdfToImages(File5,directory,"tax_quality_certificate");
+    const File5 = path.relative(baseUrl, taxQualityCertificate?.[0]?.path);
+    const file5 = await convertPdfToImages(File5,directory,"taxQualityCertificate");
 
     // social security
-    const File6 = path.relative(baseUrl, social_security?.[0]?.path);
-    const file6 = await convertPdfToImages(File6, directory, "social_security");
+    const File6 = path.relative(baseUrl, socialSecurity?.[0]?.path);
+    const file6 = await convertPdfToImages(File6, directory, "socialSecurity");
 
     //rut
     const File7 = path.relative(baseUrl, rut?.[0]?.path);
@@ -115,40 +115,40 @@ exports.CreateDocument_Management = async (req, res) => {
     const file8 = await convertPdfToImages(File8, directory, "rit");
 
     // Capacitaciones
-    const File9 = path.relative(baseUrl, Trainings?.[0]?.path);
+    const File9 = path.relative(baseUrl, trainings?.[0]?.path);
     const file9 = await convertPdfToImages(File9, directory, "Trainings");
 
     // Acta de inicio
-    const File10 = path.relative(baseUrl, initiation_record?.[0]?.path);
-    const file10 = await convertPdfToImages(File10,directory,"initiation_record");
+    const File10 = path.relative(baseUrl, initiationRecord?.[0]?.path);
+    const file10 = await convertPdfToImages(File10,directory,"initiationRecord");
 
     // Certificacion de cuenta
-    const File11 = path.relative(baseUrl, account_certification?.[0]?.path);
-    const file11 = await convertPdfToImages(File11,directory,"account_certification");
+    const File11 = path.relative(baseUrl, accountCertification?.[0]?.path);
+    const file11 = await convertPdfToImages(File11,directory,"accountCertification");
 
   
     // Creacion en la base de datos
-    const newDocumentManagement = new Document_Management({
-      creation_date,
-      retention_time: "20 años",
+    const newDocumentManagement = new DocumentManagement({
+      creationDate,
+      retentionTime: "20 años",
       ip,
       state: true || state,
       description,
       version: 1,
-      user_create:userContract,
-      user_edition:userContract,
-      user_contrac:userContract,
-      filing_letter: File1,
-      certificate_of_compliance: File2,
-      signed_certificate_of_compliance: File3,
-      activity_report: File4,
-      tax_quality_certificate: File5,
-      social_security: File6,
+      userCreate:userContract,
+      userEdition:userContract,
+      userContract:userContract,
+      filingLetter: File1,
+      certificateOfCompliance: File2,
+      signedCertificateOfCompliance: File3,
+      activityReport: File4,
+      taxQualityCertificate: File5,
+      socialSecurity: File6,
       rut: File7,
       rit: File8,
-      Trainings: File9,
-      initiation_record: File10,
-      account_certification: File11,
+      trainings: File9,
+      initiationRecord: File10,
+      accountCertification: File11,
     });
 
     const documentManagementSaved = await newDocumentManagement.save();
@@ -176,10 +176,10 @@ exports.CreateDocument_Management = async (req, res) => {
   }
 };
 
-exports.UpdateDocument_Management = async (req, res) => {
+exports.updateDocumentManagement = async (req, res) => {
   try {
     // Consulta para ver si existe la gestion documental
-        const documenteMangementeUser = await Document_Management.findOne({user_create: req.params.userContract});
+        const documenteMangementeUser = await DocumentManagement.findOne({userCreate: req.params.userContract});
       if (!documenteMangementeUser) {
       return res.status(404).json({
         success: false,
@@ -188,66 +188,66 @@ exports.UpdateDocument_Management = async (req, res) => {
     }
 
     // Variables que viene del req.files
-     const {filing_letter,certificate_of_compliance,signed_certificate_of_compliance,activity_report,tax_quality_certificate,social_security,rut,rit,Trainings,initiation_record,account_certification} = req.files;
+     const {filingLetter,certificateOfCompliance,signedCertificateOfCompliance,activityReport,taxQualityCertificate,socialSecurity,rut,rit,trainings,initiationRecord,accountCertification} = req.files;
 
     // Varibles que viene del body;
-     const { description, ip, retention_time, state } = req.body;
+     const { description, ip, retentionTime, state } = req.body;
 
     // Ruta a donde esta las imagenes
      const outputDir = path.resolve(
         __dirname,
         "../../Files/",
-        `${documenteMangementeUser.user_contrac}Img`
+        `${documenteMangementeUser.userContract}Img`
       );
       // Ruta para quitar 
       const baseUrl = path.resolve(__dirname, "../../");
 
     // Filing Letter
-    if (filing_letter) {
-      const newFilePath = filing_letter[0].path;
+    if (filingLetter) {
+      const newFilePath = filingLetter[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.filing_letter = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "filing_letter");
+      documenteMangementeUser.filingLetter = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "filingLetter");
     }
 
     // Certificate of Compliance
-       if (certificate_of_compliance) {
-      const newFilePath = certificate_of_compliance[0].path;
+       if (certificateOfCompliance) {
+      const newFilePath = certificateOfCompliance[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.certificate_of_compliance = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "certificate_of_compliance");
+      documenteMangementeUser.certificateOfCompliance = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "certificateOfCompliance");
     }
 
       // Signed Certificate of Compliance
-    if (signed_certificate_of_compliance) {
-      const newFilePath = signed_certificate_of_compliance[0].path;
+    if (signedCertificateOfCompliance) {
+      const newFilePath = signedCertificateOfCompliance[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.signed_certificate_of_compliance = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "signed_certificate_of_compliance");
+      documenteMangementeUser.signedCertificateOfCompliance = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "signedCertificateOfCompliance");
     }
 
      // Activity Report
-    if (activity_report) {
-      const newFilePath = activity_report[0].path;
+    if (activityReport) {
+      const newFilePath = activityReport[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.activity_report = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "activity_report");
+      documenteMangementeUser.activityReport = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "activityReport");
     }
 
        // Tax Quality Certificate
-    if (tax_quality_certificate) {
-      const newFilePath = tax_quality_certificate[0].path;
+    if (taxQualityCertificate) {
+      const newFilePath = taxQualityCertificate[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.tax_quality_certificate = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "tax_quality_certificate");
+      documenteMangementeUser.taxQualityCertificate = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "taxQualityCertificate");
     }
 
       // Social Security
-    if (social_security) {
-      const newFilePath = social_security[0].path;
+    if (socialSecurity) {
+      const newFilePath = socialSecurity[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.social_security = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "social_security");
+      documenteMangementeUser.socialSecurity = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "socialSecurity");
     }
 
       // RUT
@@ -268,31 +268,31 @@ exports.UpdateDocument_Management = async (req, res) => {
 
     
     // Trainings
-    if (Trainings) {
-      const newFilePath = Trainings[0].path;
+    if (trainings) {
+      const newFilePath = trainings[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.Trainings = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "Trainings");
+      documenteMangementeUser.trainings = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "trainings");
     }
 
      // Initiation Record
-    if (initiation_record) {
-      const newFilePath = initiation_record[0].path;
+    if (initiationRecord) {
+      const newFilePath = initiationRecord[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.initiation_record = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "initiation_record");
+      documenteMangementeUser.initiationRecord = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "initiationRecord");
     }
 
      // Account Certification
-    if (account_certification) {
-      const newFilePath = account_certification[0].path;
+    if (accountCertification) {
+      const newFilePath = accountCertification[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.account_certification = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "account_certification");
+      documenteMangementeUser.accountCertification = relativePath;
+      await convertPdfToImages(newFilePath, outputDir, "accountCertification");
     }
 
     // Usuario que edita
-    documenteMangementeUser.user_edition = req.userId;
+    documenteMangementeUser.userEdition = req.userId;
     // Version
     documenteMangementeUser.version += 1;
 
@@ -300,7 +300,7 @@ exports.UpdateDocument_Management = async (req, res) => {
     if(ip) documenteMangementeUser.ip = ip; 
     if(state) documenteMangementeUser.state = state;
     if(description) documenteMangementeUser.description = description;
-    if(retention_time) documenteMangementeUser.retention_time = retention_time;
+    if(retentionTime) documenteMangementeUser.retentionTime = retentionTime;
  
     await documenteMangementeUser.save();
     return res.status(200).json({
@@ -318,11 +318,11 @@ exports.UpdateDocument_Management = async (req, res) => {
   }
 };
 
-exports.DeleteDocument_Management = async (req, res) => {
+exports.deleteDocumentManagement = async (req, res) => {
   try {
     // Primera buscar el id del usuario
-    const searchDocumentManagementUser = await Document_Management.findOne({
-      user_create: req.params.userContract,
+    const searchDocumentManagementUser = await DocumentManagement.findOne({
+      userContract: req.params.userContract,
     });
 
     // Verificar si existe
@@ -333,17 +333,20 @@ exports.DeleteDocument_Management = async (req, res) => {
       });
     }
     // Pasar la id a una varibales para evitar futuros daños
-    const user_contrac = searchDocumentManagementUser.user_contrac;
+    const userContrac = searchDocumentManagementUser.userContract;
 
     // Eliminar la carpeta del usuario
-    const folderPath = path.join(__dirname, `../../Files/${user_contrac}`);
+    const folderPath = path.join(__dirname, `../../Files/${userContrac}`);
     // Eliminar la carpte de las imaganes
-    const folderPathImg = path.join( __dirname, `../../Files/${user_contrac}Img`);
+    const folderPathImg = path.join( __dirname, `../../Files/${userContrac}Img`);
 
     // Eliminar la carpeta con los pdf
     fs.rmSync(folderPath, { recursive: true, force: true });
     // Eliminar la carpeta de las imaganes
     fs.rmSync(folderPathImg, { recursive: true, force: true });
+
+    // Eliminar la gestion documental
+    await DocumentManagement.deleteOne({ userContract: req.params.userContract });
 
     return res.status(200).json({
       success: true,

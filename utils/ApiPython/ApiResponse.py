@@ -1,7 +1,7 @@
 import requests
 
 def ApiResponse(State,UserComparasaion,Description,DocumenteCompare,IdUserComparasion,IdDocumentManagement):
-    url = "http://localhost:3000/api/Data/Saved"
+    url = "http://localhost:3000/api/Data/saved"
     data={
         "Field":str(DocumenteCompare),
         "Status":bool(State),

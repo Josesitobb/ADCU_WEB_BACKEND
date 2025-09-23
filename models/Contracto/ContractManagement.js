@@ -6,6 +6,7 @@ const ContracSchema = new mongoose.Schema({
     type: String,
     require: [true, "El tipo de contrato es requerido"],
     enum: [
+      "Presentacion de servicios",
       "Termino fijo",
       "Termino indefinido",
       "Obra o labor",
@@ -65,4 +66,4 @@ ContracSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = mongoose.model("ContactManagement", ContracSchema);
+module.exports = mongoose.model("contractManagement", ContracSchema);

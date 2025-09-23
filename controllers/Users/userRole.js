@@ -87,7 +87,9 @@ const createContractor = async (
   post,
   role,
   contractId,
-  residentialaddress
+  residentialAddress,
+  institutionalEmail,
+  EconomicaActivityNumber
 ) => {
   try {
     const contractorSaved = await new User({
@@ -108,7 +110,9 @@ const createContractor = async (
       post,
       user: contractorSaved._id,
       contract: contractId,
-      residentialaddress,
+      residentialAddress,
+      institutionalEmail,
+      EconomicaActivityNumber
     });
     await contractor.save();
     return contractor.populate({ path: "user", select: "-password" });

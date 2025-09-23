@@ -55,14 +55,16 @@ exports.getContractById = async (req, res) => {
 exports.createContract = async (req, res) => {
   try {
     console.log("[CONTROLLER CONTRACTMANAGEMENT] Contrato para crear ");
-    const { typeofcontract, startDate, endDate, contractNumber, state, price } = req.body;
+    const { typeofcontract, startDate, endDate, contractNumber, state, periodValue,totalValue,objectiveContract,extension,addiction,suspension } = req.body;
 
     if (
       !typeofcontract ||
       !startDate ||
       !endDate ||
       !contractNumber ||
-      !price
+      !periodValue ||
+      !totalValue ||
+      !objectiveContract
     ) {
       return res.status(400).json({
         success: false,
@@ -95,7 +97,12 @@ exports.createContract = async (req, res) => {
       endDate,
       contractNumber,
       state: state || true,
-      price,
+      periodValue,
+      totalValue,
+      objectiveContract,
+      extension: extension || false,
+      addiction: addiction || false,
+      suspension: suspension || false
     });
 
     const saveContract = await contract.save();

@@ -53,7 +53,7 @@ exports.getDataById = async (req, res) => {
   }
 };
 
-exports.CreateData = async (req, res) => {
+exports.createData = async (req, res) => {
   try {
     // Buscar la gestion documetal
     const exitingdocumentManagement = await Document_Management.findById(
@@ -70,12 +70,12 @@ exports.CreateData = async (req, res) => {
 
     // Busqueda del usuario para traer NOMBRE CEDULA ,NUMERO DE CELULAR, FECHA DEL CONTRATO, VALOR Y NUMERO
     const ContractUser = await Contractor.findById(
-      exitingdocumentManagement.user_contrac
+      exitingdocumentManagement.userContract
     )
       .populate("user", "firsName lastName idcard telephone email")
       .populate(
         "contract",
-        "typeofcontract  startDate endDate contractNumber periodValue totalValue objectivecontract extension addiction suspension"
+        "typeofcontract  startDate endDate contractNumber periodValue totalValue objectiveContract extension addiction suspension"
       );
 
     // Si no existe mensaje de respuesta
@@ -95,32 +95,31 @@ exports.CreateData = async (req, res) => {
     // Correr archivos python
 
     // Carta de radicacion
-    
-    await OneFile("Primer_Archivo", UserContractAll);
+    // await OneFile("FilingLetter", UserContractAll);
 
-    // // Certificado de cumplimiento no firmado
-    await TwoFile("Segundo_Archivo", UserContractAll);
+    //Certificado de cumplimiento no firmado
+    await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // // Certificado de cumplimiento firmado
-    await ThreeFile("Tercer_Archivo", UserContractAll);
+    // await ThreeFile("Tercer_Archivo", UserContractAll);
 
     // // Informe de actividad
-    await FourFile("Cuarto_Archivo", UserContractAll);
+    // await FourFile("Cuarto_Archivo", UserContractAll);
 
     // // Certificado de calidad tributaria
-    await FiveFile("Quinto_Archivo", UserContractAll);
+    // await FiveFile("Quinto_Archivo", UserContractAll);
 
     // // Rut
-    await SixFile("Sexto_Archivo", UserContractAll);
+    // await SixFile("Sexto_Archivo", UserContractAll);
 
     // // RIT
-    await SevenFile("Septimo_Archivo", UserContractAll);
+    // await SevenFile("Septimo_Archivo", UserContractAll);
 
     // // Acta de inicio
-    await EightFile("Octavo_Archivo", UserContractAll);
+    // await EightFile("Octavo_Archivo", UserContractAll);
 
     // // Certificacion bancaria
-    await NineFile("Noveno_Archivo", UserContractAll);
+    // await NineFile("Noveno_Archivo", UserContractAll);
 
     return res
       .status(200)
@@ -134,7 +133,7 @@ exports.CreateData = async (req, res) => {
   }
 };
 
-exports.SavedData = async (req, res) => {
+exports.savedData = async (req, res) => {
   try {
     // Variable para la comparacion
     // Comparison:Comparacion estado
@@ -222,7 +221,7 @@ exports.SavedData = async (req, res) => {
   }
 };
 
-exports.DeleteData = async (req, res) => {
+exports.deleteData = async (req, res) => {
   try {
     const newDelete = await DataManagements.findByIdAndDelete(req.params.id);
 

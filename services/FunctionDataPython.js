@@ -12,17 +12,17 @@ exports.OneFile = async (ScriptName, UserContractAll) => {
     UserContractAll.user.email,
     // Datos del contrato
     UserContractAll.contract.typeofcontract,
-    UserContractAll.residentialaddress,
+    UserContractAll.residentialAddress,
     UserContractAll.contract.startDate,
     UserContractAll.contract.endDate,
     UserContractAll.contract.contractNumber,
-    UserContractAll.contract.totalValue,
+    UserContractAll.contract.periodValue,
     // Id Del usuario
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return pythonExecute(ScriptName, dataUserContract);
 };
 
 // Segundo archivo python
@@ -32,10 +32,10 @@ exports.TwoFile = async (ScriptName, UserContractAll) => {
     // Datos del contrato
     UserContractAll.contract.contractNumber,
     UserContractAll.contract.typeofcontract,
-    UserContractAll.contract.objectivecontract,
+    UserContractAll.contract.objectiveContract,
     UserContractAll.contract.startDate,
     UserContractAll.contract.endDate,
-    UserContractAll.contract.collectionPeriod,
+    UserContractAll.contract.periodValue,
     UserContractAll.contract.totalValue,
 
     // Datos del usuario
@@ -48,6 +48,7 @@ exports.TwoFile = async (ScriptName, UserContractAll) => {
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
+   return pythonExecute(ScriptName, dataUserContract);
 };
 // Tercer archivo python
 // Certificado de cumplimiento firmado
@@ -56,7 +57,7 @@ exports.ThreeFile = async (ScriptName, UserContractAll) => {
     // Datos del contrato
     UserContractAll.contract.contractNumber,
     UserContractAll.contract.typeofcontract,
-    UserContractAll.contract.objectivecontract,
+    UserContractAll.contract.objectiveContract,
     UserContractAll.contract.startDate,
     UserContractAll.contract.endDate,
     UserContractAll.contract.periodValue,
@@ -88,7 +89,7 @@ exports.FourFile = async (ScriptName, UserContractAll) => {
     UserContractAll.contract.extension,
     UserContractAll.contract.addiction,
     UserContractAll.contract.suspension,
-    UserContractAll.contract.objectivecontract,
+    UserContractAll.contract.objectiveContract,
 
     // Datos del usuario
     UserContractAll.user.firsName,
@@ -147,7 +148,7 @@ exports.SixFile = async (ScriptName, UserContractAll) => {
 exports.SevenFile = async (ScriptName, UserContractAll) => {
   const dataUserContract = [
     // Datos del usuario
-    UserContractAll.user.firstName,
+    UserContractAll.user.firsName,
     UserContractAll.user.lastName,
     UserContractAll.user.idcard,
     UserContractAll.user.email,
@@ -176,7 +177,7 @@ exports.EightFile = async (ScriptName, UserContractAll) => {
     UserContractAll.contract.startDate,
     UserContractAll.contract.endDate,
     UserContractAll.contract.totalValue,
-    UserContractAll.contract.objectivecontract,
+    UserContractAll.contract.objectiveContract,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
   //  return pythonExecute(ScriptName, dataUserContract);
@@ -187,7 +188,7 @@ exports.EightFile = async (ScriptName, UserContractAll) => {
 exports.NineFile = async (ScriptName, UserContractAll) => {
   const dataUserContract = [
     // Datos del usuario
-    UserContractAll.user.firstName,
+    UserContractAll.user.firsName,
     UserContractAll.user.lastName,
     UserContractAll.user.idcard,
     UserContractAll.user.email,

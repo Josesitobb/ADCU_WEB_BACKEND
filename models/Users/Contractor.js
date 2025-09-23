@@ -10,7 +10,7 @@ const contractorSchema = new mongoose.Schema({
   },
   contract: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "ContactManagement",
+    ref: "contractManagement",
     unique: true,
     require: [true, "El usuario tiene que tener un contrato"],
   },
@@ -19,8 +19,7 @@ const contractorSchema = new mongoose.Schema({
     require: [
       true,
       "Ingrese la direccion del usuario al que se le quiera hacer el contrato",
-    ],
-    require: [true, "El contratista necesita una direccion"],
+    ]
   },
   institutionalEmail: {
     type: String,

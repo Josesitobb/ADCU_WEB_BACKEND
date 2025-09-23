@@ -21,7 +21,7 @@ const UserRoutes = require('./routes/Users/userRoutes');
 const ContractManagementRoutes = require('./routes/Contracto/ContractManagementRoutes');
 
 // Gestion Documental
-const DocumentManagementRoutes = require('./routes/Document_Management/DocumentManagementRouter');
+const DocumentManagementRoutes = require('./routes/DocumentManagement/DocumentManagementRouter');
 
 //Gestion de datos
 const DataManagement = require('./routes/DataManagement/DataManagementRouter');
