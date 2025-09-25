@@ -43,12 +43,13 @@ const DataManagementsSchema = new mongoose.Schema(
     signedCertificateOfCompliance: {
       type: StateDescriptionSchema
     },
-    activityReport: {
+      activityReport: {
       type: StateDescriptionSchema
     },
-    taxQualityCertificate: {
+     taxQualityCertificate: {
       type: StateDescriptionSchema
     },
+  
     socialSecurity: {
       type: StateDescriptionSchema
     },

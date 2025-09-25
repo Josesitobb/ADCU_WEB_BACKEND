@@ -1,7 +1,7 @@
 const express = require("express");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
-const Document_Management = require("../../models/DocumentManagement/DocumentManagement");
+const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
 const {
   OneFile,
   TwoFile,
@@ -56,7 +56,7 @@ exports.getDataById = async (req, res) => {
 exports.createData = async (req, res) => {
   try {
     // Buscar la gestion documetal
-    const exitingdocumentManagement = await Document_Management.findById(
+    const exitingdocumentManagement = await DocumentManagement.findById(
       req.params.management
     );
 
@@ -95,35 +95,36 @@ exports.createData = async (req, res) => {
     // Correr archivos python
 
     // Carta de radicacion
-    // await OneFile("FilingLetter", UserContractAll);
+    await OneFilxe("FilingLetter", UserContractAll);
 
     //Certificado de cumplimiento no firmado
     await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // // Certificado de cumplimiento firmado
-    // await ThreeFile("Tercer_Archivo", UserContractAll);
+    await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
     // // Informe de actividad
-    // await FourFile("Cuarto_Archivo", UserContractAll);
+    await FourFile("ActivityReport", UserContractAll);
 
     // // Certificado de calidad tributaria
-    // await FiveFile("Quinto_Archivo", UserContractAll);
+    await FiveFile("TaxQuanlityCertificate", UserContractAll);
 
     // // Rut
-    // await SixFile("Sexto_Archivo", UserContractAll);
+    await SixFile("Rut", UserContractAll);
 
     // // RIT
-    // await SevenFile("Septimo_Archivo", UserContractAll);
+    await SevenFile("Rit", UserContractAll);
 
     // // Acta de inicio
-    // await EightFile("Octavo_Archivo", UserContractAll);
+    await EightFile("InitiationRecord", UserContractAll);
 
     // // Certificacion bancaria
-    // await NineFile("Noveno_Archivo", UserContractAll);
+    await NineFile("AccountCertification", UserContractAll);
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Script ejecutado correctamente" });
+    return res.status(200).json({
+      success: true,
+      message: "Analisis completo, Verifica los resultados",
+    });
   } catch (error) {
     console.error("[CreateData] Error al crear una comparacion:", error);
     return res.status(500).json({
@@ -131,6 +132,97 @@ exports.createData = async (req, res) => {
       message: error.message,
     });
   }
+};
+
+exports.updatedData = async (req, res) => {
+  const { management, field } = req.params;
+  try {
+    const exitingdocumentManagement = await DocumentManagement.findById(management);
+
+    if (!exitingdocumentManagement) {
+      return res.status(404).json({
+        success: false,
+        message: "No exise una gestion documental con ese id",
+      });
+    }
+
+
+
+
+    //Datos del contratista
+    const ContractUser = await Contractor.findById(
+      exitingdocumentManagement.userContract
+    )
+      .populate("user", "firsName lastName idcard telephone email")
+      .populate(
+        "contract",
+        "typeofcontract  startDate endDate contractNumber periodValue totalValue objectiveContract extension addiction suspension"
+      );
+
+    // Si no existe mensaje de respuesta
+    if (!ContractUser) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "No se encontro un contratista con la gestion documental asociada",
+      });
+    }
+
+    // Crear un documento en memoria con el id de la gestion documental
+    const UserContractAll = ContractUser.toObject();
+    // Se agregar el document management al usuario para enviarlo al python
+    UserContractAll.documentManagement = exitingdocumentManagement._id;
+
+    
+    //Arreglo de todos los nombres de los documentos
+    FieldAll = [
+      "FilingLetter",
+      "CertificateOfCompliance",
+      "signedCertificateOfCompliance",
+      "ActivityReport",
+      "TaxQuanlityCertificate",
+      "Rut",
+      "Rit",
+      "InitiationRecord",
+      "AccountCertification",
+    ];
+
+    if (!FieldAll.includes(field)) {
+      return res.status(404).json({
+        success: false,
+        message: "Seleccione un documento valido para poder actualizar",
+      });
+    }
+
+    // Verificar si quiere editar cada documentos
+    if (field == "FilingLetter")  await OneFile("FilingLetter", UserContractAll);
+
+    if(field =="CertificateOfCompliance") await  TwoFile("FilingLetter", UserContractAll);
+
+    if(field =="signedCertificateOfCompliance") await ThreeFile("FilingLetter", UserContractAll);
+
+    if(field =="ActivityReport") await FourFile("ActivityReport", UserContractAll);
+
+    if(field =="TaxQuanlityCertificate") await FiveFile("TaxQuanlityCertificate", UserContractAll);
+
+    if(field =="Rut") await SixFile("Rut", UserContractAll);
+
+    if(field =="Rit") await SevenFile("Rit", UserContractAll);
+
+    if(field =="InitiationRecord") await EightFile ("InitiationRecord", UserContractAll);
+    
+    if(field =="AccountCertification")await  NineFile("AccountCertification", UserContractAll);
+
+    
+
+    return res.status(200).json({
+      success:true,
+      message:`Archivo ${field} Actualizado correctamente verifica  `
+    })
+   
+     
+                                          
+  } catch (error) {}
 };
 
 exports.savedData = async (req, res) => {

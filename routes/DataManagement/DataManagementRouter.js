@@ -1,5 +1,5 @@
 const express = require("express");
-const {getAllDataManagemente,getDataById,createData,savedData,deleteData} = require("../../controllers/DataManagement/DataManagementControllers");
+const {getAllDataManagemente,getDataById,createData,savedData,deleteData,updatedData} = require("../../controllers/DataManagement/DataManagementControllers");
 const router = express.Router();
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
@@ -32,6 +32,11 @@ router.post(
   // checkRole("admin", "funcionario", "contratista"),
   createData
 );
+
+
+router.put("/:management/:field",
+  updatedData
+)
 
 // ✅ DELETE: Eliminar documento (si lo usas desde el frontend)
 router.delete("/:management",verifyToken,

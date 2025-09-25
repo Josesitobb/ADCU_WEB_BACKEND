@@ -101,7 +101,7 @@ exports.FourFile = async (ScriptName, UserContractAll) => {
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return pythonExecute(ScriptName, dataUserContract);
 };
 // Quinto archivo python
 // Certificado de calidad tributaria
@@ -116,31 +116,34 @@ exports.FiveFile = async (ScriptName, UserContractAll) => {
     UserContractAll.user.email,
     UserContractAll.user.telephone,
     UserContractAll.institutionalEmail,
+    UserContractAll.residentialAddress,
     // Id Del usuario
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return pythonExecute(ScriptName, dataUserContract);
 };
 // Sexto archivo python
 // Rut
 exports.SixFile = async (ScriptName, UserContractAll) => {
   const dataUserContract = [
     // Datos del usuario
-    UserContractAll.user.firstName,
+    UserContractAll.user.firsName,
     UserContractAll.user.lastName,
     UserContractAll.user.idcard,
     UserContractAll.user.email,
     UserContractAll.user.telephone,
-    UserContractAll.institutionalEmail,
     UserContractAll.EconomicaActivityNumber,
+    UserContractAll.residentialAddress,
     // Id Del usuario
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return await
+  
+   pythonExecute(ScriptName, dataUserContract);
 };
 
 // Septimo archivo python
@@ -153,13 +156,13 @@ exports.SevenFile = async (ScriptName, UserContractAll) => {
     UserContractAll.user.idcard,
     UserContractAll.user.email,
     UserContractAll.user.telephone,
-    UserContractAll.EconomicaActivityNumber,
+    UserContractAll.residentialAddress,
     // Id Del usuario
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return pythonExecute(ScriptName, dataUserContract);
 };
 
 // Octavo archivo python
@@ -178,9 +181,14 @@ exports.EightFile = async (ScriptName, UserContractAll) => {
     UserContractAll.contract.endDate,
     UserContractAll.contract.totalValue,
     UserContractAll.contract.objectiveContract,
+
+    // Id Del usuario
+    UserContractAll._id,
+    UserContractAll.documentManagement,
+
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  //  return pythonExecute(ScriptName, dataUserContract);
+   return pythonExecute(ScriptName, dataUserContract);
 };
 
 // Noveno archivo python
@@ -198,5 +206,5 @@ exports.NineFile = async (ScriptName, UserContractAll) => {
     UserContractAll.documentManagement,
   ];
   console.log("Data enviada al script Python:", dataUserContract);
-  // return pythonExecute(ScriptName, dataUserContract);
+  return pythonExecute(ScriptName, dataUserContract);
 };

@@ -83,7 +83,7 @@ def CompareChatgpt(Imagen1, Imagen2, contractNumber, typeofcontract, objectiveCo
         # ApiKey=""
         
         # Cliente de chat GPT
-        cliente = OpenAI(api_key=ApiKey)
+        cliente = OpenAI(api_key="")
         response = cliente.chat.completions.create(
             model="gpt-5",
             messages = [
@@ -111,6 +111,7 @@ def CompareChatgpt(Imagen1, Imagen2, contractNumber, typeofcontract, objectiveCo
                     7.El plazo de contrato debe coincidir con la duracion en meses: {startDate} a {endDate}
                     8.El valor del contrato debe coincidir con: {totalValue}
                     9.El valor del periodo debe coincidir con: {periodValue}
+                    10.No tiene que estar firmado por el representante legal de la entidad contratante
 
                     """
                 },

@@ -77,9 +77,8 @@ def ComparararChatgpt(Imagen1, Imagen2, periodValue, telephone, startDate, endDa
         # Encode de las imágenes
         ImagenGuia = encode_image(Imagen1)
         ImagenUsuario = encode_image(Imagen2)
-        ApiKey=""
 
-        client = OpenAI(api_key=ApiKey)
+        client = OpenAI(api_key="")
         response = client.chat.completions.create(
             model="gpt-5",
             messages = [

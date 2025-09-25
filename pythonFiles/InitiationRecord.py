@@ -22,21 +22,25 @@ pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tessera
 
 
 # Parametro que viene de Node.js
+
 try:
-    # Verificar que vengan los 10 parametros
-    if(len(sys.argv) !=9):
+    # Verificar que vengan los 12 parametros
+    if(len(sys.argv) !=12):
         raise FileExistsError(f"Nose re recibieron los parametro suficientes")
     # Datos del contrato
     firsName = sys.argv[1]
     lastName = sys.argv[2]
     idcard = sys.argv[3]
-    email = sys.argv[4]
-    telephone = sys.argv[5]
-    residentialAddress = sys.argv[6]
+    typeofcontract = sys.argv[4]
+    contractNumber = sys.argv[5]
+    startDate = sys.argv[6]
+    endDate = sys.argv[7]
+    totalValue = sys.argv[8]
+    objectiveContract = sys.argv[9]
 
     # Datos del usuario
-    idUserContract = sys.argv[7]
-    idDocumentManagement = sys.argv[8]
+    idUserContract = sys.argv[10]
+    idDocumentManagement = sys.argv[11]
     
     # Nombre del contratista
     nameComplete = firsName +" " + lastName
@@ -45,10 +49,11 @@ except Exception as e:
 
 
 # Imagen constates
-Imagen1Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\Rit\rit1Example.jpg"
+Imagen1Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\InitiationRecord\initiationRecord1Example.jpg"
 
 # Imagenes del usuario
-Imagen1UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\rit1.jpg"
+Imagen1UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\initiationRecord1.jpg"
+
 
 
 # Funcion para obtener el % de comparacion
@@ -74,14 +79,12 @@ def encode_image(image_path):
             return base64.b64encode(image_file.read()).decode("utf-8")
         
 
-def comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddress,idUserContract,idDocumentManagement,Imagen1Guia,Imagen1UserContract):
+def comparationChatgpt(firsName,lastName,idcard,typeofcontract,contractNumber,startDate,endDate,totalValue,objectiveContract,idUserContract,idDocumentManagement,Imagen1Guia,Imagen1UserContract):
    
         #Img Encode
         Imagen1GuiaEncode = encode_image(Imagen1Guia)
-
         # Img User
         Imagen1UserContractEnconde = encode_image(Imagen1UserContract)
-       
 
         # Cliete de Chat gpt
         cliente = OpenAI(api_key="")
@@ -107,17 +110,16 @@ def comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddre
         Se te proporcionan imágenes y texto OCR de un certificacion calidad tributaria contratista. 
         Debes realizar las siguientes validaciones:
         
-       1.Verificar el contribuyente Numero de cedula {idcard} y nombre {firsName} {lastName}
-       2.Verificar que sea un rit de 
-       3.Encabezado de INFORMACION BASICA
-       4.Verificar direccion {residentialAddress} en las imagenes y el texto OCR.
-       5.Verificar numero de telefono {telephone} en las imagenes y el texto OCR.
-       6.Verifica direccion de correo electronico {email} en las imagenes y el texto OCR.
-       7.Verificar el municipio en las imagenes y el texto OCR.
-       8.Encabezado PERFIL TRIBUTARIO
-       9.Verificar si esta esta escrito:Naturaleza Juridica , Regimen tributario, Fecha desde, Matricula Mercantil,Fecha inicio de Actividades,Fecha de cese de Actividad, No.Establecimineots (Tienes que estar algo al ado ejemplo No.Establecimientos: 1 o puede ser NO)
-       10.Las actividades tiene que estar en numero y descripcion 
-        
+        Primera imagen
+        1.Verifica si es un ACTA DE INICIO DE CONTRATO
+        2.Verifica que el nombre del contratista sea: {nameComplete}
+        3.Verifica el objetivo del contrato: {objectiveContract}
+        4.Verifica el monto del contrato: {totalValue}
+        5.Verifica el plazo del contrato: {startDate} a {endDate}
+        6.Verifica el nombre del contratista {nameComplete} y numero de identificacion {idcard} y el numero de contrato {contractNumber}
+        7.Verifica el numero de contrato {contractNumber} y el dia que se reunion seria el dia de inicio del contrato {startDate}
+        8.Verifica que este firmando por el contratista y el representante legal de la entidad estatal
+
         """
         
 
@@ -126,9 +128,7 @@ def comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddre
         "role": "user",
         "content": [
             {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{Imagen1GuiaEncode}"}},
-            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{Imagen1UserContractEnconde}"}},
-
-
+            {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{Imagen1UserContractEnconde}"}}
         ]
     }
 ],
@@ -162,16 +162,17 @@ def comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddre
             ],
             tool_choice={"type": "function", "function": {"name": "AprobarDocumento"}}
         )
+        
         msg = response.choices[0].message
         tool_call = msg.tool_calls[0]
         arguments = json.loads(tool_call.function.arguments)
         estado = arguments.get("estado")
         
         if estado == "aprobado":
-            ApiResponse(True, nameComplete, "OK","rit", idUserContract, idDocumentManagement)
+            ApiResponse(True, nameComplete, "OK","initiationRecord", idUserContract, idDocumentManagement)
         else:
             razon = arguments.get("razon", "Documento alterado o inválido")
-            ApiResponse(False, nameComplete, razon, "rit", idUserContract, idDocumentManagement)
+            ApiResponse(False, nameComplete, razon, "initiationRecord", idUserContract, idDocumentManagement)
 
 
 
@@ -179,12 +180,10 @@ def comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddre
 
 # -------------- MAIN ----------------------------------------#
 Resultado1 = OneFilter(Imagen1Guia,Imagen1UserContract) 
-
-
 if Resultado1 <0.90:
-    ApiResponse(False,nameComplete,"Las imagenes son muy diferentes entre si","rit",idUserContract,idDocumentManagement)
+    ApiResponse(False,nameComplete,"Las imagenes son muy diferentes entre si","initiationRecord",idUserContract,idDocumentManagement)
     raise FloatingPointError(f"Resultado {Resultado1} No coincide con el esquena")
 
-comparationChatgpt(firsName,lastName,idcard,email,telephone,residentialAddress,idUserContract,idDocumentManagement,Imagen1Guia,Imagen1UserContract)
 
 
+comparationChatgpt(firsName,lastName,idcard,typeofcontract,contractNumber,startDate,endDate,totalValue,objectiveContract,idUserContract,idDocumentManagement,Imagen1Guia,Imagen1UserContract)
