@@ -26,6 +26,9 @@ const DocumentManagementRoutes = require('./routes/DocumentManagement/DocumentMa
 //Gestion de datos
 const DataManagement = require('./routes/DataManagement/DataManagementRouter');
 
+// Verificacion de la gestion de datos
+const VerificationOfContractData = require('./routes/VerificationOfContractData/VerificationOfContractData');
+
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 
 (async () => {
@@ -56,13 +59,17 @@ app.use('/api/Documents',DocumentManagementRoutes)
 // Ver pdf
 app.use('./Files', express.static(path.join(__dirname, 'uploads')));
 // Gestion de datos
-app.use('/api/Data',DataManagement)
+app.use('/api/Data',DataManagement);
+// Verificacion de datos
+app.use('/api/Verification',VerificationOfContractData)
 
 app.use(express.json());
 
 // Inicio del servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor en http://localhost:${PORT}`);
-});
+const HOST = process.env.HOST || "0.0.0.0";
+const PORT = Number(process.env.PORT) || 3000;
+
+app.listen(PORT, HOST, () => {
+  console.log(`Servidor en http://${HOST}:${PORT}`);
+})
 

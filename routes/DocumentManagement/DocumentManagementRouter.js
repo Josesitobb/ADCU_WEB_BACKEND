@@ -23,6 +23,8 @@ router.use(verifyToken);
 // Ver todas las gestione documental
 router.get("/", checkRole("admin", "funcionario"), getAllDocumentManagement);
 
+
+
 // Gestion documental por id
 router.get(
   "/:userContract",

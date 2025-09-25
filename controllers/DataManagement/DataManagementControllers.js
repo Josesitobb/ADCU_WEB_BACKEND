@@ -32,13 +32,30 @@ exports.getAllDataManagemente = async (req, res) => {
 
 exports.getDataById = async (req, res) => {
   try {
-    const dataManagementeId = await DataManagements.findById(req.params.id);
-    if (!dataManagementeId) {
+    const{management} = req.params;
+    const existinDataManagement = await DocumentManagement.findById(management);
+    if (!existinDataManagement) {
       return res.status(404).json({
         success: false,
-        message: "No se encontro el dato",
+        message: "No existe una gestion documental con ese id",
       });
     }
+const dataManagementeId = await DataManagements.findOne({
+  $or: [
+    { "filingLetter.contractorId": existinDataManagement.userContract },
+    { "certificateOfCompliance.contractorId": existinDataManagement.userContract },
+    { "signedCertificateOfCompliance.contractorId": existinDataManagement.userContract },
+    { "activityReport.contractorId": existinDataManagement.userContract },
+    { "taxQualityCertificate.contractorId": existinDataManagement.userContract },
+    { "socialSecurity.contractorId": existinDataManagement.userContract },
+    { "rut.contractorId": existinDataManagement.userContract },
+    { "rit.contractorId": existinDataManagement.userContract },
+    { "trainings.contractorId": existinDataManagement.userContract },
+    { "initiationRecord.contractorId": existinDataManagement.userContract },
+    { "accountCertification.contractorId": existinDataManagement.userContract }
+  ]
+});
+
     return res.status(200).json({
       success: true,
       message: "Datos del dato",

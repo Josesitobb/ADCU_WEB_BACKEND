@@ -7,7 +7,8 @@ const convertPdfToImages = require("../../utils/convertPdfToImages");
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
-    const documentManagementId = await DocumentManagement.findById(req.params.userContract);
+
+    const documentManagementId = await DocumentManagement.findOne({ userContract: req.params.userContract });
     // Verificar que existe el id del documento
     if (!documentManagementId) {
       return res.status(404).json({
@@ -59,18 +60,19 @@ exports.createDocumentManagement = async (req, res) => {
     const creationDate = new Date();
 
     // Verificar que los datos del usuario vengan
-     if (!description ||!ip || !retentionTime || !state  ||!userContract) {
+     if (!description ||!ip ||!userContract) {
       return res.status(400).json({
         success: false,
         message: "Falta datos",
       });
     }
 
+    console.log("req.files:", req.files);
     // verificar que los archivos se subiero correctos
     if (!filingLetter ||!certificateOfCompliance ||!signedCertificateOfCompliance ||!activityReport ||!taxQualityCertificate ||!socialSecurity ||!rut ||!rit ||!trainings ||!initiationRecord ||!accountCertification) {
-      res.status(400).json({
+      return res.status(400).json({
         success: false,
-        message: "Le falta archivos",
+        message: "Le faltan archivos porfa verificar muchas gracias",
       });
     }
 
@@ -130,9 +132,9 @@ exports.createDocumentManagement = async (req, res) => {
     // Creacion en la base de datos
     const newDocumentManagement = new DocumentManagement({
       creationDate,
-      retentionTime: "20 años",
+      retentionTime: retentionTime || 5,
       ip,
-      state: true || state,
+      state: state || true,
       description,
       version: 1,
       userCreate:userContract,
@@ -179,7 +181,7 @@ exports.createDocumentManagement = async (req, res) => {
 exports.updateDocumentManagement = async (req, res) => {
   try {
     // Consulta para ver si existe la gestion documental
-        const documenteMangementeUser = await DocumentManagement.findOne({userCreate: req.params.userContract});
+        const documenteMangementeUser = await DocumentManagement.findOne({userContract: req.params.userContract});
       if (!documenteMangementeUser) {
       return res.status(404).json({
         success: false,
@@ -197,7 +199,7 @@ exports.updateDocumentManagement = async (req, res) => {
      const outputDir = path.resolve(
         __dirname,
         "../../Files/",
-        `${documenteMangementeUser.userContract}Img`
+        `${documenteMangementeUser.userContract}Img` // FIX nombre correcto
       );
       // Ruta para quitar 
       const baseUrl = path.resolve(__dirname, "../../");
@@ -298,7 +300,7 @@ exports.updateDocumentManagement = async (req, res) => {
 
     // Varibles que pueden editar el usuario que no son documentos
     if(ip) documenteMangementeUser.ip = ip; 
-    if(state) documenteMangementeUser.state = state;
+    if(state !== undefined) documenteMangementeUser.state = state;
     if(description) documenteMangementeUser.description = description;
     if(retentionTime) documenteMangementeUser.retentionTime = retentionTime;
  
