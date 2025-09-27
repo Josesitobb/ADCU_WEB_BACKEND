@@ -112,13 +112,13 @@ exports.createData = async (req, res) => {
     // Correr archivos python
 
     // Carta de radicacion
-    await OneFilxe("FilingLetter", UserContractAll);
+    await OneFile("FilingLetter", UserContractAll);
 
     //Certificado de cumplimiento no firmado
     await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // // Certificado de cumplimiento firmado
-    await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+    // await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
     // // Informe de actividad
     await FourFile("ActivityReport", UserContractAll);

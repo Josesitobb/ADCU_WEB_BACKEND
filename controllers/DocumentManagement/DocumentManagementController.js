@@ -4,6 +4,7 @@ const User = require("../../models/Users/Functionary");
 const fs = require("fs");
 const path = require("path");
 const convertPdfToImages = require("../../utils/convertPdfToImages");
+require("dotenv").config();
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
@@ -83,7 +84,8 @@ exports.createDocumentManagement = async (req, res) => {
       fs.mkdirSync(directory, { recursive: true });
     
     // baseUrl = "C:\\Users\\JoseD\\OneDrive\\Documentos\\ADCU_WEB_BACKEND";
-    const baseUrl = "C:/Users/SENA/OneDrive/Documentos/ADCU/ADCU_WEB_BACKEND";
+    const baseUrl = process.env.URLDELPROYECTO;
+    
     // Carta de radicacion de cuenta de cobro
     const File1 = path.relative(baseUrl, filingLetter?.[0]?.path);
     const file1 = await convertPdfToImages(File1, directory, "filingLetter");

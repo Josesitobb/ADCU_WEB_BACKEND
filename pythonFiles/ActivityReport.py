@@ -6,7 +6,7 @@ import pytesseract
 from openai import OpenAI
 import json
 import sys, os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -14,7 +14,11 @@ from utils.ApiPython.ApiResponse import ApiResponse
 
 
 # Acceder a la variables .env
-# load_dotenv()
+load_dotenv()
+IMAGENCONSTANTE = os.getenv("IMAGENCONSTANTE")
+IMAGENDELUSUARIO = os.getenv("IMAGENDELUSUARIO")
+KEYCHATGPT = os.getenv("KEYCHATGPT")
+
 
 # Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -52,19 +56,19 @@ except Exception as e:
 
 
 # Imagen constates
-Imagen1Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\ActivityReport\activityReport1Example.jpg"
-Imagen2Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\ActivityReport\activityReport2Example.jpg"
-Imagen3Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\ActivityReport\activityReport3Example.jpg"
-Imagen4Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\ActivityReport\activityReport4Example.jpg"
-Imagen5Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\ActivityReport\activityReport5Example.jpg"
+Imagen1Guia =fr"{IMAGENCONSTANTE}\ActivityReport\activityReport1Example.jpg"
+Imagen2Guia =fr"{IMAGENCONSTANTE}\ActivityReport\activityReport2Example.jpg"
+Imagen3Guia =fr"{IMAGENCONSTANTE}\ActivityReport\activityReport3Example.jpg"
+Imagen4Guia =fr"{IMAGENCONSTANTE}\ActivityReport\activityReport4Example.jpg"
+Imagen5Guia =fr"{IMAGENCONSTANTE}\ActivityReport\activityReport5Example.jpg"
 
 
 # Imagenes del usuario
-Imagen1UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\activityReport1.jpg"
-Imagen2UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\activityReport2.jpg"
-Imagen3UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\activityReport3.jpg"
-Imagen4UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\activityReport4.jpg"
-Imagen5UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\activityReport5.jpg"
+Imagen1UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\activityReport1.jpg"
+Imagen2UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\activityReport2.jpg"
+Imagen3UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\activityReport3.jpg"
+Imagen4UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\activityReport4.jpg"
+Imagen5UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\activityReport5.jpg"
 
 
 # Funcion para obtener el % de comparacion
@@ -105,9 +109,8 @@ def comparationChatgpt(typeofcontract,contractNumber,startDate,endDate,totalValu
         Imagen4UserContractEnconde = encode_image(Imagen4UserContract)
         Imagen5UserContractEnconde = encode_image(Imagen5UserContract)
 
-        # Cliete de Chat gpt
-        cliente = OpenAI(api_key="")
-        
+        # Cliente de Chat gpt
+        cliente = OpenAI(api_key=KEYCHATGPT)
 
         # Menssaje
         response = cliente.chat.completions.create(

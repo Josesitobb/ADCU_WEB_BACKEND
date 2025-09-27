@@ -6,7 +6,7 @@ import pytesseract
 from openai import OpenAI
 import json
 import sys, os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -14,7 +14,11 @@ from utils.ApiPython.ApiResponse import ApiResponse
 
 
 # Acceder a la variables .env
-# load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+IMAGENCONSTANTE = os.getenv("IMAGENCONSTANTE")
+IMAGENDELUSUARIO = os.getenv("IMAGENDELUSUARIO")
+KEYCHATGPT = os.getenv("KEYCHATGPT")
+
 
 # Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -48,12 +52,12 @@ except Exception as e:
 
 
 # Imagen constates
-Imagen1Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\TaxQualityCertificate\taxQualityCertificate1Example.jpg"
-Imagen2Guia =r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\TaxQualityCertificate\taxQualityCertificate2Example.jpg"
+Imagen1Guia =fr"{IMAGENCONSTANTE}\TaxQualityCertificate\taxQualityCertificate1Example.jpg"
+Imagen2Guia =fr"{IMAGENCONSTANTE}\TaxQualityCertificate\taxQualityCertificate2Example.jpg"
 
 # Imagenes del usuario
-Imagen1UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\taxQualityCertificate1.jpg"
-Imagen2UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\taxQualityCertificate2.jpg"
+Imagen1UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\taxQualityCertificate1.jpg"
+Imagen2UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\taxQualityCertificate2.jpg"
 
 
 # Funcion para obtener el % de comparacion
@@ -89,7 +93,7 @@ def comparationChatgpt(contractNumber,firsName,lastName,idcard,email,telephone,i
         Imagen2UserContractEnconde = encode_image(Imagen2UserContract)
 
         # Cliete de Chat gpt
-        cliente = OpenAI(api_key="")
+        cliente = OpenAI(api_key=KEYCHATGPT)
         
 
         # Menssaje

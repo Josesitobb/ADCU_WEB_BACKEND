@@ -6,7 +6,7 @@ import pytesseract
 from openai import OpenAI
 import json
 import sys, os
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -14,7 +14,11 @@ from utils.ApiPython.ApiResponse import ApiResponse
 
 
 # Acceder a la variables .env
-# load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+IMAGENCONSTANTE = os.getenv("IMAGENCONSTANTE")
+IMAGENDELUSUARIO = os.getenv("IMAGENDELUSUARIO")
+KEYCHATGPT = os.getenv("KEYCHATGPT")
+
 
 # Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -47,7 +51,7 @@ except Exception as e:
 
 
 # Imagenes del usuario
-Imagen1UserContract = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\AccountCertification1.jpg"
+Imagen1UserContract = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\AccountCertification1.jpg"
 
 
 
@@ -79,7 +83,7 @@ def comparationChatgpt(firsName,lastName,idcard,email,telephone,idUserContract,i
         Imagen1UserContractEnconde = encode_image(Imagen1UserContract)
 
         # Cliete de Chat gpt
-        cliente = OpenAI(api_key="")
+        cliente = OpenAI(api_key=KEYCHATGPT)
         
 
         # Menssaje

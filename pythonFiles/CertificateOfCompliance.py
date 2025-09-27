@@ -14,6 +14,14 @@ from utils.ApiPython.ApiResponse import ApiResponse
 # Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
+# Acceder a la variables .env
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+IMAGENCONSTANTE = os.getenv("IMAGENCONSTANTE")
+IMAGENDELUSUARIO = os.getenv("IMAGENDELUSUARIO")
+KEYCHATGPT = os.getenv("KEYCHATGPT")
+
+
+
 
 # Verificar cuantos parametros viene desde Node.js
 try:
@@ -48,11 +56,11 @@ except Exception as e:
     
 # IMAGENES
 # Imagen costante
-Imagen1 = r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\certificateOfComplianceExample.jpg"
+Imagen1 = fr"{IMAGENCONSTANTE}\certificateOfComplianceExample.jpg"
 # Imagen del usuario a comparar
-Imagen2 = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\certificateOfCompliance1.jpg"
-    
-    
+Imagen2 = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\certificateOfCompliance1.jpg"
+
+
 # Funcion para decodificar la imagen en base64
 def oneFilter(Imagen1, Imagen2):
     # Cargar imagenes en escala de grises
@@ -83,7 +91,7 @@ def CompareChatgpt(Imagen1, Imagen2, contractNumber, typeofcontract, objectiveCo
         # ApiKey=""
         
         # Cliente de chat GPT
-        cliente = OpenAI(api_key="")
+        cliente = OpenAI(api_key=KEYCHATGPT)
         response = cliente.chat.completions.create(
             model="gpt-5",
             messages = [

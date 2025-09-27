@@ -1,7 +1,13 @@
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '.env'))
+
+HOST = os.getenv("HOST")
 
 def ApiResponse(State,UserComparasaion,Description,DocumenteCompare,IdUserComparasion,IdDocumentManagement):
-    url = "http://localhost:3000/api/Data/saved"
+    url = f"http://{HOST}:5000/api/Data/saved"
     data={
         "Field":str(DocumenteCompare),
         "Status":bool(State),

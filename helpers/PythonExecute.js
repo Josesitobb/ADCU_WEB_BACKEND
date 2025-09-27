@@ -1,10 +1,12 @@
 const path = require("path");
 const { exec } = require("child_process");
 const express = require("express");
+require('dotenv').config({ path: require('path').resolve(__dirname, '../.env') });
+
 
 function pythonExecute(scriptName, data = []) {
   //Ejecuta el comando
-  const campodepython ="C:/Users/JoseD/AppData/Local/Programs/Python/Python313/python.exe";
+  const campodepython = process.env.URLDELPYTHON; 
   // Ruta del python entra a la carpeta
   const scriptPath = path.resolve(__dirname, `../pythonFiles/${scriptName}.py`);
 

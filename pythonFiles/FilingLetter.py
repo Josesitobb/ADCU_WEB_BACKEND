@@ -8,11 +8,14 @@ import json
 import sys, os
 from dotenv import load_dotenv
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "../")))
 from utils.ApiPython.ApiResponse import ApiResponse
 
 # Acceder a la variables .env
-load_dotenv()
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+IMAGENCONSTANTE   = os.getenv("IMAGENCONSTANTE")
+IMAGENDELUSUARIO  = os.getenv("IMAGENDELUSUARIO")
+KEYCHATGPT        = os.getenv("KEYCHATGPT")
 
 # Variable para iniciar el pytesseract
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
@@ -46,9 +49,9 @@ except Exception as e:
     
 
 # Imagen costante
-Imagen1 = r"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\utils\Img\filingLetterExample.jpg"
+Imagen1 = fr"{IMAGENCONSTANTE}\filingLetterExample.jpg"
 # Imagen del usuario a comparar
-Imagen2 = fr"C:\Users\JoseD\OneDrive\Documentos\ADCU\ADCU_WEB_BACKEND\Files\{idUserContract}Img\filingLetter1.jpg"
+Imagen2 = fr"{IMAGENDELUSUARIO}\{idUserContract}Img\filingLetter1.jpg"
 def primerFiltro(Imagen1, Imagen2):
     # Cargar imágenes en escala de grises
     img1 = cv2.imread(Imagen1, cv2.IMREAD_GRAYSCALE)
@@ -78,7 +81,7 @@ def ComparararChatgpt(Imagen1, Imagen2, periodValue, telephone, startDate, endDa
         ImagenGuia = encode_image(Imagen1)
         ImagenUsuario = encode_image(Imagen2)
 
-        client = OpenAI(api_key="")
+        client = OpenAI(api_key=KEYCHATGPT)
         response = client.chat.completions.create(
             model="gpt-5",
             messages = [
