@@ -1,8 +1,10 @@
 const express = require("express");
-const {getAllDataManagemente,getDataById,createData,savedData,deleteData,updatedData} = require("../../controllers/DataManagement/DataManagementControllers");
+const {getAllDataManagemente,getDataById,createData,savedData,deleteData,updatedData,toogleStateData} = require("../../controllers/DataManagement/DataManagementControllers");
 const router = express.Router();
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
+
+
 
 // ✅ GET: Obtener todos los documentos
 router.get(
@@ -12,6 +14,12 @@ router.get(
   getAllDataManagemente
 );
 
+// ✅ POST: Guardar documento desde Python u otra fuente
+router.post("/saved",
+   savedData
+  );
+
+
 // Obtener una comparacion por id
 router.get(
   "/:management",
@@ -20,10 +28,9 @@ router.get(
   getDataById
 );
 
-// ✅ POST: Guardar documento desde Python u otra fuente
-router.post("/saved",
-   savedData
-  );
+// Cambiar el estado del documento
+
+
 
 // Llamar para comenzar la creacion
 router.post(
@@ -33,13 +40,20 @@ router.post(
   createData
 );
 
-
+// Actualizar
 router.put("/:management/:field",
   updatedData
-)
+);
+
+  router.patch("/:management/:field/toggle",
+  verifyToken,
+  checkRole("admin", "funcionario"),
+  toogleStateData
+);
 
 // ✅ DELETE: Eliminar documento (si lo usas desde el frontend)
 router.delete("/:management",verifyToken,
   checkRole("admin"), deleteData);
+
 
 module.exports = router;

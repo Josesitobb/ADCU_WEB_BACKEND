@@ -9,7 +9,7 @@ const {
 } = require("./userRole");
 const ContractManagement = require("../../models/Contracto/ContractManagement");
 
-//Obtener todos los usuarios (ADMIN)
+//Obtener todos los usuarios (ADMIN) 
 exports.getAllUsers = async (req, res) => {
   console.log("[CONTROLLER USER] Ejecutando getAllUsers");
   try {
@@ -28,25 +28,40 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Obtener solo los usuario Admin
+// Obtener solo los usuario Admin por estado
 exports.getAllAdmin = async (req, res) => {
   try {
-    // Consulta a la base de datos
-    const AdminUser = await User.find().select("-password");
-    // Verificar si existe el usuario
-    if (!AdminUser) {
-      return res.status(404).json({
+    // Variable global
+    let userAllAdmin;
+
+    // QueryDeLaUrl
+    const { state } = req.query;
+
+    if (state && !["true", "false"].includes(state)) {
+      return res.status(400).json({
         success: false,
-        message: "No existe el usuario admin",
+        message: "Si vas a utilizar state tiene que ser booleano",
       });
     }
-    // Filtrar los usuarios
-    const AdminFilter = await AdminUser.filter(
-      (useradmin) => useradmin.role === "admin"
-    );
+
+    // Consulta a la base de datos
+    if (state)
+      userAllAdmin = await User.find({
+        state: state == "true" ? true : false,
+        role: "admin",
+      }).select("-password");
+
+    // Consulta a la base de datos
+    if (state == undefined)
+      userAllAdmin = await User.find({ role: "admin" }).select("-password");
+
     return res.status(200).json({
       success: true,
-      data: AdminFilter,
+      message: `Usuarios admis encontrados con el estado: ${state} son: ${userAllAdmin.length}`,
+      data:
+        userAllAdmin.length !== 0
+          ? userAllAdmin
+          : `No hay usuarios admins con el estado: ${state}`,
     });
   } catch (err) {
     console.log(err);
@@ -57,24 +72,37 @@ exports.getAllAdmin = async (req, res) => {
   }
 };
 
-// Obtener solo los funcionarios
+// Obtener solo los funcionarios por estado
 exports.getAllFuncionary = async (req, res) => {
   try {
+    // Variable global
+    let userAllFuncionary;
+
+    // QueryDeLaUrl
+    const { state } = req.query;
+
     // Consulta a la base de datos
-    const FuncionaryUser = await Functionary.find().populate({
-      path: "user",
-      select: "-password",
-    });
-    // Verificar si existe el usuario
-    if (!FuncionaryUser) {
-      return res.status(404).json({
-        success: false,
-        message: "No existe el usuario admin",
-      });
+    if (state) {
+      // Consulta a la base de datos
+      const userFuncionary = await Functionary.find().populate({ path: "user",select: "-password "});
+      // Filtrar por state
+      userAllFuncionary = userFuncionary.filter((u) => u.user.state === (state == "true" ? true : false));
     }
+
+    // Si no viene state motrar todo los usuarios sin umportar el state
+    if (state == undefined)
+      userAllFuncionary = await Functionary.find().populate({path: "user",select: "-password"});
+
     return res.status(200).json({
       success: true,
-      data: FuncionaryUser,
+      message:
+        state == undefined
+          ? `Usuario funcionario encontrados : ${userAllFuncionary.length}`
+          : `Usuarios funcionarios encontrados con el estado: ${state} son: ${userAllFuncionary.length}`,
+      data:
+        userAllFuncionary.length !== 0
+          ? userAllFuncionary
+          : `No existe funcionarios con el estado que selecciono`,
     });
   } catch (err) {
     console.log(err);
@@ -88,26 +116,42 @@ exports.getAllFuncionary = async (req, res) => {
 // Obtener solo los Contratistas
 exports.getAllContractor = async (req, res) => {
   try {
+    // Variable global
+    let userAllContractor;
+    
+    // QueryDeLaUrl
+    const { state } = req.query;
+
     // Consulta a la base de datos
-    const Contractorser = await Contractor.find()
-      .populate({ path: "user", select: "-password" })
-      .populate("contract");
-    // Verificar si existe el usuario
-    if (!Contractorser) {
-      return res.status(404).json({
-        success: false,
-        message: "No existe el usuario admin",
-      });
+    if (state) {
+      // Consulta a la base de datos
+      const userContractor = await Contractor.find().populate({ path: "user", select: "-password" }).populate("contract");
+      // Filtrar por state
+      userAllContractor = userContractor.filter((u) => u.user.state === (state == "true" ? true : false));
     }
+
+
+    // Si no viene state motrar todo los usuarios sin umportar el state
+    if (state == undefined) userAllContractor = await Contractor.find().populate({ path: "user", select: "-password" }).populate("contract");
+ 
+
     return res.status(200).json({
       success: true,
-      data: Contractorser,
+      message:
+        state == undefined
+          ? `Usuario contratista encontrados : ${userAllContractor.length}`
+          : `Usuarios contratista  encontrados con el estado: ${state} son: ${userAllContractor.length}`,
+      data:
+        userAllContractor.length !== 0
+          ? userAllContractor
+          : `No existe contratista  con el estado que selecciono`,
     });
+
   } catch (err) {
     console.log(err);
     return res.status(500).json({
       success: false,
-      message: "Erro al traer todos los usuarios funcionarios",
+      message: "Erro al traer todos los usuarios contratista ",
     });
   }
 };
@@ -236,10 +280,20 @@ exports.createUser = async (req, res) => {
 
     if (role === "contratista") {
       //  Datos obligatorios del contratista
-      const { contractId, residentialAddress, institutionalEmail, EconomicaActivityNumber } = req.body;
+      const {
+        contractId,
+        residentialAddress,
+        institutionalEmail,
+        EconomicaActivityNumber,
+      } = req.body;
 
       // Verificar que no vengan vacio
-      if (!contractId || !residentialAddress || !institutionalEmail || !EconomicaActivityNumber) {
+      if (
+        !contractId ||
+        !residentialAddress ||
+        !institutionalEmail ||
+        !EconomicaActivityNumber
+      ) {
         return res.status(400).json({
           success: false,
           message: "Falta datos para crear el usuario contratista",

@@ -1,16 +1,46 @@
 const express = require("express");
 const ContracManagement = require("../../models/Contracto/ContractManagement");
 const Contract = require("../../models/Users/Contractor");
-const cron = require("node-cron");
+const ContractManagement = require("../../models/Contracto/ContractManagement");
 
 // Ver todos los contratos
 exports.getAllContract = async (req, res) => {
   console.log("[CONTROLLER CONTRACTMANAGEMENT] Ejcutando getAllContract");
   try {
-    const contract = await ContracManagement.find();
+    // // QuerySelector
+    const { WithContractor } = req.query;
+
+    // Verificar que WithContractor sea booleano
+    if (WithContractor &&!["true", "false", "/"].includes(WithContractor)) {
+      return res.status(400).json({
+        success: false,
+        message: "Tiene que ser true o false o dejar el espacion en blanco",
+      });
+    }
+
+    // Variablae global
+    let AllContact;
+    // Todos los contratos que estann vinculados
+    if (WithContractor == "true") AllContact = await Contract.find().populate("contract");
+
+    // Los contrato que no estan vinculados
+    if (WithContractor == "false") {
+      // Consultar todos los contratista
+      const userContracts = await Contract.find({}, "contract");
+
+      // Iterrar por cada id 
+      const newUserContracts = userContracts.map((u) => u.contract);
+
+      // Consulta todos los contratos
+      AllContact = await ContracManagement.find({_id: { $nin: newUserContracts }});
+    }
+
+    // Si no viene nada en la url mandar todos los contratos
+    if(WithContractor == undefined) AllContact = await ContractManagement.find();
+
     return res.status(200).json({
       success: true,
-      data: contract,
+      data: AllContact,
     });
   } catch (error) {
     console.log(
@@ -23,6 +53,34 @@ exports.getAllContract = async (req, res) => {
       error: error.message,
     });
   }
+};
+
+// Obtener contratos activos e inactivos
+exports.getStateContracts = async (req, res) => {
+  // Traer estado del la url
+  const { state } = req.query;
+
+  // Verificar que el state sea boleano
+  if (!["true", "false"].includes(state)) {
+    return res.status(400).json({
+      success: false,
+      message: "El valor tiene que ser true o false",
+    });
+  }
+  const contracAtive = await ContracManagement.find({ state: state });
+
+  if (!contracAtive) {
+    return res.status(404).json({
+      success: false,
+      message: "No hay contrato activos en este momento",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: `El numero de contrato activos es ${contracAtive.length}`,
+    data: contracAtive.length !== 0 ? contracAtive : "No hay contratos",
+  });
 };
 
 // Obtener un contrato especifico
@@ -55,7 +113,19 @@ exports.getContractById = async (req, res) => {
 exports.createContract = async (req, res) => {
   try {
     console.log("[CONTROLLER CONTRACTMANAGEMENT] Contrato para crear ");
-    const { typeofcontract, startDate, endDate, contractNumber, state, periodValue,totalValue,objectiveContract,extension,addiction,suspension } = req.body;
+    const {
+      typeofcontract,
+      startDate,
+      endDate,
+      contractNumber,
+      state,
+      periodValue,
+      totalValue,
+      objectiveContract,
+      extension,
+      addiction,
+      suspension,
+    } = req.body;
 
     if (
       !typeofcontract ||
@@ -102,7 +172,7 @@ exports.createContract = async (req, res) => {
       objectiveContract,
       extension: extension || false,
       addiction: addiction || false,
-      suspension: suspension || false
+      suspension: suspension || false,
     });
 
     const saveContract = await contract.save();
@@ -130,7 +200,6 @@ exports.updateContract = async (req, res, next) => {
     // Consulta a la base de datos
     const contractUpdate = await ContracManagement.findById(req.params.id);
 
-
     // Verificar si el contrato existe
     if (!contractUpdate) {
       return res.status(404).json({
@@ -145,15 +214,16 @@ exports.updateContract = async (req, res, next) => {
       const userContract = await Contract.findOne({
         contract: contractUpdate._id,
       }).populate("user");
-      if (userContract ) {
+      if (userContract) {
         userContract.user.state = state;
         await userContract.user.save();
       }
     }
 
-    if (typeofcontract  !== undefined) contractUpdate.typeofcontract = typeofcontract;
-    if (startDate  !== undefined) contractUpdate.startDate = startDate;
-    if (endDate  !== undefined) contractUpdate.endDate = endDate;
+    if (typeofcontract !== undefined)
+      contractUpdate.typeofcontract = typeofcontract;
+    if (startDate !== undefined) contractUpdate.startDate = startDate;
+    if (endDate !== undefined) contractUpdate.endDate = endDate;
     if (state !== undefined) contractUpdate.state = state;
     if (price !== undefined) contractUpdate.price = price;
 
@@ -201,3 +271,4 @@ exports.deleteContract = async (req, res) => {
     });
   }
 };
+

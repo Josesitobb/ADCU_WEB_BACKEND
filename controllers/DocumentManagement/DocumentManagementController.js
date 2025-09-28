@@ -8,7 +8,6 @@ require("dotenv").config();
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
-
     const documentManagementId = await DocumentManagement.findOne({ userContract: req.params.userContract });
     // Verificar que existe el id del documento
     if (!documentManagementId) {
@@ -68,7 +67,6 @@ exports.createDocumentManagement = async (req, res) => {
       });
     }
 
-    console.log("req.files:", req.files);
     // verificar que los archivos se subiero correctos
     if (!filingLetter ||!certificateOfCompliance ||!signedCertificateOfCompliance ||!activityReport ||!taxQualityCertificate ||!socialSecurity ||!rut ||!rit ||!trainings ||!initiationRecord ||!accountCertification) {
       return res.status(400).json({
@@ -83,7 +81,6 @@ exports.createDocumentManagement = async (req, res) => {
     // Si el directorio no existe crea la carpeta
       fs.mkdirSync(directory, { recursive: true });
     
-    // baseUrl = "C:\\Users\\JoseD\\OneDrive\\Documentos\\ADCU_WEB_BACKEND";
     const baseUrl = process.env.URLDELPROYECTO;
     
     // Carta de radicacion de cuenta de cobro

@@ -21,7 +21,6 @@ exports.OneFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return pythonExecute(ScriptName, dataUserContract);
 };
 
@@ -47,7 +46,6 @@ exports.TwoFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
    return pythonExecute(ScriptName, dataUserContract);
 };
 // Tercer archivo python
@@ -100,7 +98,6 @@ exports.FourFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return pythonExecute(ScriptName, dataUserContract);
 };
 // Quinto archivo python
@@ -121,7 +118,6 @@ exports.FiveFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return pythonExecute(ScriptName, dataUserContract);
 };
 // Sexto archivo python
@@ -140,7 +136,6 @@ exports.SixFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return await
   
    pythonExecute(ScriptName, dataUserContract);
@@ -161,7 +156,6 @@ exports.SevenFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return pythonExecute(ScriptName, dataUserContract);
 };
 
@@ -187,7 +181,6 @@ exports.EightFile = async (ScriptName, UserContractAll) => {
     UserContractAll.documentManagement,
 
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
    return pythonExecute(ScriptName, dataUserContract);
 };
 
@@ -205,6 +198,5 @@ exports.NineFile = async (ScriptName, UserContractAll) => {
     UserContractAll._id,
     UserContractAll.documentManagement,
   ];
-  console.log("Data enviada al script Python:", dataUserContract);
   return pythonExecute(ScriptName, dataUserContract);
 };

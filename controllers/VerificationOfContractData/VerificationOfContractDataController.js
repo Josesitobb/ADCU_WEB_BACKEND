@@ -6,8 +6,6 @@ exports.getDataVerificactionById = async (req, res) => {
   try {
     const dataManagemntsId = req.params.dataManagemntsId;
 
-    
-
     // Verifica si existe un gestion de datos con ese contractor
     const existinDataManagement = await DataManagement.findById(dataManagemntsId);
 
@@ -22,20 +20,28 @@ exports.getDataVerificactionById = async (req, res) => {
     let dataStatus = [];
     if (existinDataManagement.filingLetter?.status === false)
       dataStatus.push({ document: "filingLetter" });
+
     if (existinDataManagement.certificateOfCompliance?.status === false)
       dataStatus.push({ document: "certificateOfCompliance" });
+
     if (existinDataManagement.signedCertificateOfCompliance?.status === false)
       dataStatus.push({ document: "signedCertificateOfCompliance" });
+
     if (existinDataManagement.activityReport?.status === false)
       dataStatus.push({ document: "activityReport" });
+
     if (existinDataManagement.taxQualityCertificate?.status === false)
       dataStatus.push({ document: "taxQualityCertificate" });
+
     if (existinDataManagement.rut?.status === false)
       dataStatus.push({ document: "rut" });
+
     if (existinDataManagement.rit?.status === false)
       dataStatus.push({ document: "rit" });
+
     if (existinDataManagement.initiationRecord?.status === false)
       dataStatus.push({ document: "initiationRecord" });
+    
     if (existinDataManagement.accountCertification?.status === false)
       dataStatus.push({ document: "accountCertification" });
 

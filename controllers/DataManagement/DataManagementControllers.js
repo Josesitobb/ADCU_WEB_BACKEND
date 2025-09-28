@@ -161,10 +161,7 @@ exports.updatedData = async (req, res) => {
         success: false,
         message: "No exise una gestion documental con ese id",
       });
-    }
-
-
-
+    };
 
     //Datos del contratista
     const ContractUser = await Contractor.findById(
@@ -183,7 +180,7 @@ exports.updatedData = async (req, res) => {
         message:
           "No se encontro un contratista con la gestion documental asociada",
       });
-    }
+    };
 
     // Crear un documento en memoria con el id de la gestion documental
     const UserContractAll = ContractUser.toObject();
@@ -193,15 +190,15 @@ exports.updatedData = async (req, res) => {
     
     //Arreglo de todos los nombres de los documentos
     FieldAll = [
-      "FilingLetter",
-      "CertificateOfCompliance",
+      "filingLetter",
+      "certificateOfCompliance",
       "signedCertificateOfCompliance",
-      "ActivityReport",
-      "TaxQuanlityCertificate",
-      "Rut",
-      "Rit",
-      "InitiationRecord",
-      "AccountCertification",
+      "activityReport",
+      "taxQualityCertificate",
+      "rut",
+      "rit",
+      "initiationRecord",
+      "accountCertification",
     ];
 
     if (!FieldAll.includes(field)) {
@@ -212,25 +209,23 @@ exports.updatedData = async (req, res) => {
     }
 
     // Verificar si quiere editar cada documentos
-    if (field == "FilingLetter")  await OneFile("FilingLetter", UserContractAll);
+    if (field == "filingLetter")  await OneFile("FilingLetter", UserContractAll);
 
-    if(field =="CertificateOfCompliance") await  TwoFile("FilingLetter", UserContractAll);
+    if(field =="certificateOfCompliance") await  TwoFile("FilingLetter", UserContractAll);
 
     if(field =="signedCertificateOfCompliance") await ThreeFile("FilingLetter", UserContractAll);
 
-    if(field =="ActivityReport") await FourFile("ActivityReport", UserContractAll);
+    if(field =="activityReport") await FourFile("ActivityReport", UserContractAll);
 
-    if(field =="TaxQuanlityCertificate") await FiveFile("TaxQuanlityCertificate", UserContractAll);
+    if(field =="taxQuanlityCertificate") await FiveFile("TaxQuanlityCertificate", UserContractAll);
 
-    if(field =="Rut") await SixFile("Rut", UserContractAll);
+    if(field =="rut") await SixFile("Rut", UserContractAll);
 
-    if(field =="Rit") await SevenFile("Rit", UserContractAll);
+    if(field =="rit") await SevenFile("Rit", UserContractAll);
 
-    if(field =="InitiationRecord") await EightFile ("InitiationRecord", UserContractAll);
-    
-    if(field =="AccountCertification")await  NineFile("AccountCertification", UserContractAll);
+    if(field =="initiationRecord") await EightFile ("InitiationRecord", UserContractAll);
 
-    
+    if(field =="accountCertification")await  NineFile("AccountCertification", UserContractAll);
 
     return res.status(200).json({
       success:true,
@@ -239,7 +234,13 @@ exports.updatedData = async (req, res) => {
    
      
                                           
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Error al actualizar la comparacion",
+      error: error.message,
+    });
+  }
 };
 
 exports.savedData = async (req, res) => {
@@ -260,7 +261,6 @@ exports.savedData = async (req, res) => {
       IdDocumentManagement,
     } = req.body;
 
-    console.log(IdDocumentManagement);
 
     console.log(req.body);
     console.log("Entrado a la verificacion");
@@ -279,7 +279,6 @@ exports.savedData = async (req, res) => {
     //   });
     // }
 
-    console.log("Paso la verificacion");
     // Verificar que el usuario contratista exista en la tabla contratistas
     const UserContractorExisting = await Contractor.findById(IdUserComparasion);
 
@@ -351,3 +350,67 @@ exports.deleteData = async (req, res) => {
     });
   }
 };
+
+exports.toogleStateData = async(req,res)=>{
+  try{
+
+  const {management,field} = req.params;
+
+  const existinDocumentManagement = await DocumentManagement.findById(management);
+
+  if(!existinDocumentManagement){
+    return res.status(404).json({
+      success:false,
+      message:'No existe una gestion documental'
+    });
+  }
+
+  // Verificar que venga el documento correctos
+    FieldSelect =[
+      "filingLetter",
+      "certificateOfCompliance",
+      // "signedCertificateOfCompliance",
+      "activityReport",
+      "taxQualityCertificate",
+      "rut",
+      "rit",
+      "initiationRecord",
+      "accountCertification",
+    ];
+
+    if (!FieldSelect.includes(field)) {
+      return res.status(404).json({
+        success: false,
+        message: "Seleccione un documento valido para poder actualizar patch",
+      });
+    }
+
+    // Validar que si exista una gestion documental con una gestion de datos
+    const existinDataManagement = await DataManagements.findOne({documentManagement:existinDocumentManagement.documentManagement});
+  
+
+    if(!existinDataManagement){
+      return res.status(404).json({
+        success:false,
+        message:'No hay una gestion de datos asociada a esta gestion documental'
+      })
+    }
+
+    existinDataManagement[field].status = !existinDataManagement[field].status;
+    existinDataManagement[field].description ="ok"
+
+    await existinDataManagement.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Estado de ${field} actualizado a ${existinDataManagement[field].status}`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error en el servidor',
+      error: error.message
+    });
+  }
+}
