@@ -6,6 +6,7 @@ const {
   createDocumentManagement,
   updateDocumentManagement,
   deleteDocumentManagement,
+  getDocumentManagementStats
 } = require("../../controllers/DocumentManagement/DocumentManagementController");
 
 const middlewaresFiles = require("../../middlewares/DocumentManagementController/Files");
@@ -23,7 +24,8 @@ router.use(verifyToken);
 // Ver todas las gestione documental
 router.get("/", checkRole("admin", "funcionario"), getAllDocumentManagement);
 
-
+// Estadisticas de la gestion documental
+router.get("/stats", checkRole("admin", "funcionario"), getDocumentManagementStats);
 
 // Gestion documental por id
 router.get(

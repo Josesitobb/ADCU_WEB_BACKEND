@@ -9,7 +9,7 @@ const {
 } = require("./userRole");
 const ContractManagement = require("../../models/Contracto/ContractManagement");
 
-//Obtener todos los usuarios (ADMIN) 
+//Obtener todos los usuarios (ADMIN)
 exports.getAllUsers = async (req, res) => {
   console.log("[CONTROLLER USER] Ejecutando getAllUsers");
   try {
@@ -84,14 +84,22 @@ exports.getAllFuncionary = async (req, res) => {
     // Consulta a la base de datos
     if (state) {
       // Consulta a la base de datos
-      const userFuncionary = await Functionary.find().populate({ path: "user",select: "-password "});
+      const userFuncionary = await Functionary.find().populate({
+        path: "user",
+        select: "-password ",
+      });
       // Filtrar por state
-      userAllFuncionary = userFuncionary.filter((u) => u.user.state === (state == "true" ? true : false));
+      userAllFuncionary = userFuncionary.filter(
+        (u) => u.user.state === (state == "true" ? true : false)
+      );
     }
 
     // Si no viene state motrar todo los usuarios sin umportar el state
     if (state == undefined)
-      userAllFuncionary = await Functionary.find().populate({path: "user",select: "-password"});
+      userAllFuncionary = await Functionary.find().populate({
+        path: "user",
+        select: "-password",
+      });
 
     return res.status(200).json({
       success: true,
@@ -118,22 +126,27 @@ exports.getAllContractor = async (req, res) => {
   try {
     // Variable global
     let userAllContractor;
-    
+
     // QueryDeLaUrl
     const { state } = req.query;
 
     // Consulta a la base de datos
     if (state) {
       // Consulta a la base de datos
-      const userContractor = await Contractor.find().populate({ path: "user", select: "-password" }).populate("contract");
+      const userContractor = await Contractor.find()
+        .populate({ path: "user", select: "-password" })
+        .populate("contract");
       // Filtrar por state
-      userAllContractor = userContractor.filter((u) => u.user.state === (state == "true" ? true : false));
+      userAllContractor = userContractor.filter(
+        (u) => u.user.state === (state == "true" ? true : false)
+      );
     }
 
-
     // Si no viene state motrar todo los usuarios sin umportar el state
-    if (state == undefined) userAllContractor = await Contractor.find().populate({ path: "user", select: "-password" }).populate("contract");
- 
+    if (state == undefined)
+      userAllContractor = await Contractor.find()
+        .populate({ path: "user", select: "-password" })
+        .populate("contract");
 
     return res.status(200).json({
       success: true,
@@ -146,7 +159,6 @@ exports.getAllContractor = async (req, res) => {
           ? userAllContractor
           : `No existe contratista  con el estado que selecciono`,
     });
-
   } catch (err) {
     console.log(err);
     return res.status(500).json({
@@ -369,117 +381,178 @@ exports.updateUser = async (req, res) => {
       role,
       state,
       post,
-      residentialaddress,
+      residentialAddress,
+      contractId,
+      institutionalEmail,
+      EconomicaActivityNumber,
     } = req.body;
 
-    const updatedUser = await User.findById(req.params.id);
-
-    //  Si no existe el usuario mandar mensaje
-    if (!updatedUser) {
+    // Buscar el usuario por ID
+    const user = await User.findById(req.params.id);
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "Usuario no encontrado",
       });
     }
 
-    // Rol no se puede editar
-    if (role) {
+    // Verificar que el rol no se modifique
+    if (role && role !== user.role) {
       return res.status(400).json({
         success: false,
-        message: "El rol no se puede editar",
+        message: "No puedes modificar el rol del usuario",
       });
     }
 
-    // Verificar el idcard
-    if (idcard && idcard !== updatedUser.idcard) {
-      const exitingIdcard = await User.findOne({ idcard });
-      if (exitingIdcard) {
+    // Verificar el telefono
+    if (telephone) {
+      // Verificar que el telefono no este en uso
+      const telephoneExist = await User.findOne({ telephone });
+      if (telephoneExist && telephoneExist._id !== user._id) {
         return res.status(400).json({
           success: false,
-          message: "La cedula ya esta en uso ",
+          message: "El telefono ya esta en uso",
         });
       }
     }
 
     // Verificar el email
-    if (email && email !== updatedUser.email) {
-      const exitingEmail = await User.findOne({ email });
-      if (exitingEmail) {
+    if (email) {
+      // Verificar que el email no este en uso
+      const emailExist = await User.findOne({ email });
+      if (emailExist && emailExist._id !== user._id) {
         return res.status(400).json({
           success: false,
-          message: "El email ya esta en uso porfa seleccione otro",
+          message: "El email ya esta en uso",
         });
       }
     }
 
-    // Verificar el numero
-    if (telephone && telephone !== updatedUser.telephone) {
-      const exitingTelephone = await User.findOne({ telephone });
-      if (exitingTelephone) {
+    // Verificar el idcard
+    if (idcard) {
+      // Verificar que el idcard no este en uso
+      const idcardExist = await User.findOne({ idcard });
+      if (idcardExist && idcardExist._id !== user._id) {
         return res.status(400).json({
           success: false,
-          message: "El numero ya esta en uso porfa seleccione otro",
+          message: "El idcard ya esta en uso",
         });
       }
     }
 
-    // No permitir editar el state del contratista
-    if (state !== undefined && updatedUser.role === "contratista") {
+    // Campos del contratista
+
+    // Verificar el estado del contratista
+    if (state && user.role === "contratista") {
       return res.status(400).json({
         success: false,
-        message: "No se puede actualizar el estado del contratista",
+        message:
+          "Si quieres cambiar el estado del contratista tienes que hacerlo desde el contrato",
       });
     }
 
-    // Cambio de direccion del contratista
-    let contractorUserAddress;
-    // Verificar que venga del body la variable
-    if (residentialaddress) {
-      if (updatedUser.role !== "contratista") {
-        return res.status(400).json({
-          success: false,
-          message: "Solo los contratista tiene direccion",
-        });
-      }
-
-      const Contractor = await Contractor.findOne({
-        user: updatedUser._id,
-      });
-      // Si no encuentra el contratista da error
-      if (!Contractor) {
+    // Verificar direccion residencial
+    if (residentialAddress && user.role === "contratista") {
+      const contractor = await Contractor.findOne({ user: user._id });
+      if (!contractor) {
         return res.status(404).json({
           success: false,
-          message: "Erro al actualizar la direccion",
+          message: "Contratista no encontrado",
+        });
+      }
+      contractor.residentialAddress = residentialAddress;
+      await contractor.save();
+    }
+
+    // verificar email institucional
+    if (institutionalEmail && user.role === "contratista") {
+      const emailExist = await Contractor.findOne({
+        email: institutionalEmail,
+      });
+      if (emailExist && emailExist.user !== user._id) {
+        return res.status(400).json({
+          success: false,
+          message: "El email institucional ya esta en uso",
+        });
+      }
+      const contractor = await Contractor.findOne({ user: user._id });
+      contractor.institutionalEmail = institutionalEmail;
+      await contractor.save();
+    }
+
+    // Verificar numero de actividad economica
+    if (EconomicaActivityNumber && user.role === "contratista") {
+      const economicaActivityNumber = await Contractor.findOne({
+        user: user._id,
+      });
+      economicaActivityNumber.EconomicaActivityNumber = EconomicaActivityNumber;
+      await economicaActivityNumber.save();
+    }
+
+    // Actualizar el contrato
+    let userContractor;
+
+    if (contractId) {
+      // Si no tiene rol admin no puede cambiar el contrato
+      if (req.userRole !== "admin") {
+        return res.status(403).json({
+          success: false,
+          message: "No tienes permisos para cambiar el contrato",
+        });
+      }
+      // Buscar el contrato
+      const contract = await ContractManagement.findById(contractId);
+      if (!contract) {
+        return res.status(404).json({
+          success: false,
+          message: "Contrato no encontrado",
         });
       }
 
-      Contractor.residentialaddress = residentialaddress;
-      await Contractor.save();
-      contractorUserAddress = await Contractor.populate({
-        path: "user",
-        select: "-password",
+      // Verificar que el contrato no este asignado a otro contratista
+      const contractAssigned = await Contractor.findOne({
+        contract: contractId,
       });
+      if (contractAssigned) {
+        return res.status(400).json({
+          success: false,
+          message: "El contrato ya esta asignado a otro contratista",
+        });
+      }
+
+      // Actualizar el contrato del contratista
+      const contractor = await Contractor.findOne({ user: user._id });
+      if (!contractor) {
+        return res.status(404).json({
+          success: false,
+          message: "No se encontro el contratista para actualizar el contrato",
+        });
+      }
+      contractor.contract = contractId;
+      await contractor.save();
     }
+    // Actualizar los campos del usuario
+    if (firsName) user.firsName = firsName;
+    if (lastname) user.lastName = lastname;
+    if (idcard) user.idcard = idcard;
+    if (telephone) user.telephone = telephone;
+    if (email) user.email = email;
+    if (post) user.post = post;
+    if (password) user.password = password;
 
-    // Guardar cambios en la base de datos
-    if (firsName) updatedUser.firsName = firsName;
-    if (lastname) updatedUser.lastName = lastname;
-    if (idcard) updatedUser.idcard = idcard;
-    if (telephone) updatedUser.telephone = telephone;
-    if (email) updatedUser.email = email;
-    if (password) updatedUser.password = password;
-    if (state !== undefined) updatedUser.state = state;
-    if (post) updatedUser.post = post;
+    await user.save();
 
-    await updatedUser.save();
-
-    const userData = updatedUser.toObject();
-    delete userData.password;
+    // Si el usuario es contratista traer los datos actualizados
+    if (user.role === "contratista") {
+      userContractor = await Contractor.findOne({ user: user._id })
+        .populate({ path: "user", select: "-password" })
+        .populate("contract");
+    }
 
     return res.status(200).json({
       success: true,
-      message: "Usuario actualizado exitosamente",
-      data: contractorUserAddress || userData,
+      message: "Usuario actualizado correctamente",
+      data: userContractor || user,
     });
   } catch (error) {
     // Manejar errores
@@ -561,6 +634,53 @@ exports.deleteUser = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error al eliminar el usuario",
+      error: error.message,
+    });
+  }
+};
+
+// StatusUser
+exports.getUserStats = async (req, res) => {
+  try {
+    let stats;
+    // Contar todos los usuarios
+    const users = await User.find();
+    // Total de usuarios
+    const totalUsers = users.length;
+
+    // Usuarios activos
+    const usersActive = users.filter((u) => u.state === true).length;
+    // Usuarios inactivos
+    const usersInactive = users.filter((u) => u.state === false).length;
+    // Contar usuarios por rol
+    const admins = users.filter((u) => u.role === "admin").length;
+    const functionarys = users.filter((u) => u.role === "funcionario").length;
+    const contractors = users.filter((u) => u.role === "contratista").length;
+
+    // Armar el objeto de estadisticas
+    stats = {
+      'Total de usuarios': totalUsers,
+      'Usuarios activos': usersActive,
+      'Usuarios inactivos': usersInactive,
+      'Admins': admins,
+      'Funcionarios': functionarys,
+      'Contratistas': contractors,
+    };
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Estadisticas de usuarios",
+        data: stats,
+      });
+  } catch (error) {
+    console.error(
+      "[CONTROLLER Error al obtener estadisticas de usuario]",
+      error.message
+    );
+    return res.status(500).json({
+      success: false,
+      message: "Error al obtener estadisticas de usuario",
       error: error.message,
     });
   }

@@ -97,7 +97,7 @@ const Document_Management = new mongoose.Schema({
   },
   userContract: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Contractors",
+    ref: "Contractor",
     required: [true, "Usuario contratista es obligatorio"],
   },
   version: {

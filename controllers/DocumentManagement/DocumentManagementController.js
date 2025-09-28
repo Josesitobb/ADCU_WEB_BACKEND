@@ -8,7 +8,19 @@ require("dotenv").config();
 
 exports.getDocumentManagementById = async (req, res) => {
   try {
-    const documentManagementId = await DocumentManagement.findOne({ userContract: req.params.userContract });
+    const documentManagementId = await DocumentManagement.findOne({
+      userContract: req.params.userContract,
+    }).populate({
+      path: "userContract",
+      model: "Contractor",
+      select:
+        "institutionalEmail residentialAddress EconomicaActivityNumber user",
+      populate: {
+        path: "user",
+        model: "User",
+        select: "firstName lastName idcard telephone email post role",
+      },
+    });
     // Verificar que existe el id del documento
     if (!documentManagementId) {
       return res.status(404).json({
@@ -33,13 +45,28 @@ exports.getDocumentManagementById = async (req, res) => {
 // Todos los documentos
 exports.getAllDocumentManagement = async (req, res) => {
   try {
-    const documentManagement = await DocumentManagement.find();
+    const documentManagement = await DocumentManagement.find().populate({
+      path: "userContract",
+      model: "Contractor",
+      select:
+        "institutionalEmail residentialAddress EconomicaActivityNumber user",
+      populate: {
+        path: "user",
+        model: "User",
+        select: "firsName lastName idcard telephone email post role",
+      },
+    });
+
     return res.status(200).json({
       success: true,
       message: "Cargado con exito los documentos",
       data: documentManagement,
     });
   } catch (error) {
+    console.log(
+      "[DocumentManagentController] Error al traer todos los documentos",
+      error
+    );
     return res.status(500).json({
       success: false,
       message: "Error al cargar los documentos",
@@ -50,8 +77,20 @@ exports.getAllDocumentManagement = async (req, res) => {
 
 exports.createDocumentManagement = async (req, res) => {
   try {
-  //  Lo que viene de los archivos
-    const {filingLetter,certificateOfCompliance,signedCertificateOfCompliance,activityReport,taxQualityCertificate,socialSecurity,rut,rit,trainings,initiationRecord,accountCertification} = req.files;
+    //  Lo que viene de los archivos
+    const {
+      filingLetter,
+      certificateOfCompliance,
+      signedCertificateOfCompliance,
+      activityReport,
+      taxQualityCertificate,
+      socialSecurity,
+      rut,
+      rit,
+      trainings,
+      initiationRecord,
+      accountCertification,
+    } = req.files;
     // Lo que viene del usuario
     const { description, ip, retentionTime, state } = req.body;
     // Id del usuario contratista
@@ -60,7 +99,7 @@ exports.createDocumentManagement = async (req, res) => {
     const creationDate = new Date();
 
     // Verificar que los datos del usuario vengan
-     if (!description ||!ip ||!userContract) {
+    if (!description || !ip || !userContract) {
       return res.status(400).json({
         success: false,
         message: "Falta datos",
@@ -68,7 +107,19 @@ exports.createDocumentManagement = async (req, res) => {
     }
 
     // verificar que los archivos se subiero correctos
-    if (!filingLetter ||!certificateOfCompliance ||!signedCertificateOfCompliance ||!activityReport ||!taxQualityCertificate ||!socialSecurity ||!rut ||!rit ||!trainings ||!initiationRecord ||!accountCertification) {
+    if (
+      !filingLetter ||
+      !certificateOfCompliance ||
+      !signedCertificateOfCompliance ||
+      !activityReport ||
+      !taxQualityCertificate ||
+      !socialSecurity ||
+      !rut ||
+      !rit ||
+      !trainings ||
+      !initiationRecord ||
+      !accountCertification
+    ) {
       return res.status(400).json({
         success: false,
         message: "Le faltan archivos porfa verificar muchas gracias",
@@ -79,21 +130,32 @@ exports.createDocumentManagement = async (req, res) => {
     const directory = path.join(__dirname, `../../Files/${userContract}Img`);
 
     // Si el directorio no existe crea la carpeta
-      fs.mkdirSync(directory, { recursive: true });
-    
+    fs.mkdirSync(directory, { recursive: true });
+
     const baseUrl = process.env.URLDELPROYECTO;
-    
+
     // Carta de radicacion de cuenta de cobro
     const File1 = path.relative(baseUrl, filingLetter?.[0]?.path);
     const file1 = await convertPdfToImages(File1, directory, "filingLetter");
 
     // Certificado de cumplimiento
     const File2 = path.relative(baseUrl, certificateOfCompliance?.[0]?.path);
-     const file2 = await convertPdfToImages(File2,directory,"certificateOfCompliance");
+    const file2 = await convertPdfToImages(
+      File2,
+      directory,
+      "certificateOfCompliance"
+    );
 
     // Ceritifcado de cumplimiento firmado
-    const File3 = path.relative(baseUrl,signedCertificateOfCompliance?.[0]?.path);
-    const file3 = await convertPdfToImages(File3,directory,"signedCertificateOfCompliance");
+    const File3 = path.relative(
+      baseUrl,
+      signedCertificateOfCompliance?.[0]?.path
+    );
+    const file3 = await convertPdfToImages(
+      File3,
+      directory,
+      "signedCertificateOfCompliance"
+    );
 
     // Reporte de actividad
     const File4 = path.relative(baseUrl, activityReport?.[0]?.path);
@@ -101,7 +163,11 @@ exports.createDocumentManagement = async (req, res) => {
 
     // Certificado de calidad tributaria
     const File5 = path.relative(baseUrl, taxQualityCertificate?.[0]?.path);
-    const file5 = await convertPdfToImages(File5,directory,"taxQualityCertificate");
+    const file5 = await convertPdfToImages(
+      File5,
+      directory,
+      "taxQualityCertificate"
+    );
 
     // social security
     const File6 = path.relative(baseUrl, socialSecurity?.[0]?.path);
@@ -121,13 +187,20 @@ exports.createDocumentManagement = async (req, res) => {
 
     // Acta de inicio
     const File10 = path.relative(baseUrl, initiationRecord?.[0]?.path);
-    const file10 = await convertPdfToImages(File10,directory,"initiationRecord");
+    const file10 = await convertPdfToImages(
+      File10,
+      directory,
+      "initiationRecord"
+    );
 
     // Certificacion de cuenta
     const File11 = path.relative(baseUrl, accountCertification?.[0]?.path);
-    const file11 = await convertPdfToImages(File11,directory,"accountCertification");
+    const file11 = await convertPdfToImages(
+      File11,
+      directory,
+      "accountCertification"
+    );
 
-  
     // Creacion en la base de datos
     const newDocumentManagement = new DocumentManagement({
       creationDate,
@@ -136,9 +209,9 @@ exports.createDocumentManagement = async (req, res) => {
       state: state || true,
       description,
       version: 1,
-      userCreate:userContract,
-      userEdition:userContract,
-      userContract:userContract,
+      userCreate: userContract,
+      userEdition: userContract,
+      userContract: userContract,
       filingLetter: File1,
       certificateOfCompliance: File2,
       signedCertificateOfCompliance: File3,
@@ -180,8 +253,10 @@ exports.createDocumentManagement = async (req, res) => {
 exports.updateDocumentManagement = async (req, res) => {
   try {
     // Consulta para ver si existe la gestion documental
-        const documenteMangementeUser = await DocumentManagement.findOne({userContract: req.params.userContract});
-      if (!documenteMangementeUser) {
+    const documenteMangementeUser = await DocumentManagement.findOne({
+      userContract: req.params.userContract,
+    });
+    if (!documenteMangementeUser) {
       return res.status(404).json({
         success: false,
         message: "No hay gestión documental relacionada con este usuario",
@@ -189,19 +264,31 @@ exports.updateDocumentManagement = async (req, res) => {
     }
 
     // Variables que viene del req.files
-     const {filingLetter,certificateOfCompliance,signedCertificateOfCompliance,activityReport,taxQualityCertificate,socialSecurity,rut,rit,trainings,initiationRecord,accountCertification} = req.files;
+    const {
+      filingLetter,
+      certificateOfCompliance,
+      signedCertificateOfCompliance,
+      activityReport,
+      taxQualityCertificate,
+      socialSecurity,
+      rut,
+      rit,
+      trainings,
+      initiationRecord,
+      accountCertification,
+    } = req.files;
 
     // Varibles que viene del body;
-     const { description, ip, retentionTime, state } = req.body;
+    const { description, ip, retentionTime, state } = req.body;
 
     // Ruta a donde esta las imagenes
-     const outputDir = path.resolve(
-        __dirname,
-        "../../Files/",
-        `${documenteMangementeUser.userContract}Img` // FIX nombre correcto
-      );
-      // Ruta para quitar 
-      const baseUrl = path.resolve(__dirname, "../../");
+    const outputDir = path.resolve(
+      __dirname,
+      "../../Files/",
+      `${documenteMangementeUser.userContract}Img` // FIX nombre correcto
+    );
+    // Ruta para quitar
+    const baseUrl = path.resolve(__dirname, "../../");
 
     // Filing Letter
     if (filingLetter) {
@@ -212,22 +299,30 @@ exports.updateDocumentManagement = async (req, res) => {
     }
 
     // Certificate of Compliance
-       if (certificateOfCompliance) {
+    if (certificateOfCompliance) {
       const newFilePath = certificateOfCompliance[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.certificateOfCompliance = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "certificateOfCompliance");
+      await convertPdfToImages(
+        newFilePath,
+        outputDir,
+        "certificateOfCompliance"
+      );
     }
 
-      // Signed Certificate of Compliance
+    // Signed Certificate of Compliance
     if (signedCertificateOfCompliance) {
       const newFilePath = signedCertificateOfCompliance[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.signedCertificateOfCompliance = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "signedCertificateOfCompliance");
+      await convertPdfToImages(
+        newFilePath,
+        outputDir,
+        "signedCertificateOfCompliance"
+      );
     }
 
-     // Activity Report
+    // Activity Report
     if (activityReport) {
       const newFilePath = activityReport[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -235,7 +330,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "activityReport");
     }
 
-       // Tax Quality Certificate
+    // Tax Quality Certificate
     if (taxQualityCertificate) {
       const newFilePath = taxQualityCertificate[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -243,7 +338,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "taxQualityCertificate");
     }
 
-      // Social Security
+    // Social Security
     if (socialSecurity) {
       const newFilePath = socialSecurity[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -251,7 +346,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "socialSecurity");
     }
 
-      // RUT
+    // RUT
     if (rut) {
       const newFilePath = rut[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -267,7 +362,6 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "rit");
     }
 
-    
     // Trainings
     if (trainings) {
       const newFilePath = trainings[0].path;
@@ -276,7 +370,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "trainings");
     }
 
-     // Initiation Record
+    // Initiation Record
     if (initiationRecord) {
       const newFilePath = initiationRecord[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -284,7 +378,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(newFilePath, outputDir, "initiationRecord");
     }
 
-     // Account Certification
+    // Account Certification
     if (accountCertification) {
       const newFilePath = accountCertification[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
@@ -298,11 +392,11 @@ exports.updateDocumentManagement = async (req, res) => {
     documenteMangementeUser.version += 1;
 
     // Varibles que pueden editar el usuario que no son documentos
-    if(ip) documenteMangementeUser.ip = ip; 
-    if(state !== undefined) documenteMangementeUser.state = state;
-    if(description) documenteMangementeUser.description = description;
-    if(retentionTime) documenteMangementeUser.retentionTime = retentionTime;
- 
+    if (ip) documenteMangementeUser.ip = ip;
+    if (state !== undefined) documenteMangementeUser.state = state;
+    if (description) documenteMangementeUser.description = description;
+    if (retentionTime) documenteMangementeUser.retentionTime = retentionTime;
+
     await documenteMangementeUser.save();
     return res.status(200).json({
       success: true,
@@ -339,7 +433,7 @@ exports.deleteDocumentManagement = async (req, res) => {
     // Eliminar la carpeta del usuario
     const folderPath = path.join(__dirname, `../../Files/${userContrac}`);
     // Eliminar la carpte de las imaganes
-    const folderPathImg = path.join( __dirname, `../../Files/${userContrac}Img`);
+    const folderPathImg = path.join(__dirname, `../../Files/${userContrac}Img`);
 
     // Eliminar la carpeta con los pdf
     fs.rmSync(folderPath, { recursive: true, force: true });
@@ -347,7 +441,9 @@ exports.deleteDocumentManagement = async (req, res) => {
     fs.rmSync(folderPathImg, { recursive: true, force: true });
 
     // Eliminar la gestion documental
-    await DocumentManagement.deleteOne({ userContract: req.params.userContract });
+    await DocumentManagement.deleteOne({
+      userContract: req.params.userContract,
+    });
 
     return res.status(200).json({
       success: true,
@@ -358,6 +454,71 @@ exports.deleteDocumentManagement = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Error al eliminar el documento",
+      error: error.message,
+    });
+  }
+};
+
+exports.getDocumentManagementStats = async (req, res) => {
+  try {
+    let stats;
+    // Total de documentos
+    const totalDocuments = await DocumentManagement.find();
+
+    // Conteo total de documentos
+    const totalCount = totalDocuments.length;
+
+    // Contratista sin gestion documental
+    // consulta todos los contratistas
+    const contractors = await Contractor.find();
+    const contractorsWithDocs = contractors.length - totalCount;
+
+
+
+    // Documentos activos e inactivos
+    const activeDocuments = totalDocuments.filter(
+      (doc) => doc.state === true
+    ).length;
+    // Documentos inactivos
+    const inactiveDocuments = totalDocuments.filter(
+      (doc) => doc.state === false
+    ).length;
+
+    const contractor = (await Contractor.find()).length;
+
+    // Contratos sin gestion documental
+    let ContractsWithoutDocumentManagement = 0;
+
+
+    totalDocuments.forEach((d) => {
+      if (d.filingLetter) ContractsWithoutDocumentManagement++;
+      if (d.certificateOfCompliance) ContractsWithoutDocumentManagement++;
+      if (d.signedCertificateOfCompliance) ContractsWithoutDocumentManagement++;
+      if (d.activityReport) ContractsWithoutDocumentManagement++;
+      if (d.taxQualityCertificate) ContractsWithoutDocumentManagement++;
+      if (d.socialSecurity) ContractsWithoutDocumentManagement++;
+      if (d.rut) ContractsWithoutDocumentManagement++;
+      if (d.rit) ContractsWithoutDocumentManagement++;
+      if (d.trainings)ContractsWithoutDocumentManagement++;
+      if (d.initiationRecord)ContractsWithoutDocumentManagement++;
+      if (d.accountCertification)ContractsWithoutDocumentManagement++;
+    });
+
+    stats = {
+      'total de documentos':totalCount,
+      'documentos activos': activeDocuments,
+      'documentos inactivos': inactiveDocuments,
+      'Documentos en el sistema':ContractsWithoutDocumentManagement,
+      'Contratistas sin gestiones documentales': contractorsWithDocs
+    
+    };
+
+    return res.status(200).json({ success: true, message: "Estadísticas de gestión documental obtenidas correctamente", data: stats });
+  } catch (error) {
+    console.error("[GetDocumentManagementStats] Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error al obtener las estadísticas de gestión documental",
       error: error.message,
     });
   }

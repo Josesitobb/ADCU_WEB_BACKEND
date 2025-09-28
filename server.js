@@ -68,41 +68,41 @@ app.use("/api/Data", DataManagement);
 app.use("/api/Verification", VerificationOfContractData);
 
 
-  // Data api
-  app.use("/", (req, res) => {
-    res.send(`
+//   // Data api
+//   app.use("/", (req, res) => {
+//     res.send(`
 
-   Bienvenido a la API de ADCU
-   <br>
+//    Bienvenido a la API de ADCU
+//    <br>
 
-   Endpoints:
-  // Inicio de sesion
-   Post: /api/auth/signin 
-   <br>
+//    Endpoints:
+//   // Inicio de sesion
+//    Post: /api/auth/signin 
+//    <br>
 
-  //  Gestion de usuarios:
-  Get: /api/users  
-  <br>
+//   //  Gestion de usuarios:
+//   Get: /api/users  
+//   <br>
 
-  //  Gestion de contratos:
-  Get: /api/Contracts   
-   <br>
+//   //  Gestion de contratos:
+//   Get: /api/Contracts   
+//    <br>
 
-  // Gestion documental:
-  Get: /api/Documents  
-   <br>
+//   // Gestion documental:
+//   Get: /api/Documents  
+//    <br>
 
-  // Gestion de datos
-  Get: /api/Data 
-  <br>
+//   // Gestion de datos
+//   Get: /api/Data 
+//   <br>
 
-  // Verificacion de datos:
-  Get:/api/Verification  
-   <br>
+//   // Verificacion de datos:
+//   Get:/api/Verification  
+//    <br>
    
 
-    `);
-  });
+//     `);
+//   });
 
 app.use(express.json());
 

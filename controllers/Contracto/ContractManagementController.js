@@ -195,7 +195,19 @@ exports.updateContract = async (req, res, next) => {
   try {
     console.log("[CONTROLLER CONTRACTMANAGEMENT] Contrato para actualizar ");
     // Variables especiales para la actualizacion
-    const { typeofcontract, startDate, endDate, state, price } = req.body;
+    const {
+      typeofcontract,
+      startDate,
+      endDate,
+      contractNumber,
+      state,
+      periodValue,
+      totalValue,
+      objectiveContract,
+      extension,
+      addiction,
+      suspension,
+    } = req.body;
 
     // Consulta a la base de datos
     const contractUpdate = await ContracManagement.findById(req.params.id);
@@ -220,12 +232,31 @@ exports.updateContract = async (req, res, next) => {
       }
     }
 
-    if (typeofcontract !== undefined)
-      contractUpdate.typeofcontract = typeofcontract;
-    if (startDate !== undefined) contractUpdate.startDate = startDate;
-    if (endDate !== undefined) contractUpdate.endDate = endDate;
+    // Verificar que no exista un contrato con el mismo numero de contrato
+    if (contractNumber && contractNumber !== contractUpdate.contractNumber) {
+      const contractDuplicate = await ContracManagement.findOne({
+        contractNumber,
+      });
+
+      if (contractDuplicate) {
+        return res.status(400).json({
+          success: false,
+          message: "Ya existe un contrato con el mismo numero de contrato",
+        });
+      }
+    }
+
+    if (typeofcontract )contractUpdate.typeofcontract = typeofcontract;
+    if (startDate ) contractUpdate.startDate = startDate;
+    if (endDate ) contractUpdate.endDate = endDate;
     if (state !== undefined) contractUpdate.state = state;
-    if (price !== undefined) contractUpdate.price = price;
+    if (objectiveContract ) contractUpdate.objectiveContract = objectiveContract;
+    if (periodValue ) contractUpdate.periodValue = periodValue;
+    if (totalValue ) contractUpdate.totalValue = totalValue;
+    if (extension !== undefined) contractUpdate.extension = extension;
+    if (addiction !== undefined) contractUpdate.addiction = addiction;
+    if (suspension !== undefined) contractUpdate.suspension = suspension;
+    if(contractNumber) contractUpdate.contractNumber = contractNumber;
 
     await contractUpdate.save();
 
@@ -272,5 +303,51 @@ exports.deleteContract = async (req, res) => {
   }
 };
 
+// Estadisticas de los contratos
+exports.getStatsContract = async (req, res) => {
+  try {
+
+    let stats;
+
+    // Traer todos los contratos
+    const contractStats = await ContracManagement.find();
+
+    // Contar contratos activos e inactivos
+    const activeContracts = contractStats.filter(c => c.state === true).length;
+    const inactiveContracts = contractStats.filter(c => c.state === false).length;
+    const totalContracts = contractStats.length;
+
+    // Contrato vinculados a un contratista
+    const contractsLinked = (await Contract.find().populate("contract")).length;
+    
+    // Contrato que no esta vinculado a ningun contratista
+    const contractsNotLinked = totalContracts - contractsLinked;
+
+    // Contrato que tiene la fecha de finalizacion menor a la fecha actual
+     const expiredContracts = contractStats.filter(c => new Date(c.endDate) < new Date()).length;
+
+    stats = {
+      'Total de contratos':totalContracts,
+      'Contratos activos':activeContracts,
+      'Contratos inactivos':inactiveContracts,
+      'Contratos vinculados':contractsLinked,
+      'Contratos no vinculados':contractsNotLinked,
+      'Contratos expirados':expiredContracts
+    };
 
 
+    return res.status(200).json({
+      success: true,
+      message: "Estadisticas de contratos obtenidas exitosamente",
+      data: stats,
+
+    });
+  } catch (error) {
+    console.log("[CONTROLLER CONTRACTMANAGEMENT] Error al obtener estadisticas");
+    return res.status(500).json({
+      success: false,
+      message: "Error al obtener estadisticas de contratos",
+      error: error.message,
+    });
+  }
+};

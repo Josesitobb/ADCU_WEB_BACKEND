@@ -414,3 +414,31 @@ exports.toogleStateData = async(req,res)=>{
     });
   }
 }
+
+exports.getDataStats = async (req, res) => {
+  try {
+    let stats = {};
+    // Total de documentos
+    const totalDocuments = await DataManagements.find();
+    // Conteo total de documentos
+    const totalCount = totalDocuments.length;
+    // Contratista sin gestion documental
+    // consulta todos los contratistas
+    const contractors = await Contractor.find();
+    const contractorsWithDocs = contractors.length - totalCount;  
+    // Contratos sin gestion documental
+    const ContractsWithoutDocumentManagement = contractors.length - totalCount;
+    stats = {
+      'total de documentos':totalCount,
+      'Usuario contratista sin gestion de datos': contractorsWithDocs
+    };
+    return res.status(200).json({ success: true, message: "Estadísticas de gestión de datos obtenidas correctamente", data: stats });
+  } catch (error) {
+    console.error("[GetDocumentManagementStats] Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error al obtener las estadísticas de gestión de datos",
+      error: error.message,
+    });
+  }
+};

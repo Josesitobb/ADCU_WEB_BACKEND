@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getAllContract,
   getStateContracts,
+  getStatsContract,
   getContractById,
   createContract,
   updateContract,
@@ -14,11 +15,20 @@ const { checkRole } = require("../../middlewares/Role/role");
 // Todos los contratos
 router.get("/", verifyToken, checkRole("admin", "funcionario"), getAllContract);
 
+
 // Obtener solo los contratos activos
 router.get("/contractActive",
   verifyToken,
   checkRole("admin", "funcionario"),
   getStateContracts
+);
+
+
+// Obtener stadisticas de los contratos
+router.get("/stats",
+  verifyToken,
+  checkRole("admin", "funcionario"),
+  getStatsContract
 );
 
 
@@ -44,7 +54,7 @@ router.post(
 router.put(
   "/:id",
   verifyToken,
-  checkRole("admin", "funcionario"),
+  checkRole("admin"),
   updateContract
 );
 

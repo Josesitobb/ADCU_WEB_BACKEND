@@ -1,5 +1,5 @@
 const express = require("express");
-const {getAllDataManagemente,getDataById,createData,savedData,deleteData,updatedData,toogleStateData} = require("../../controllers/DataManagement/DataManagementControllers");
+const {getAllDataManagemente,getDataById,createData,savedData,deleteData,updatedData,toogleStateData,getDataStats} = require("../../controllers/DataManagement/DataManagementControllers");
 const router = express.Router();
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
@@ -18,6 +18,8 @@ router.get(
 router.post("/saved",
    savedData
   );
+
+  router.get("/stats", verifyToken, checkRole("admin", "funcionario"), getDataStats);
 
 
 // Obtener una comparacion por id
