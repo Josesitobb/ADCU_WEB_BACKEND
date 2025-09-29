@@ -2,6 +2,8 @@ const express = require("express");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
+
+
 const {
   OneFile,
   TwoFile,
@@ -351,6 +353,7 @@ exports.deleteData = async (req, res) => {
   }
 };
 
+
 exports.toogleStateData = async(req,res)=>{
   try{
 
@@ -442,3 +445,4 @@ exports.getDataStats = async (req, res) => {
     });
   }
 };
+

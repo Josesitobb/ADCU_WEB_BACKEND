@@ -1,8 +1,7 @@
-const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
-const Contractor = require("../../models/Users/Contractor");
-const User = require("../../models/Users/Functionary");
 const fs = require("fs");
 const path = require("path");
+const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
+const Contractor = require("../../models/Users/Contractor");
 const convertPdfToImages = require("../../utils/convertPdfToImages");
 require("dotenv").config();
 
@@ -459,6 +458,91 @@ exports.deleteDocumentManagement = async (req, res) => {
   }
 };
 
+exports.deleteDocumentByContractor = async (req, res) => {
+  try {
+    const { userContract, file } = req.params;
+
+    const exitingdocumentManagement = await DocumentManagement.findOne({
+      userContract: userContract,
+    });
+    if (!exitingdocumentManagement) {
+      return res.status(404).json({
+        success: false,
+        message: "No existe una gestion documental con ese id de usuario",
+      });
+    }
+
+    const validFiles = [
+      "filingLetter",
+      "certificateOfCompliance",
+      "signedCertificateOfCompliance",
+      "activityReport",
+      "taxQualityCertificate",
+      "socialSecurity",
+      "rut",
+      "rit",
+      "trainings",
+      "initiationRecord",
+      "accountCertification",
+    ];
+    if (!validFiles.includes(file)) {
+      return res.status(400).json({
+        success: false,
+        message: "El nombre del archivo no es valido",
+      });
+    }
+
+    // Ruta a donde esta las imagenes
+    const outputDir = path.join(__dirname, `../../Files/${userContract}Img`);
+    console.log("carpeta", outputDir);
+
+    //Leer todo los archivos de la carpeta del usuario 
+    fs.readdir(outputDir,(err,files)=>{
+      if(err) return console.log('Error',err) ;
+
+      // Filtrar todos los archis con el nombre
+     const toDelete =files.filter((u)=>u.startsWith(file));
+      // Iterar por cada archivo 
+      for(const u in toDelete){
+        const newPath = path.join(outputDir,toDelete[u]);
+        fs.promises.unlink(newPath);
+      }
+    });
+
+    // Borrar el pdf
+    const outputDirPdf = path.join(__dirname,`../../Files/${userContract}/${file}.pdf`);
+    // Ejecutar la promesa para eliminar
+    fs.promises.unlink(outputDirPdf).catch(err=>{
+      if(err==="ENOENT")console.log('Archivo ya eliminado porfa volver a subir un archivo nuevo',err)
+  
+    })
+
+    // Cambiar la ruta por archivo eliminado
+    exitingdocumentManagement[file] = 'Archivo eliminado';
+
+    // Gurdarlo en la base de datos
+    await exitingdocumentManagement.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Archivos ${file} eliminado correctamente ${exitingdocumentManagement}`,
+    });
+  } catch (error) {
+    console.log(
+      "[DataMangementControllers] Error al borrar un documento",
+      error
+    );
+
+ 
+
+    return res.status(500).json({
+      success: false,
+      message: "Error al borrar un documento",
+      error: error.message,
+    });
+  }
+};
+
 exports.getDocumentManagementStats = async (req, res) => {
   try {
     let stats;
@@ -472,8 +556,6 @@ exports.getDocumentManagementStats = async (req, res) => {
     // consulta todos los contratistas
     const contractors = await Contractor.find();
     const contractorsWithDocs = contractors.length - totalCount;
-
-
 
     // Documentos activos e inactivos
     const activeDocuments = totalDocuments.filter(
@@ -489,7 +571,6 @@ exports.getDocumentManagementStats = async (req, res) => {
     // Contratos sin gestion documental
     let ContractsWithoutDocumentManagement = 0;
 
-
     totalDocuments.forEach((d) => {
       if (d.filingLetter) ContractsWithoutDocumentManagement++;
       if (d.certificateOfCompliance) ContractsWithoutDocumentManagement++;
@@ -499,21 +580,26 @@ exports.getDocumentManagementStats = async (req, res) => {
       if (d.socialSecurity) ContractsWithoutDocumentManagement++;
       if (d.rut) ContractsWithoutDocumentManagement++;
       if (d.rit) ContractsWithoutDocumentManagement++;
-      if (d.trainings)ContractsWithoutDocumentManagement++;
-      if (d.initiationRecord)ContractsWithoutDocumentManagement++;
-      if (d.accountCertification)ContractsWithoutDocumentManagement++;
+      if (d.trainings) ContractsWithoutDocumentManagement++;
+      if (d.initiationRecord) ContractsWithoutDocumentManagement++;
+      if (d.accountCertification) ContractsWithoutDocumentManagement++;
     });
 
     stats = {
-      'total de documentos':totalCount,
-      'documentos activos': activeDocuments,
-      'documentos inactivos': inactiveDocuments,
-      'Documentos en el sistema':ContractsWithoutDocumentManagement,
-      'Contratistas sin gestiones documentales': contractorsWithDocs
-    
+      "total de documentos": totalCount,
+      "documentos activos": activeDocuments,
+      "documentos inactivos": inactiveDocuments,
+      "Documentos en el sistema": ContractsWithoutDocumentManagement,
+      "Contratistas sin gestiones documentales": contractorsWithDocs,
     };
 
-    return res.status(200).json({ success: true, message: "Estadísticas de gestión documental obtenidas correctamente", data: stats });
+    return res
+      .status(200)
+      .json({
+        success: true,
+        message: "Estadísticas de gestión documental obtenidas correctamente",
+        data: stats,
+      });
   } catch (error) {
     console.error("[GetDocumentManagementStats] Error:", error);
     return res.status(500).json({
