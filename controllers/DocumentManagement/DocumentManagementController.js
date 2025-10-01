@@ -135,14 +135,15 @@ exports.createDocumentManagement = async (req, res) => {
 
     // Carta de radicacion de cuenta de cobro
     const File1 = path.relative(baseUrl, filingLetter?.[0]?.path);
-    const file1 = await convertPdfToImages(File1, directory, "filingLetter");
+    const file1 = await convertPdfToImages(File1, directory, "filingLetter",1);
 
     // Certificado de cumplimiento
     const File2 = path.relative(baseUrl, certificateOfCompliance?.[0]?.path);
     const file2 = await convertPdfToImages(
       File2,
       directory,
-      "certificateOfCompliance"
+      "certificateOfCompliance",1
+    
     );
 
     // Ceritifcado de cumplimiento firmado
@@ -153,43 +154,44 @@ exports.createDocumentManagement = async (req, res) => {
     const file3 = await convertPdfToImages(
       File3,
       directory,
-      "signedCertificateOfCompliance"
+      "signedCertificateOfCompliance",1
     );
 
     // Reporte de actividad
     const File4 = path.relative(baseUrl, activityReport?.[0]?.path);
-    const file4 = await convertPdfToImages(File4, directory, "activityReport");
+    const file4 = await convertPdfToImages(File4, directory, "activityReport",5);
 
     // Certificado de calidad tributaria
     const File5 = path.relative(baseUrl, taxQualityCertificate?.[0]?.path);
     const file5 = await convertPdfToImages(
       File5,
       directory,
-      "taxQualityCertificate"
+      "taxQualityCertificate",2
     );
 
     // social security
     const File6 = path.relative(baseUrl, socialSecurity?.[0]?.path);
-    const file6 = await convertPdfToImages(File6, directory, "socialSecurity");
+    const file6 = await convertPdfToImages(File6, directory, "socialSecurity",2);
 
     //rut
     const File7 = path.relative(baseUrl, rut?.[0]?.path);
-    const file7 = await convertPdfToImages(File7, directory, "rut");
+    const file7 = await convertPdfToImages(File7, directory, "rut",1);
 
     // rit
     const File8 = path.relative(baseUrl, rit?.[0]?.path);
-    const file8 = await convertPdfToImages(File8, directory, "rit");
+    const file8 = await convertPdfToImages(File8, directory, "rit",1);
 
     // Capacitaciones
     const File9 = path.relative(baseUrl, trainings?.[0]?.path);
-    const file9 = await convertPdfToImages(File9, directory, "Trainings");
+    const file9 = await convertPdfToImages(File9, directory, "Trainings",5);
 
     // Acta de inicio
     const File10 = path.relative(baseUrl, initiationRecord?.[0]?.path);
     const file10 = await convertPdfToImages(
       File10,
       directory,
-      "initiationRecord"
+      "initiationRecord",
+      1
     );
 
     // Certificacion de cuenta
@@ -197,7 +199,8 @@ exports.createDocumentManagement = async (req, res) => {
     const file11 = await convertPdfToImages(
       File11,
       directory,
-      "accountCertification"
+      "accountCertification",
+      1
     );
 
     // Creacion en la base de datos
@@ -294,7 +297,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = filingLetter[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.filingLetter = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "filingLetter");
+      await convertPdfToImages(newFilePath, outputDir, "filingLetter", 1);
     }
 
     // Certificate of Compliance
@@ -305,7 +308,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(
         newFilePath,
         outputDir,
-        "certificateOfCompliance"
+        "certificateOfCompliance", 1
       );
     }
 
@@ -317,7 +320,7 @@ exports.updateDocumentManagement = async (req, res) => {
       await convertPdfToImages(
         newFilePath,
         outputDir,
-        "signedCertificateOfCompliance"
+        "signedCertificateOfCompliance", 1
       );
     }
 
@@ -326,7 +329,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = activityReport[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.activityReport = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "activityReport");
+      await convertPdfToImages(newFilePath, outputDir, "activityReport",5);
     }
 
     // Tax Quality Certificate
@@ -334,7 +337,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = taxQualityCertificate[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.taxQualityCertificate = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "taxQualityCertificate");
+      await convertPdfToImages(newFilePath, outputDir, "taxQualityCertificate",2);
     }
 
     // Social Security
@@ -342,7 +345,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = socialSecurity[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.socialSecurity = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "socialSecurity");
+      await convertPdfToImages(newFilePath, outputDir, "socialSecurity",2);
     }
 
     // RUT
@@ -350,7 +353,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = rut[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.rut = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "rut");
+      await convertPdfToImages(newFilePath, outputDir, "rut",1);
     }
 
     // RIT
@@ -358,7 +361,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = rit[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.rit = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "rit");
+      await convertPdfToImages(newFilePath, outputDir, "rit",1);
     }
 
     // Trainings
@@ -366,7 +369,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = trainings[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.trainings = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "trainings");
+      await convertPdfToImages(newFilePath, outputDir, "trainings",5);
     }
 
     // Initiation Record
@@ -374,7 +377,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = initiationRecord[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.initiationRecord = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "initiationRecord");
+      await convertPdfToImages(newFilePath, outputDir, "initiationRecord", 1);
     }
 
     // Account Certification
@@ -382,7 +385,7 @@ exports.updateDocumentManagement = async (req, res) => {
       const newFilePath = accountCertification[0].path;
       const relativePath = path.relative(baseUrl, newFilePath);
       documenteMangementeUser.accountCertification = relativePath;
-      await convertPdfToImages(newFilePath, outputDir, "accountCertification");
+      await convertPdfToImages(newFilePath, outputDir, "accountCertification", 1);
     }
 
     // Usuario que edita

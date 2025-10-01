@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
@@ -15,6 +17,7 @@ const {
   EightFile,
   NineFile,
 } = require("../../services/FunctionDataPython");
+const { console } = require("inspector");
 
 exports.getAllDataManagemente = async (req, res) => {
   try {
@@ -111,6 +114,39 @@ exports.createData = async (req, res) => {
     // Se agregar el document management al usuario para enviarlo al python
     UserContractAll.documentManagement = exitingdocumentManagement._id;
 
+    // Verificar que los archivos sean correctos al numero de documentos
+    const FieldAll = [
+      "filingLetter1.jpg",
+      "certificateOfCompliance1.jpg",
+      "signedCertificateOfCompliance1.jpg",
+      "activityReport1.jpg",
+      "activityReport2.jpg",
+      "activityReport3.jpg",
+      "activityReport4.jpg",
+      "activityReport5.jpg",
+      "taxQualityCertificate1.jpg",
+      "taxQualityCertificate2.jpg",
+      "rut1.jpg",
+      "rit1.jpg",
+      "initiationRecord1.jpg",
+      "accountCertification1.jpg",
+    ]
+    // Recorrer el arreglo y verificar que existan los archivos
+    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}Img`);
+
+    // Leer la carpta de los archivos
+    const files = fs.readdirSync(outputDir);
+
+    // Verificar que los archivos existan
+    for(const field of FieldAll){
+      if(!files.includes(field)){
+        return res.status(400).json({
+          success:false,
+          message:`Falta el archivo ${field} en la carpeta ${exitingdocumentManagement.userContract}Img`
+        });
+      }
+    }
+
     // Correr archivos python
 
     // Carta de radicacion
@@ -120,7 +156,7 @@ exports.createData = async (req, res) => {
     await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // // Certificado de cumplimiento firmado
-    // await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+    await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
     // // Informe de actividad
     await FourFile("ActivityReport", UserContractAll);
@@ -143,6 +179,7 @@ exports.createData = async (req, res) => {
     return res.status(200).json({
       success: true,
       message: "Analisis completo, Verifica los resultados",
+      data: files
     });
   } catch (error) {
     console.error("[CreateData] Error al crear una comparacion:", error);
@@ -209,33 +246,153 @@ exports.updatedData = async (req, res) => {
         message: "Seleccione un documento valido para poder actualizar",
       });
     }
+    // Verificar que los archivos sean correctos al numero de documentos
+    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}Img`);
+    // Leer la carpta de los archivos
+    const files = fs.readdirSync(outputDir);
 
     // Verificar si quiere editar cada documentos
-    if (field == "filingLetter")  await OneFile("FilingLetter", UserContractAll);
+    if (field == "filingLetter") {
+      // Verificar que el archivo exista
+      const fieldFilingLetter =['filingLetter1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldFilingLetter){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
 
-    if(field =="certificateOfCompliance") await  TwoFile("FilingLetter", UserContractAll);
+      await OneFile("FilingLetter", UserContractAll);
+      
+    } 
 
-    if(field =="signedCertificateOfCompliance") await ThreeFile("FilingLetter", UserContractAll);
+    if(field =="certificateOfCompliance"){
+      // Verificar que el archivo exista
+      const fieldCertificateOfCompliance =['certificateOfCompliance1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldCertificateOfCompliance){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await  TwoFile("certificateOfCompliance", UserContractAll);
+    } 
 
-    if(field =="activityReport") await FourFile("ActivityReport", UserContractAll);
+    if(field =="signedCertificateOfCompliance") {
+      // Verificar que el archivo exista
+      const fieldSignedCertificateOfCompliance =['signedCertificateOfCompliance1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldSignedCertificateOfCompliance){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+    }
 
-    if(field =="taxQuanlityCertificate") await FiveFile("TaxQuanlityCertificate", UserContractAll);
+    if(field =="activityReport") {
+      // Verificar que el archivo exista
+      const fieldActivityReport =['activityReport1.jpg','activityReport2.jpg','activityReport3.jpg','activityReport4.jpg','activityReport5.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldActivityReport){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await FourFile("activityReport", UserContractAll);
+    }
 
-    if(field =="rut") await SixFile("Rut", UserContractAll);
+    if(field =="taxQualityCertificate") {
+      // Verificar que el archivo exista
+      const fieldTaxQualityCertificate =['taxQualityCertificate1.jpg','taxQualityCertificate2.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldTaxQualityCertificate){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await FiveFile("taxQualityCertificate", UserContractAll);
+    }
 
-    if(field =="rit") await SevenFile("Rit", UserContractAll);
+    if(field =="rut") {
+      // Verificar que el archivo exista
+      const fieldRut =['rut1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldRut){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await SixFile("rut", UserContractAll);
+    }
 
-    if(field =="initiationRecord") await EightFile ("InitiationRecord", UserContractAll);
+    if(field =="rit") {
+      // Verificar que el archivo exista
+      const fieldRit =['rit1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldRit){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await SevenFile("rit", UserContractAll);
+    }
 
-    if(field =="accountCertification")await  NineFile("AccountCertification", UserContractAll);
+    if(field =="initiationRecord") {
+      // Verificar que el archivo exista
+      const fieldInitiationRecord =['initiationRecord1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldInitiationRecord){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await EightFile ("initiationRecord", UserContractAll);
+    }
+
+    if(field =="accountCertification") {
+      // Verificar que el archivo exista
+      const fieldAccountCertification =['accountCertification1.jpg'];
+      // Verificar que los archivos existan
+      for(const file of fieldAccountCertification){
+        if(!files.includes(file)){
+          return res.status(400).json({
+            success: false,
+            message: `El archivo ${file} no existe en la carpeta de salida`,
+          });
+        }
+      }
+      await NineFile("accountCertification", UserContractAll);
+    }
 
     return res.status(200).json({
       success:true,
-      message:`Archivo ${field} Actualizado correctamente verifica  `
-    })
-   
-     
-                                          
+      message:`Archivo ${field} Actualizado correctamente verifica los resultados`,
+    });                              
   } catch (error) {
     return res.status(500).json({
       success: false,

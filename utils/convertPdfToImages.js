@@ -1,7 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 
-async function convertPdfToImages(pathDocument, outputDir, baseName) {
+async function convertPdfToImages(pathDocument, outputDir, baseName,counterImg) {
   try {
     const { pdf } = await import("pdf-to-img"); 
 
@@ -13,6 +13,9 @@ async function convertPdfToImages(pathDocument, outputDir, baseName) {
       const pathSaved = path.join(outputDir, `${baseName}${counter}.jpg`);
       await fs.writeFile(pathSaved, image);
       counter++;
+      
+      // Cantidad de imaganes que se van a permitir
+      if(counter > counterImg)break;
     }
   } catch (error) {
     console.log(error);

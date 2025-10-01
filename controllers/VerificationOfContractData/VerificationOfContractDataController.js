@@ -92,8 +92,7 @@ exports.getDataVerificactionById = async (req, res) => {
 exports.getAllDataVerificaction = async (req, res) => {
   try {
     const allVerifications = await VerificationOfContractData.find().populate({
-      path: "dataManagemnts",
-      select: "firsName lastName idcard telephone email",
+      path: "dataManagemnts"
     });
 
     return res.status(200).json({

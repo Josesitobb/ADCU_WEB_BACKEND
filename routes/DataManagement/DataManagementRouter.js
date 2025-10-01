@@ -19,7 +19,9 @@ router.post("/saved",
    savedData
   );
 
-  router.get("/stats", verifyToken, checkRole("admin", "funcionario"), getDataStats);
+  router.get("/stats", 
+    verifyToken,
+     checkRole("admin", "funcionario"), getDataStats);
 
 
 // Obtener una comparacion por id
@@ -37,7 +39,7 @@ router.get(
 // Llamar para comenzar la creacion
 router.post(
   "/:management",
-  // verifyToken,
+  verifyToken,
   // checkRole("admin", "funcionario", "contratista"),
   createData
 );
@@ -54,7 +56,8 @@ router.put("/:management/:field",
 );
 
 // ✅ DELETE: Eliminar documento (si lo usas desde el frontend)
-router.delete("/:management",verifyToken,
+router.delete("/:management",
+  verifyToken,
   checkRole("admin"), deleteData);
 
 
