@@ -5,7 +5,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 const config = require("./config");
 const { MongoClient, ObjecId } = require("mongodb");
-const path = require("path");
+const path = require("node:path");
 
 // Llamar funcion para inactivar los contratos
 require("./controllers/Contracto/inactivarContratos");
@@ -28,7 +28,7 @@ const DataManagement = require("./routes/DataManagement/DataManagementRouter");
 
 // Verificacion de la gestion de datos
 const VerificationOfContractData = require("./routes/VerificationOfContractData/VerificationOfContractData");
-const { request } = require("http");
+
 
 const mongoClient = new MongoClient(process.env.MONGODB_URI);
 

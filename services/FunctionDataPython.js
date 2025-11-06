@@ -1,28 +1,28 @@
-const pythonExecute = require("../helpers/PythonExecute");
+// const pythonExecute = require("../helpers/PythonExecute");
 
-// Primer archivo python
-// Carta de radicacion
-exports.OneFile = async (ScriptName, UserContractAll) => {
-  const dataUserContract = [
-    // Datos del usuario
-    UserContractAll.user.firsName,
-    UserContractAll.user.lastName,
-    UserContractAll.user.idcard,
-    UserContractAll.user.telephone,
-    UserContractAll.user.email,
-    // Datos del contrato
-    UserContractAll.contract.typeofcontract,
-    UserContractAll.residentialAddress,
-    UserContractAll.contract.startDate,
-    UserContractAll.contract.endDate,
-    UserContractAll.contract.contractNumber,
-    UserContractAll.contract.periodValue,
-    // Id Del usuario
-    UserContractAll._id,
-    UserContractAll.documentManagement,
-  ];
-  return pythonExecute(ScriptName, dataUserContract);
-};
+// // Primer archivo python
+// // Carta de radicacion
+// exports.OneFile = async (ScriptName, UserContractAll) => {
+//   const dataUserContract = [
+//     // Datos del usuario
+//     UserContractAll.user.firsName,
+//     UserContractAll.user.lastName,
+//     UserContractAll.user.idcard,
+//     UserContractAll.user.telephone,
+//     UserContractAll.user.email,
+//     // Datos del contrato
+//     UserContractAll.contract.typeofcontract,
+//     UserContractAll.residentialAddress,
+//     UserContractAll.contract.startDate,
+//     UserContractAll.contract.endDate,
+//     UserContractAll.contract.contractNumber,
+//     UserContractAll.contract.periodValue,
+//     // Id Del usuario
+//     UserContractAll._id,
+//     UserContractAll.documentManagement,
+//   ];
+//   return pythonExecute(ScriptName, dataUserContract);
+// };
 
 // Segundo archivo python
 // Certificado de cumplimiento no firmado

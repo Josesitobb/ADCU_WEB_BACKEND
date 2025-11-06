@@ -1,9 +1,11 @@
-const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
+// Funciones para la comparacion
+const {generateFilingLetter} = require("./Scripts/FilingLetter");
+const {generateCertificateOfCompliance}= require('./Scripts/CertificateOfCompliance');
 
 
 const {
@@ -17,7 +19,7 @@ const {
   EightFile,
   NineFile,
 } = require("../../services/FunctionDataPython");
-const { console } = require("inspector");
+
 
 exports.getAllDataManagemente = async (req, res) => {
   try {
@@ -77,23 +79,22 @@ const dataManagementeId = await DataManagements.findOne({
 
 exports.createData = async (req, res) => {
   try {
+    const management = req.params.management;
+
     // Buscar la gestion documetal
-    const exitingdocumentManagement = await DocumentManagement.findById(
-      req.params.management
-    );
+    const exitingdocumentManagement = await DocumentManagement.findById(management);
+  
 
     // Si no existe mensaje de respuesta
     if (!exitingdocumentManagement) {
       return res.status(404).json({
         success: false,
-        message: "Error no existe una gestion documental",
+        message: "No existe una gestion documental",
       });
     }
 
     // Busqueda del usuario para traer NOMBRE CEDULA ,NUMERO DE CELULAR, FECHA DEL CONTRATO, VALOR Y NUMERO
-    const ContractUser = await Contractor.findById(
-      exitingdocumentManagement.userContract
-    )
+    const ContractUser = await Contractor.findById(exitingdocumentManagement.userContract)
       .populate("user", "firsName lastName idcard telephone email")
       .populate(
         "contract",
@@ -149,32 +150,33 @@ exports.createData = async (req, res) => {
 
     // Correr archivos python
 
-    // Carta de radicacion
-    await OneFile("FilingLetter", UserContractAll);
-
+    // Carta de radicacion FilingLetter
+    // await generateFilingLetter(UserContractAll);
+  
     //Certificado de cumplimiento no firmado
-    await TwoFile("CertificateOfCompliance", UserContractAll);
+    // await generateCertificateOfCompliance(UserContractAll);
+    // await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // // Certificado de cumplimiento firmado
-    await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+    // await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
     // // Informe de actividad
-    await FourFile("ActivityReport", UserContractAll);
+    // await FourFile("ActivityReport", UserContractAll);
 
     // // Certificado de calidad tributaria
-    await FiveFile("TaxQuanlityCertificate", UserContractAll);
+    // await FiveFile("TaxQuanlityCertificate", UserContractAll);
 
     // // Rut
-    await SixFile("Rut", UserContractAll);
+    // await SixFile("Rut", UserContractAll);
 
     // // RIT
-    await SevenFile("Rit", UserContractAll);
+    // await SevenFile("Rit", UserContractAll);
 
     // // Acta de inicio
-    await EightFile("InitiationRecord", UserContractAll);
+    // await EightFile("InitiationRecord", UserContractAll);
 
     // // Certificacion bancaria
-    await NineFile("AccountCertification", UserContractAll);
+    // await NineFile("AccountCertification", UserContractAll);
 
     return res.status(200).json({
       success: true,
@@ -228,7 +230,7 @@ exports.updatedData = async (req, res) => {
 
     
     //Arreglo de todos los nombres de los documentos
-    FieldAll = [
+    const FieldAll = [
       "filingLetter",
       "certificateOfCompliance",
       "signedCertificateOfCompliance",
@@ -526,7 +528,7 @@ exports.toogleStateData = async(req,res)=>{
   }
 
   // Verificar que venga el documento correctos
-    FieldSelect =[
+    const FieldSelect =[
       "filingLetter",
       "certificateOfCompliance",
       // "signedCertificateOfCompliance",

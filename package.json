@@ -24,6 +24,7 @@
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
     "node-cron": "^4.2.0",
+    "openai": "^6.7.0",
     "pdf-to-img": "^4.5.0",
     "sequelize": "^6.37.7"
   },
