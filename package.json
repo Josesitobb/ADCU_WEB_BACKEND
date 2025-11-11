@@ -5,7 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node serve.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "sonar":" sonar -Dsonar.token=1f2ff6ca7f07d4715a3c5c2116e4a11c3980ade2 -Dsonar.projectKey=Josesitobb_ADCU_WEB_BACKEND -Dsonar.organization=josesitobb -X"
   },
   "keywords": [],
   "author": "",

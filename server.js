@@ -3,7 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
-const config = require("./config");
 const { MongoClient, ObjecId } = require("mongodb");
 const path = require("node:path");
 
@@ -113,3 +112,5 @@ const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, HOST, () => {
   console.log(`Servidor en http://${HOST}:${PORT}`);
 });
+
+

@@ -8,18 +8,6 @@ const {generateFilingLetter} = require("./Scripts/FilingLetter");
 const {generateCertificateOfCompliance}= require('./Scripts/CertificateOfCompliance');
 
 
-const {
-  OneFile,
-  TwoFile,
-  ThreeFile,
-  FourFile,
-  FiveFile,
-  SixFile,
-  SevenFile,
-  EightFile,
-  NineFile,
-} = require("../../services/FunctionDataPython");
-
 
 exports.getAllDataManagemente = async (req, res) => {
   try {
