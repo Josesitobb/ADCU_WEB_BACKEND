@@ -28,15 +28,6 @@ const DataManagement = require("./routes/DataManagement/DataManagementRouter");
 // Verificacion de la gestion de datos
 const VerificationOfContractData = require("./routes/VerificationOfContractData/VerificationOfContractData");
 
-
-const mongoClient = new MongoClient(process.env.MONGODB_URI);
-
-async () => {
-  await mongoClient.connect();
-  app.set("mongoDB", mongoClient.db());
-  console.log("Conexion directa a mongoDB establecida");
-};
-
 const app = express();
 
 // Middlewares
