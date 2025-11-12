@@ -6,7 +6,7 @@ const { FILE, INITIATIONRECORD } = require("../../../config/config");
 const { base64image } = require("../../../utils/base64Image");
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
-exports.generateActivityReports = async (data) => {
+exports.generateInitiationRecord = async (data) => {
   try {
     // Constantes
     const {

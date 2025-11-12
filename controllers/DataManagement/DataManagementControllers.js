@@ -6,6 +6,12 @@ const DocumentManagement = require("../../models/DocumentManagement/DocumentMana
 // Funciones para la comparacion
 const {generateFilingLetter} = require("./Scripts/FilingLetter");
 const {generateCertificateOfCompliance}= require('./Scripts/CertificateOfCompliance');
+const {generateActivityReports}= require('./Scripts/ActivityReport');
+const {generateTaxQuanlityCertificate} = require('./Scripts/TaxQuanlityCertificate');
+const {generateRut}=require('./Scripts/Rut');
+const {generateRit}= require('./Scripts/Rit');
+const {generateInitiationRecord}= require('./Scripts/InitiationRecord');
+const {generateAccountCertification} = require('./Scripts/AccountCertification');
 
 
 
@@ -139,32 +145,33 @@ exports.createData = async (req, res) => {
     // Correr archivos python
 
     // Carta de radicacion FilingLetter
-    // await generateFilingLetter(UserContractAll);
+    await generateFilingLetter(UserContractAll);
   
     //Certificado de cumplimiento no firmado
-    // await generateCertificateOfCompliance(UserContractAll);
+    await generateCertificateOfCompliance(UserContractAll);
     // await TwoFile("CertificateOfCompliance", UserContractAll);
 
-    // // Certificado de cumplimiento firmado
+    // Certificado de cumplimiento firmado
     // await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
-    // // Informe de actividad
-    // await FourFile("ActivityReport", UserContractAll);
+    // Informe de actividad
+     await generateActivityReports(UserContractAll);
 
     // // Certificado de calidad tributaria
-    // await FiveFile("TaxQuanlityCertificate", UserContractAll);
+    await generateTaxQuanlityCertificate(UserContractAll);
 
-    // // Rut
-    // await SixFile("Rut", UserContractAll);
+    // Rut
+    await generateRut(UserContractAll);
 
-    // // RIT
-    // await SevenFile("Rit", UserContractAll);
+    // RIT
+    await generateRit(UserContractAll);
 
-    // // Acta de inicio
-    // await EightFile("InitiationRecord", UserContractAll);
+    // Acta de inicio
+    await generateInitiationRecord(UserContractAll)
 
-    // // Certificacion bancaria
-    // await NineFile("AccountCertification", UserContractAll);
+    // Certificacion bancaria
+    await generateAccountCertification(UserContractAll)
+ 
 
     return res.status(200).json({
       success: true,
