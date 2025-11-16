@@ -2,6 +2,7 @@ const express = require("express");
 const ContracManagement = require("../../models/Contracto/ContractManagement");
 const Contract = require("../../models/Users/Contractor");
 const ContractManagement = require("../../models/Contracto/ContractManagement");
+const mongoose = require("mongoose");
 
 // Ver todos los contratos
 exports.getAllContract = async (req, res) => {
@@ -151,17 +152,17 @@ exports.createContract = async (req, res) => {
       });
     }
 
-    if (typeof contractNumber !== "string" || /[\$\.]/.test(contractNumber)) {
+    if (typeof contractNumber !== "string" || /[$.]/.test(contractNumber)) {
       return res.status(400).json({
         success: false,
         message: "Valor inválido para número de contrato.",
       });
     }
 
-     // Sanitizar 
+    // Sanitizar
     const safeContractNumber = contractNumber.trim();
-    
-    // Hacer query a la base de datos 
+
+    // Hacer query a la base de datos
     const query = { contractNumber: safeContractNumber };
 
     // Verificar que no exista un contrato con el mismo numero de contrato
@@ -247,9 +248,9 @@ exports.updateContract = async (req, res, next) => {
 
     // Verificar que no exista un contrato con el mismo numero de contrato
     if (contractNumber && contractNumber !== contractUpdate.contractNumber) {
-      const contractDuplicate = await ContracManagement.findOne({
-        contractNumber,
-      });
+      const safeContractNumber = contractNumber.trim();
+      const query = { contractNumber: safeContractNumber };
+      const contractDuplicate = await ContracManagement.findOne(query);
 
       if (contractDuplicate) {
         return res.status(400).json({
@@ -296,8 +297,19 @@ exports.deleteContract = async (req, res) => {
   try {
     const idContract = req.params.id;
 
+    if (!mongoose.Types.ObjectId.isValid(idContract)) {
+      return res.status(400).json({
+        success: false,
+        message: "El ID proporcionado no es válido",
+      });
+    }
+
+    // Evitar el noSqlInyection
+    const safeContractNumber = idContract.trim();
+    const query = {contract:safeContractNumber}
+
     // Verificar que le usuario no pueda elimianar a el contratista si tiene un contrato
-    const verifyUser = await Contract.findOne({ contract: idContract });
+    const verifyUser = await Contract.findOne(query);
 
     if (verifyUser) {
       return res.status(400).json({
