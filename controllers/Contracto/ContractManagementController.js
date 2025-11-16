@@ -88,7 +88,7 @@ exports.getStateContracts = async (req, res) => {
   return res.status(200).json({
     success: true,
     message: `El numero de contrato activos es ${contracAtive.length}`,
-    data: contracAtive.length !== 0 ? contracAtive : "No hay contratos",
+    data: contracAtive.length === 0 ? contracAtive : "No hay contratos",
   });
 };
 
@@ -151,8 +151,21 @@ exports.createContract = async (req, res) => {
       });
     }
 
+    if (typeof contractNumber !== "string" || /[\$\.]/.test(contractNumber)) {
+      return res.status(400).json({
+        success: false,
+        message: "Valor inválido para número de contrato.",
+      });
+    }
+
+     // Sanitizar 
+    const safeContractNumber = contractNumber.trim();
+    
+    // Hacer query a la base de datos 
+    const query = { contractNumber: safeContractNumber };
+
     // Verificar que no exista un contrato con el mismo numero de contrato
-    const contractDuplicate = await ContracManagement.findOne({contractNumber});
+    const contractDuplicate = await ContracManagement.findOne(query);
 
     if (contractDuplicate) {
       return res.status(400).json({
