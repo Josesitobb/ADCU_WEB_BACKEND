@@ -14,22 +14,6 @@ const {
 const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
 
-// Middleware de diagnóstico para todas las rutas
-router.use((req, res, next) => {
-  console.log("\n=== DIAGNÓSTICO DE RUTA ===");
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
-  console.log("Headers:", {
-    authorization: req.headers.authorization
-      ? "***" + req.headers.authorization.slice(-8)
-      : null,
-    "x-access-token": req.headers["x-access-token"]
-      ? "***" + req.headers["x-access-token"].slice(-8)
-      : null,
-    "user-agent": req.headers["user-agent"],
-  });
-  next();
-});
-
 // GET /api/Users
 router.get("/", verifyToken, checkRole("admin", "funcionario"), getAllUsers);
 

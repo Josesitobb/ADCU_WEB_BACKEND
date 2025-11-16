@@ -11,7 +11,7 @@ exports.getAllContract = async (req, res) => {
     const { WithContractor } = req.query;
 
     // Verificar que WithContractor sea booleano
-    if (WithContractor &&!["true", "false", "/"].includes(WithContractor)) {
+    if (WithContractor && !["true", "false", "/"].includes(WithContractor)) {
       return res.status(400).json({
         success: false,
         message: "Tiene que ser true o false o dejar el espacion en blanco",
@@ -21,22 +21,26 @@ exports.getAllContract = async (req, res) => {
     // Variablae global
     let AllContact;
     // Todos los contratos que estann vinculados
-    if (WithContractor == "true") AllContact = await Contract.find().populate("contract");
+    if (WithContractor == "true")
+      AllContact = await Contract.find().populate("contract");
 
     // Los contrato que no estan vinculados
     if (WithContractor == "false") {
       // Consultar todos los contratista
       const userContracts = await Contract.find({}, "contract");
 
-      // Iterrar por cada id 
+      // Iterrar por cada id
       const newUserContracts = userContracts.map((u) => u.contract);
 
       // Consulta todos los contratos
-      AllContact = await ContracManagement.find({_id: { $nin: newUserContracts }});
+      AllContact = await ContracManagement.find({
+        _id: { $nin: newUserContracts },
+      });
     }
 
     // Si no viene nada en la url mandar todos los contratos
-    if(WithContractor == undefined) AllContact = await ContractManagement.find();
+    if (WithContractor == undefined)
+      AllContact = await ContractManagement.find();
 
     return res.status(200).json({
       success: true,
@@ -67,7 +71,12 @@ exports.getStateContracts = async (req, res) => {
       message: "El valor tiene que ser true o false",
     });
   }
-  const contracAtive = await ContracManagement.find({ state: state });
+
+  // Convertir el valor a bolenano para no mandar directarmente a la consulta
+  const stateBool = state === "true";
+
+  // Mandar consulta
+  const contracAtive = await ContracManagement.find({ state: stateBool });
 
   if (!contracAtive) {
     return res.status(404).json({
@@ -142,17 +151,8 @@ exports.createContract = async (req, res) => {
       });
     }
 
-    // if (new Date(endDate) < new Date(startDate)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "La fecha fin no puede ser mayor a la fecha inicio",
-    //   });
-    // }
-
     // Verificar que no exista un contrato con el mismo numero de contrato
-    const contractDuplicate = await ContracManagement.findOne({
-      contractNumber,
-    });
+    const contractDuplicate = await ContracManagement.findOne({contractNumber});
 
     if (contractDuplicate) {
       return res.status(400).json({
@@ -246,17 +246,17 @@ exports.updateContract = async (req, res, next) => {
       }
     }
 
-    if (typeofcontract )contractUpdate.typeofcontract = typeofcontract;
-    if (startDate ) contractUpdate.startDate = startDate;
-    if (endDate ) contractUpdate.endDate = endDate;
+    if (typeofcontract) contractUpdate.typeofcontract = typeofcontract;
+    if (startDate) contractUpdate.startDate = startDate;
+    if (endDate) contractUpdate.endDate = endDate;
     if (state !== undefined) contractUpdate.state = state;
-    if (objectiveContract ) contractUpdate.objectiveContract = objectiveContract;
-    if (periodValue ) contractUpdate.periodValue = periodValue;
-    if (totalValue ) contractUpdate.totalValue = totalValue;
+    if (objectiveContract) contractUpdate.objectiveContract = objectiveContract;
+    if (periodValue) contractUpdate.periodValue = periodValue;
+    if (totalValue) contractUpdate.totalValue = totalValue;
     if (extension !== undefined) contractUpdate.extension = extension;
     if (addiction !== undefined) contractUpdate.addiction = addiction;
     if (suspension !== undefined) contractUpdate.suspension = suspension;
-    if(contractNumber) contractUpdate.contractNumber = contractNumber;
+    if (contractNumber) contractUpdate.contractNumber = contractNumber;
 
     await contractUpdate.save();
 
@@ -283,14 +283,15 @@ exports.deleteContract = async (req, res) => {
   try {
     const idContract = req.params.id;
 
-  // Verificar que le usuario no pueda elimianar a el contratista si tiene un contrato 
-    const verifyUser = await Contract.findOne({contract:idContract});
+    // Verificar que le usuario no pueda elimianar a el contratista si tiene un contrato
+    const verifyUser = await Contract.findOne({ contract: idContract });
 
-    if(verifyUser){
+    if (verifyUser) {
       return res.status(400).json({
-        success:false,
-        message:"No se puede eliminar un contrato con un contratista vinculado, cambie el contratista de contrato"
-            })
+        success: false,
+        message:
+          "No se puede eliminar un contrato con un contratista vinculado, cambie el contratista de contrato",
+      });
     }
 
     const contract = await ContracManagement.findByIdAndDelete(idContract);
@@ -318,44 +319,49 @@ exports.deleteContract = async (req, res) => {
 // Estadisticas de los contratos
 exports.getStatsContract = async (req, res) => {
   try {
-
     let stats;
 
     // Traer todos los contratos
     const contractStats = await ContracManagement.find();
 
     // Contar contratos activos e inactivos
-    const activeContracts = contractStats.filter(c => c.state === true).length;
-    const inactiveContracts = contractStats.filter(c => c.state === false).length;
+    const activeContracts = contractStats.filter(
+      (c) => c.state === true
+    ).length;
+    const inactiveContracts = contractStats.filter(
+      (c) => c.state === false
+    ).length;
     const totalContracts = contractStats.length;
 
     // Contrato vinculados a un contratista
     const contractsLinked = (await Contract.find().populate("contract")).length;
-    
+
     // Contrato que no esta vinculado a ningun contratista
     const contractsNotLinked = totalContracts - contractsLinked;
 
     // Contrato que tiene la fecha de finalizacion menor a la fecha actual
-     const expiredContracts = contractStats.filter(c => new Date(c.endDate) < new Date()).length;
+    const expiredContracts = contractStats.filter(
+      (c) => new Date(c.endDate) < new Date()
+    ).length;
 
     stats = {
-      'Total de contratos':totalContracts,
-      'Contratos activos':activeContracts,
-      'Contratos inactivos':inactiveContracts,
-      'Contratos vinculados':contractsLinked,
-      'Contratos no vinculados':contractsNotLinked,
-      'Contratos expirados':expiredContracts
+      "Total de contratos": totalContracts,
+      "Contratos activos": activeContracts,
+      "Contratos inactivos": inactiveContracts,
+      "Contratos vinculados": contractsLinked,
+      "Contratos no vinculados": contractsNotLinked,
+      "Contratos expirados": expiredContracts,
     };
-
 
     return res.status(200).json({
       success: true,
       message: "Estadisticas de contratos obtenidas exitosamente",
       data: stats,
-
     });
   } catch (error) {
-    console.log("[CONTROLLER CONTRACTMANAGEMENT] Error al obtener estadisticas");
+    console.log(
+      "[CONTROLLER CONTRACTMANAGEMENT] Error al obtener estadisticas"
+    );
     return res.status(500).json({
       success: false,
       message: "Error al obtener estadisticas de contratos",
