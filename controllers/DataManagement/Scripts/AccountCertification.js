@@ -4,6 +4,7 @@ const OpenAI = require("openai");
 const dataMagemente = require("../../../models/DataManagements/DataManagements");
 const { FILE } = require("../../../config/config");
 const { base64image } = require("../../../utils/base64Image");
+const documentsCreate=require('../../../utils/documentsUpdater');
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
 exports.generateAccountCertification = async (data) => {
@@ -30,7 +31,7 @@ exports.generateAccountCertification = async (data) => {
     // Imagenes del usuario
     const userImagen1 = base64image(imagesDir1);
 
-    const cliente = new OpenAI({ apikey: process.env.KEYCHATGPT });
+    const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
 
     // Crear el prompt
     const response = await cliente.chat.completions.create({
@@ -117,16 +118,8 @@ Se te proporcionan imágenes y texto OCR de un certificacion calidad tributaria 
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    const responseDocuments = new dataMagemente({
-      accountCertification: {
-        status: estado === "aprobado",
-        description: estado == "ok" ? "Documento aprobado" : razon,
-        usercomparasion: `${firsName}${lastName}`,
-        documentManagement: documentManagement,
-        contractorId: _id,
-      },
-    });
-    await responseDocuments.save();
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'accountCertification');
   } catch (error) {
     throw new Error("Error al generar la comparacion:" + error.message);
   }

@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
 const Contractor = require("../../models/Users/Contractor");
 const convertPdfToImages = require("../../utils/convertPdfToImages");
@@ -127,81 +127,56 @@ exports.createDocumentManagement = async (req, res) => {
 
     // Verificar el directorio
     const directory = path.join(__dirname, `../../Files/${userContract}Img`);
-
+   
     // Si el directorio no existe crea la carpeta
     fs.mkdirSync(directory, { recursive: true });
 
-    const baseUrl = process.env.URLDELPROYECTO;
+    // const baseUrl = process.env.URLDELPROYECTO;
 
     // Carta de radicacion de cuenta de cobro
-    const File1 = path.relative(baseUrl, filingLetter?.[0]?.path);
-    const file1 = await convertPdfToImages(File1, directory, "filingLetter",1);
+    const File1 = filingLetter?.[0]?.path;
+    console.log(File1)
+     await convertPdfToImages(File1, directory, "filingLetter",1);
 
     // Certificado de cumplimiento
-    const File2 = path.relative(baseUrl, certificateOfCompliance?.[0]?.path);
-    const file2 = await convertPdfToImages(
-      File2,
-      directory,
-      "certificateOfCompliance",1
-    
-    );
+    const File2 =  certificateOfCompliance?.[0]?.path;
+    await convertPdfToImages(File2,directory,"certificateOfCompliance",1);
 
     // Ceritifcado de cumplimiento firmado
-    const File3 = path.relative(
-      baseUrl,
-      signedCertificateOfCompliance?.[0]?.path
-    );
-    const file3 = await convertPdfToImages(
-      File3,
-      directory,
-      "signedCertificateOfCompliance",1
-    );
+    const File3 = signedCertificateOfCompliance?.[0]?.path
+    await convertPdfToImages(File3,directory,"signedCertificateOfCompliance",1);
 
     // Reporte de actividad
-    const File4 = path.relative(baseUrl, activityReport?.[0]?.path);
-    const file4 = await convertPdfToImages(File4, directory, "activityReport",5);
+    const File4 = activityReport?.[0]?.path;
+    await convertPdfToImages(File4, directory, "activityReport",5);
 
     // Certificado de calidad tributaria
-    const File5 = path.relative(baseUrl, taxQualityCertificate?.[0]?.path);
-    const file5 = await convertPdfToImages(
-      File5,
-      directory,
-      "taxQualityCertificate",2
-    );
+    const File5 = taxQualityCertificate?.[0]?.path;
+    await convertPdfToImages(File5,directory,"taxQualityCertificate",2);
 
     // social security
-    const File6 = path.relative(baseUrl, socialSecurity?.[0]?.path);
-    const file6 = await convertPdfToImages(File6, directory, "socialSecurity",2);
+    const File6 = socialSecurity?.[0]?.path;
+    await convertPdfToImages(File6, directory, "socialSecurity",2);
 
     //rut
-    const File7 = path.relative(baseUrl, rut?.[0]?.path);
-    const file7 = await convertPdfToImages(File7, directory, "rut",1);
+    const File7 = rut?.[0]?.path;
+    await convertPdfToImages(File7, directory, "rut",1);
 
     // rit
-    const File8 = path.relative(baseUrl, rit?.[0]?.path);
-    const file8 = await convertPdfToImages(File8, directory, "rit",1);
+    const File8 = rit?.[0]?.path;
+    await convertPdfToImages(File8, directory, "rit",1);
 
     // Capacitaciones
-    const File9 = path.relative(baseUrl, trainings?.[0]?.path);
-    const file9 = await convertPdfToImages(File9, directory, "Trainings",5);
+    const File9 = trainings?.[0]?.path;
+   await convertPdfToImages(File9, directory, "Trainings",5);
 
     // Acta de inicio
-    const File10 = path.relative(baseUrl, initiationRecord?.[0]?.path);
-    const file10 = await convertPdfToImages(
-      File10,
-      directory,
-      "initiationRecord",
-      1
-    );
+    const File10 =initiationRecord?.[0]?.path;
+    await convertPdfToImages(File10,directory,"initiationRecord",1);
 
     // Certificacion de cuenta
-    const File11 = path.relative(baseUrl, accountCertification?.[0]?.path);
-    const file11 = await convertPdfToImages(
-      File11,
-      directory,
-      "accountCertification",
-      1
-    );
+    const File11 = accountCertification?.[0]?.path;
+    await convertPdfToImages(File11,directory,"accountCertification",1);
 
     // Creacion en la base de datos
     const newDocumentManagement = new DocumentManagement({
@@ -254,18 +229,12 @@ exports.createDocumentManagement = async (req, res) => {
 
 exports.updateDocumentManagement = async (req, res) => {
   try {
-    // Consulta para ver si existe la gestion documental
-    const documenteMangementeUser = await DocumentManagement.findOne({
-      userContract: req.params.userContract,
-    });
-    if (!documenteMangementeUser) {
-      return res.status(404).json({
-        success: false,
-        message: "No hay gestión documental relacionada con este usuario",
-      });
-    }
 
-    // Variables que viene del req.files
+    // Varaibles que viene en la peticion
+    const userContract = req.params.userContract;
+    const userEdit = req.userId;
+
+     // Variables que viene del req.files
     const {
       filingLetter,
       certificateOfCompliance,
@@ -283,28 +252,30 @@ exports.updateDocumentManagement = async (req, res) => {
     // Varibles que viene del body;
     const { description, ip, retentionTime, state } = req.body;
 
+    // Consulta para ver si existe la gestion documental
+    const documenteMangementeUser = await DocumentManagement.findOne({userContract: userContract});
+
+    if (!documenteMangementeUser) {
+      return res.status(404).json({
+        success: false,
+        message: "No hay gestión documental relacionada con este usuario",
+      });
+    }
+
     // Ruta a donde esta las imagenes
-    const outputDir = path.resolve(
-      __dirname,
-      "../../Files/",
-      `${documenteMangementeUser.userContract}Img` // FIX nombre correcto
-    );
-    // Ruta para quitar
-    const baseUrl = path.resolve(__dirname, "../../");
+    const outputDir = path.resolve(__dirname,"../../Files/",`${documenteMangementeUser.userContract}Img`);
 
     // Filing Letter
     if (filingLetter) {
       const newFilePath = filingLetter[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.filingLetter = relativePath;
+      documenteMangementeUser.filingLetter = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "filingLetter", 1);
     }
 
     // Certificate of Compliance
     if (certificateOfCompliance) {
       const newFilePath = certificateOfCompliance[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.certificateOfCompliance = relativePath;
+      documenteMangementeUser.certificateOfCompliance = newFilePath;
       await convertPdfToImages(
         newFilePath,
         outputDir,
@@ -315,8 +286,7 @@ exports.updateDocumentManagement = async (req, res) => {
     // Signed Certificate of Compliance
     if (signedCertificateOfCompliance) {
       const newFilePath = signedCertificateOfCompliance[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.signedCertificateOfCompliance = relativePath;
+      documenteMangementeUser.signedCertificateOfCompliance = newFilePath;
       await convertPdfToImages(
         newFilePath,
         outputDir,
@@ -327,69 +297,61 @@ exports.updateDocumentManagement = async (req, res) => {
     // Activity Report
     if (activityReport) {
       const newFilePath = activityReport[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.activityReport = relativePath;
+      documenteMangementeUser.activityReport = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "activityReport",5);
     }
 
     // Tax Quality Certificate
     if (taxQualityCertificate) {
       const newFilePath = taxQualityCertificate[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.taxQualityCertificate = relativePath;
+      documenteMangementeUser.taxQualityCertificate = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "taxQualityCertificate",2);
     }
 
     // Social Security
     if (socialSecurity) {
       const newFilePath = socialSecurity[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.socialSecurity = relativePath;
+      documenteMangementeUser.socialSecurity = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "socialSecurity",2);
     }
 
     // RUT
     if (rut) {
       const newFilePath = rut[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.rut = relativePath;
+      documenteMangementeUser.rut = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "rut",1);
     }
 
     // RIT
     if (rit) {
       const newFilePath = rit[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.rit = relativePath;
+      documenteMangementeUser.rit = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "rit",1);
     }
 
     // Trainings
     if (trainings) {
       const newFilePath = trainings[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.trainings = relativePath;
+      documenteMangementeUser.trainings = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "trainings",5);
     }
 
     // Initiation Record
     if (initiationRecord) {
       const newFilePath = initiationRecord[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.initiationRecord = relativePath;
+      documenteMangementeUser.initiationRecord = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "initiationRecord", 1);
     }
 
     // Account Certification
     if (accountCertification) {
       const newFilePath = accountCertification[0].path;
-      const relativePath = path.relative(baseUrl, newFilePath);
-      documenteMangementeUser.accountCertification = relativePath;
+      documenteMangementeUser.accountCertification = newFilePath;
       await convertPdfToImages(newFilePath, outputDir, "accountCertification", 1);
     }
 
     // Usuario que edita
-    documenteMangementeUser.userEdition = req.userId;
+    documenteMangementeUser.userEdition = userEdit;
     // Version
     documenteMangementeUser.version += 1;
 
@@ -497,7 +459,6 @@ exports.deleteDocumentByContractor = async (req, res) => {
 
     // Ruta a donde esta las imagenes
     const outputDir = path.join(__dirname, `../../Files/${userContract}Img`);
-    console.log("carpeta", outputDir);
 
     //Leer todo los archivos de la carpeta del usuario 
     fs.readdir(outputDir,(err,files)=>{
@@ -528,7 +489,7 @@ exports.deleteDocumentByContractor = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Archivos ${file} eliminado correctamente ${exitingdocumentManagement}`,
+      message: `Archivos ${file} eliminado correctamente`,
     });
   } catch (error) {
     console.log(

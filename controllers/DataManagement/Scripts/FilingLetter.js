@@ -2,6 +2,8 @@ const fs = require('node:fs');
 const path = require('node:path');
 const OpenAI  = require('openai');
 const dataMagemente = require('../../../models/DataManagements/DataManagements');
+
+const documentsCreate=require('../../../utils/documentsUpdater');
 const { FILE,FILINGLETTER } = require('../../../config/config');
 const {base64image} = require('../../../utils/base64Image');
 require("dotenv").config({path:path.resolve(__dirname,'../../../.env')});
@@ -129,17 +131,11 @@ exports.generateFilingLetter = async (data) => {
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    // Respuesta al servidor
-    const responseDocuments = new dataMagemente({
-    filingLetter:{
-     status:estado ==='aprobado',
-     description:estado =='ok'?'Documento aprobado':razon,
-     usercomparasion:`${firsName }${lastName}`,
-     documentManagement:documentManagement,
-     contractorId:_id
-        }
-    });
-    await responseDocuments.save();
+    // Nombre completo 
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'filingLetter');
+
+
 }
 catch(error){
     throw new Error('Error al generar la carta de archivo: ' + error.message);

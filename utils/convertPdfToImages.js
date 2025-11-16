@@ -1,5 +1,5 @@
-const fs = require("fs/promises");
-const path = require("path");
+const fs = require("node:fs/promises");
+const path = require("node:path");
 
 async function convertPdfToImages(pathDocument, outputDir, baseName,counterImg) {
   try {
@@ -7,6 +7,8 @@ async function convertPdfToImages(pathDocument, outputDir, baseName,counterImg) 
 
     let counter = 1;
     const document = await pdf(pathDocument, { scale: 1 });
+
+   
 
     for await (const image of document) {
       // const pathSaved = path.join(outputDir, `${baseName}_page${counter}.jpg`);

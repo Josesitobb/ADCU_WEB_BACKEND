@@ -13,6 +13,15 @@ const StateDescriptionSchema = new mongoose.Schema(
       type: String,
       require: [true, "La descripcion es requerida"],
     },
+    
+    
+  },
+  { _id: false }
+);
+
+// Esquema principal
+const DataManagementsSchema = new mongoose.Schema(
+  {
     usercomparasion: {
       type: String,
       require: [true, "El usuario de comparacion es requerido"],
@@ -26,14 +35,7 @@ const StateDescriptionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'ContactManagement',
       require: ['Es requerido el id del contratista', true]
-    }
-  },
-  { _id: false }
-);
-
-// Esquema principal
-const DataManagementsSchema = new mongoose.Schema(
-  {
+    },
     filingLetter:{
       type: StateDescriptionSchema,
     },

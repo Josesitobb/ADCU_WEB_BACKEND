@@ -7,6 +7,7 @@ const {
   TAXQUIANLITYCERTIFICATE1,
   TAXQUIANLITYCERTIFICATE2,
 } = require("../../../config/config");
+const documentsCreate=require('../../../utils/documentsUpdater');
 const { base64image } = require("../../../utils/base64Image");
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
@@ -52,7 +53,7 @@ exports.generateTaxQuanlityCertificate = async (data) => {
     const imagenConst2 = base64image(imageConstantPath2);
 
     // Cliente del chat gpt
-    const cliente = new OpenAI({ apikey: process.env.KEYCHATGPT });
+    const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
 
     // Crear el prompt
     const response = await cliente.chat.completions.create({
@@ -163,16 +164,9 @@ exports.generateTaxQuanlityCertificate = async (data) => {
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    const responseDocuments = new dataMagemente({
-      taxQualityCertificate: {
-        status: estado === "aprobado",
-        description: estado == "ok" ? "Documento aprobado" : razon,
-        usercomparasion: `${firsName}${lastName}`,
-        documentManagement: documentManagement,
-        contractorId: _id,
-      },
-    });
-    await responseDocuments.save();
+    // Nombre completo 
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'taxQualityCertificate');
   } catch (error) {
     throw new Error("Error al generar la comparacion:" + error.message);
   }

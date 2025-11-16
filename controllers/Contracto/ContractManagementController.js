@@ -281,7 +281,19 @@ exports.updateContract = async (req, res, next) => {
 // Eliminar un contrato
 exports.deleteContract = async (req, res) => {
   try {
-    const contract = await ContracManagement.findByIdAndDelete(req.params.id);
+    const idContract = req.params.id;
+
+  // Verificar que le usuario no pueda elimianar a el contratista si tiene un contrato 
+    const verifyUser = await Contract.findOne({contract:idContract});
+
+    if(verifyUser){
+      return res.status(400).json({
+        success:false,
+        message:"No se puede eliminar un contrato con un contratista vinculado, cambie el contratista de contrato"
+            })
+    }
+
+    const contract = await ContracManagement.findByIdAndDelete(idContract);
     //Verificar que un contrato exista
     if (!contract) {
       return res.status(404).json({

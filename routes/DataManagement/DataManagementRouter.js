@@ -5,8 +5,7 @@ const { verifyToken } = require("../../middlewares/Token/authJwt");
 const { checkRole } = require("../../middlewares/Role/role");
 
 
-
-// ✅ GET: Obtener todos los documentos
+// GET: Obtener todos los documentos
 router.get(
   "/",
   verifyToken,
@@ -32,7 +31,7 @@ router.get(
   getDataById
 );
 
-// Cambiar el estado del documento
+
 
 
 
@@ -49,7 +48,8 @@ router.put("/:management/:field",
   updatedData
 );
 
-  router.patch("/:management/:field/toggle",
+// Cambiar el estado del documento
+router.patch("/:management/:field/toggle",
   verifyToken,
   checkRole("admin", "funcionario"),
   toogleStateData

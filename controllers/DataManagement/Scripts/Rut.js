@@ -6,6 +6,7 @@ const {
   FILE,
   RUT,
 } = require("../../../config/config");
+const documentsCreate=require('../../../utils/documentsUpdater');
 const { base64image } = require("../../../utils/base64Image");
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
@@ -33,8 +34,8 @@ exports.generateRut = async (data) => {
       `${FILE}${_id}img/rut1.jpg`
     );
     // Verificar que todas las imaganes esten
-    if (!fs.existsSync(imagesDir1) || !fs.existsSync(imagesDir2)) {
-      throw new Error("El pdf no cumple con el numero de paginas 2");
+    if (!fs.existsSync(imagesDir1)) {
+      throw new Error("El pdf no cumple con el numero de paginas 1");
     }
 
     // Imagenes del usuario
@@ -44,7 +45,7 @@ exports.generateRut = async (data) => {
     const imagenConst1 = base64image(imageConstantPath1);
 
     // Cliente del chat gpt
-    const cliente = new OpenAI({ apikey: process.env.KEYCHATGPT });
+    const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
 
     // Crear el prompt
     const response = await cliente.chat.completions.create({
@@ -140,16 +141,9 @@ exports.generateRut = async (data) => {
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    const responseDocuments = new dataMagemente({
-      rut: {
-        status: estado === "aprobado",
-        description: estado == "ok" ? "Documento aprobado" : razon,
-        usercomparasion: `${firsName}${lastName}`,
-        documentManagement: documentManagement,
-        contractorId: _id,
-      },
-    });
-    await responseDocuments.save();
+       // Nombre completo 
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'rut');
   } catch (error) {
     throw new Error("Error al generar la comparacion:" + error.message);
   }

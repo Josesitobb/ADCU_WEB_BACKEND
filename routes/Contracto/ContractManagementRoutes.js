@@ -32,7 +32,7 @@ router.get("/stats",
 );
 
 
-// Contrato espesifico
+// Contrato especifico 
 router.get(
   "/:id",
   verifyToken,

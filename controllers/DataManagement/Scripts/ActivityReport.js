@@ -2,9 +2,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const OpenAI = require('openai');
 const dataMagemente = require('../../../models/DataManagements/DataManagements');
+const documentsCreate=require('../../../utils/documentsUpdater');
 const { FILE, ACTIVITYREPORT1, ACTIVITYREPORT2, ACTIVITYREPORT3, ACTIVITYREPORT4, ACTIVITYREPORT5 } = require('../../../config/config');
 const { base64image } = require('../../../utils/base64Image');
-require("dotenv").config({ path: path.resolve(__dirname, '../../../.env') });
+require("dotenv").config({path:path.resolve(__dirname,'../../../.env')});
 
 exports.generateActivityReports = async (data) => {
     try {
@@ -44,7 +45,7 @@ exports.generateActivityReports = async (data) => {
         const imagenConst5 = base64image(imageConstantPath5);
 
         // Cliente del chat gpt
-        const cliente = new OpenAI({ apikey: process.env.KEYCHATGPT });
+          const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
 
         // Crear el prompt
         const response = await cliente.chat.completions.create({
@@ -75,7 +76,7 @@ exports.generateActivityReports = async (data) => {
         ### 2. Validaciones de la primera imagen (datos generales del contrato)
         1. Tipo de contrato: ${typeofcontract}
         2. Número y fecha de contrato: ${contractNumber}  | ${startDate}
-        3. Nombre del contratista: ${nameComplet}
+        3. Nombre del contratista: ${lastName} ${firsName}
         4. Número de documento: ${idcard}
         5. Plan de ejecución: desde ${startDate} hasta ${endDate}
         6. Valor total del contrato (números y letras): ${totalValue}
@@ -180,16 +181,9 @@ exports.generateActivityReports = async (data) => {
         const razon = args.razon || "Documento alterado o inválido";
 
 
-        const responseDocuments = new dataMagemente({
-            activityReport: {
-                status: estado === 'aprobado',
-                description: estado == 'ok' ? 'Documento aprobado' : razon,
-                usercomparasion: `${firsName}${lastName}`,
-                documentManagement: documentManagement,
-                contractorId: _id
-            }
-        });
-        await responseDocuments.save();
+    // Nombre completo 
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'activityReport');
 
     } catch (error) {
         throw new Error('Error al generar la comparacion:' + error.message)

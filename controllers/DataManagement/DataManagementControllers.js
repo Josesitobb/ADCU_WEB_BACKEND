@@ -142,35 +142,32 @@ exports.createData = async (req, res) => {
       }
     }
 
-    // Correr archivos python
-
     // Carta de radicacion FilingLetter
     await generateFilingLetter(UserContractAll);
   
     //Certificado de cumplimiento no firmado
     await generateCertificateOfCompliance(UserContractAll);
-    // await TwoFile("CertificateOfCompliance", UserContractAll);
 
     // Certificado de cumplimiento firmado
-    // await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+    //await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
     // Informe de actividad
-     await generateActivityReports(UserContractAll);
+    await generateActivityReports(UserContractAll);
 
-    // // Certificado de calidad tributaria
+    // Certificado de calidad tributaria
     await generateTaxQuanlityCertificate(UserContractAll);
 
     // Rut
-    await generateRut(UserContractAll);
+     await generateRut(UserContractAll);
 
-    // RIT
-    await generateRit(UserContractAll);
+   // RIT
+      await generateRit(UserContractAll);
 
     // Acta de inicio
-    await generateInitiationRecord(UserContractAll)
+     await generateInitiationRecord(UserContractAll);
 
     // Certificacion bancaria
-    await generateAccountCertification(UserContractAll)
+     await generateAccountCertification(UserContractAll);
  
 
     return res.status(200).json({
@@ -188,6 +185,7 @@ exports.createData = async (req, res) => {
 };
 
 exports.updatedData = async (req, res) => {
+  console.log('[UPDATEDATA CONTROLLER]')
   const { management, field } = req.params;
   try {
     const exitingdocumentManagement = await DocumentManagement.findById(management);
@@ -262,7 +260,7 @@ exports.updatedData = async (req, res) => {
         }
       }
 
-      await OneFile("FilingLetter", UserContractAll);
+      await generateFilingLetter(UserContractAll);
       
     } 
 
@@ -278,7 +276,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await  TwoFile("certificateOfCompliance", UserContractAll);
+      await generateCertificateOfCompliance(UserContractAll);
     } 
 
     if(field =="signedCertificateOfCompliance") {
@@ -308,7 +306,8 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await FourFile("activityReport", UserContractAll);
+      console.log('[ENTRANDO A FUNCION DE ANALISIS]')
+      await generateActivityReports(UserContractAll);
     }
 
     if(field =="taxQualityCertificate") {
@@ -323,7 +322,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await FiveFile("taxQualityCertificate", UserContractAll);
+      await generateTaxQuanlityCertificate(UserContractAll);
     }
 
     if(field =="rut") {
@@ -338,7 +337,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await SixFile("rut", UserContractAll);
+      await generateRut(UserContractAll);
     }
 
     if(field =="rit") {
@@ -353,7 +352,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await SevenFile("rit", UserContractAll);
+      await generateRit(UserContractAll);
     }
 
     if(field =="initiationRecord") {
@@ -368,7 +367,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await EightFile ("initiationRecord", UserContractAll);
+      await generateInitiationRecord(UserContractAll);;
     }
 
     if(field =="accountCertification") {
@@ -383,7 +382,7 @@ exports.updatedData = async (req, res) => {
           });
         }
       }
-      await NineFile("accountCertification", UserContractAll);
+      await generateAccountCertification(UserContractAll);
     }
 
     return res.status(200).json({

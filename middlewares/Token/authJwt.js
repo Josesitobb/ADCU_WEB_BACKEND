@@ -24,7 +24,6 @@ const verifyTokenfn = (req,res,next)=>{
         const decoded = jwt.verify(token, config.secret);
         req.userId = decoded.id;
         req.userRole = decoded.role;
-        console.log('[AuthJWT] Token valio para', decoded.email);
         next();
     }catch(error){
         console.log('[AuthJWT] Error:', error.name, '_', error.message);

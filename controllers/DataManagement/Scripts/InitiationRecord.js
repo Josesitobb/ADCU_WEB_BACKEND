@@ -3,6 +3,7 @@ const path = require("node:path");
 const OpenAI = require("openai");
 const dataMagemente = require("../../../models/DataManagements/DataManagements");
 const { FILE, INITIATIONRECORD } = require("../../../config/config");
+const documentsCreate=require('../../../utils/documentsUpdater');
 const { base64image } = require("../../../utils/base64Image");
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
@@ -39,7 +40,7 @@ exports.generateInitiationRecord = async (data) => {
     const imagenConst1 = base64image(imageConstantPath1);
 
     // Cliente del chat gpt
-    const cliente = new OpenAI({ apikey: process.env.KEYCHATGPT });
+    const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
 
     // Crear el prompt
     const response = await cliente.chat.completions.create({
@@ -133,16 +134,8 @@ exports.generateInitiationRecord = async (data) => {
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    const responseDocuments = new dataMagemente({
-      initiationRecord: {
-        status: estado === "aprobado",
-        description: estado == "ok" ? "Documento aprobado" : razon,
-        usercomparasion: `${firsName}${lastName}`,
-        documentManagement: documentManagement,
-        contractorId: _id,
-      },
-    });
-    await responseDocuments.save();
+    const userComparasion = `${firsName} ${lastName}`
+    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'initiationRecord');
   } catch (error) {
     throw new Error("Error al generar la comparacion:" + error.message);
   }
