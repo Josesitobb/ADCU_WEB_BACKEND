@@ -3,6 +3,7 @@ const path = require("node:path");
 const Contractor = require("../../models/Users/Contractor");
 const DataManagements = require("../../models/DataManagements/DataManagements");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
+const mongoose = require("mongoose");
 // Funciones para la comparacion
 const {generateFilingLetter} = require("./Scripts/FilingLetter");
 const {generateCertificateOfCompliance}= require('./Scripts/CertificateOfCompliance');
@@ -398,91 +399,6 @@ exports.updatedData = async (req, res) => {
   }
 };
 
-exports.savedData = async (req, res) => {
-  try {
-    // Variable para la comparacion
-    // Comparison:Comparacion estado
-    // Usercomparasion:Usuario de comparacion
-    // Description: Descripcion por si falla
-    // IdUserComparasion: Id del usuario comparado
-    // IdDocumentManagement: Id de la gestion documental
-
-    const {
-      Field,
-      Status,
-      Usercomparasion,
-      Description,
-      IdUserComparasion,
-      IdDocumentManagement,
-    } = req.body;
-
-
-    console.log(req.body);
-    console.log("Entrado a la verificacion");
-    // Verificar que vengas todas antes de hacer la peticion
-    // if (
-    //   !Field ||
-    //   !Status ||
-    //   !Usercomparasion ||
-    //   !Description ||
-    //   !IdUserComparasion ||
-    //   !IdDocumentManagement
-    // ) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Falta datos para terminanar la comparacion",
-    //   });
-    // }
-
-    // Verificar que el usuario contratista exista en la tabla contratistas
-    const UserContractorExisting = await Contractor.findById(IdUserComparasion);
-
-    if (!UserContractorExisting) {
-      return res.status(400).json({
-        success: false,
-        message: "Usuario contratista no existe porfa volver a intentar",
-      });
-    }
-    console.log("Paso la verificacion del contratista");
-
-    // Buscar Si el contratita ya tiene un usuario en data por contratista
-    let dataManagementContractor = await DataManagements.findOne({
-      contractorId: IdUserComparasion,
-    });
-
-    if (!dataManagementContractor) {
-      // Crear un documento en memoria para despues insertarlo
-      dataManagementContractor = new DataManagements({
-        contractorId: IdUserComparasion,
-      });
-    }
-
-    console.log("Paso la verificacion de data");
-
-    dataManagementContractor[Field] = {
-      status: Status,
-      description: Description,
-      usercomparasion: Usercomparasion,
-      documentManagement: IdDocumentManagement,
-      contractorId: IdUserComparasion,
-    };
-
-    const saved = await dataManagementContractor.save();
-    console.log("Documento guardado correctamente:", saved);
-    return res.status(201).json({
-      success: true,
-      message: `Campo ${Field} actualizado correctamente`,
-      data: saved,
-    });
-  } catch (error) {
-    console.error("[SavedData] Error al guardar documento:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Error al guardar documento",
-      error: error.message,
-    });
-  }
-};
 
 exports.deleteData = async (req, res) => {
   try {
