@@ -1,4 +1,4 @@
-module.exports = (req, res) => {
+function apiHome(req, res) {
   res.send(`<!doctype html>
 <html lang="es">
 <head>
@@ -18,7 +18,6 @@ module.exports = (req, res) => {
   <pre><code>
 /api/auth
   POST /api/auth/signin
-
 /api/Users
   GET    /api/Users
   GET    /api/Users/Admin
@@ -29,7 +28,6 @@ module.exports = (req, res) => {
   GET    /api/Users/:id
   PUT    /api/Users/:id
   DELETE /api/Users/:id
-
 /api/Contracts
   GET    /api/Contracts
   GET    /api/Contracts/contractActive
@@ -38,7 +36,6 @@ module.exports = (req, res) => {
   POST   /api/Contracts
   PUT    /api/Contracts/:id
   DELETE /api/Contracts/:id
-
 /api/Documents
   GET    /api/Documents
   GET    /api/Documents/stats
@@ -47,7 +44,6 @@ module.exports = (req, res) => {
   PUT    /api/Documents/:userContract
   DELETE /api/Documents/:userContract
   DELETE /api/Documents/:userContract/:file
-
 /api/Data
   GET    /api/Data
   GET    /api/Data/stats
@@ -56,7 +52,6 @@ module.exports = (req, res) => {
   PUT    /api/Data/:management/:field
   PATCH  /api/Data/:management/:field/toggle
   DELETE /api/Data/:management
-
 /api/Verification
   GET    /api/Verification
   GET    /api/Verification/stats
@@ -64,6 +59,6 @@ module.exports = (req, res) => {
   </code></pre>
 </body>
 </html>`);
-};
+}
 
-  
+module.exports = apiHome;
