@@ -5,7 +5,6 @@ const {verifyToken} = require('../../middlewares/Token/authJwt');
 const {checkRole}= require('../../middlewares/Role/role');
 
 
-
 router.get("/",
     verifyToken,
     checkRole('admin','funcionario'),

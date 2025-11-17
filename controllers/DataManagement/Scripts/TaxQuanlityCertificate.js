@@ -7,25 +7,18 @@ const {
   TAXQUIANLITYCERTIFICATE1,
   TAXQUIANLITYCERTIFICATE2,
 } = require("../../../config/config");
-const documentsCreate=require('../../../utils/documentsUpdater');
+const documentsCreate = require("../../../utils/documentsUpdater");
 const { base64image } = require("../../../utils/base64Image");
 require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
 exports.generateTaxQuanlityCertificate = async (data) => {
   try {
+    console.log(data);
     // Constantes
-    const {
-      contractNumber,
-      firsName,
-      lastName,
-      idcard,
-      email,
-      telephone,
-      institutionalEmail,
-      residentialAddress,
-      _id,
-      documentManagement,
-    } = data;
+    const { contractNumber } = data.contract;
+    const { firsName, lastName, idcard, email, telephone } = data.user;
+    const { institutionalEmail, residentialAddress, _id, documentManagement } =
+      data;
     // Imagen constante para la comparacion
     const imageConstantPath1 = path.join(__dirname, TAXQUIANLITYCERTIFICATE1);
     const imageConstantPath2 = path.join(__dirname, TAXQUIANLITYCERTIFICATE2);
@@ -53,7 +46,7 @@ exports.generateTaxQuanlityCertificate = async (data) => {
     const imagenConst2 = base64image(imageConstantPath2);
 
     // Cliente del chat gpt
-    const cliente = new OpenAI({apiKey:process.env.KEYCHATGPT});
+    const cliente = new OpenAI({ apiKey: process.env.KEYCHATGPT });
 
     // Crear el prompt
     const response = await cliente.chat.completions.create({
@@ -61,11 +54,12 @@ exports.generateTaxQuanlityCertificate = async (data) => {
       messages: [
         {
           role: "system",
-          content: `Eres un asistente experto en la verificación de documentos legales. "
-                            "Tu tarea es analizar imágenes de contratos y el texto extraído por OCR "
-                            "para determinar si el documento es auténtico o ha sido alterado. "
-                            "Debes verificar estructura, diseño, logos, sellos, coherencia de datos, "
-                            "y consistencia entre texto y formato oficial.`,
+          content: ` "Eres un asistente experto en la verificación de documentos legales. "
+            "Tu tarea es analizar imágenes de contratos y el texto extraído por OCR "
+            "para determinar si el documento es auténtico o ha sido alterado. "
+            "Debes verificar estructura, diseño, logos, sellos, coherencia de datos, "
+            "y consistencia entre texto y formato oficial se te va a pasar una imaganes de guia para que veas como son los logos etc..."
+        `,
         },
         {
           role: "user",
@@ -164,9 +158,16 @@ exports.generateTaxQuanlityCertificate = async (data) => {
     const estado = args.estado;
     const razon = args.razon || "Documento alterado o inválido";
 
-    // Nombre completo 
-    const userComparasion = `${firsName} ${lastName}`
-    return await documentsCreate(userComparasion,_id,documentManagement,estado,razon,'taxQualityCertificate');
+    // Nombre completo
+    const userComparasion = `${firsName} ${lastName}`;
+    return await documentsCreate(
+      userComparasion,
+      _id,
+      documentManagement,
+      estado,
+      razon,
+      "taxQualityCertificate"
+    );
   } catch (error) {
     throw new Error("Error al generar la comparacion:" + error.message);
   }

@@ -12,18 +12,11 @@ require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
 exports.generateRut = async (data) => {
   try {
+    console.log(data)
     // Constantes
-    const {
-      firsName,
-      lastName,
-      idcard,
-      email,
-      telephone,
-      EconomicaActivityNumber,
-      residentialAddress,
-      _id,
-      documentManagement,
-    } = data;
+    const {firsName,lastName,idcard,email,telephone,} = data.user;
+    const {EconomicaActivityNumber,residentialAddress,_id,documentManagement} = data;
+
     // Imagen constante para la comparacion
     const imageConstantPath1 = path.join(__dirname, RUT);
 

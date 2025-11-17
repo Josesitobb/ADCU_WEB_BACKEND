@@ -18,11 +18,9 @@ exports.generateRit = async (data) => {
       lastName,
       idcard,
       email,
-      telephone,
-      residentialAddress,
-      _id,
-      documentManagement,
-    } = data;
+      telephone
+    } = data.user;
+    const {residentialAddress,_id,documentManagement} = data;
     // Imagen constante para la comparacion
     const imageConstantPath1 = path.join(__dirname, RIT);
 

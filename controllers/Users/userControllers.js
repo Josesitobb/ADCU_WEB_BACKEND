@@ -211,7 +211,7 @@ exports.createUser = async (req, res) => {
     // Validar los datos personales
     const {
       firsName,
-      lastname,
+      lastName,
       idcard,
       telephone,
       email,
@@ -224,7 +224,7 @@ exports.createUser = async (req, res) => {
     // Campos principales
     if (
       !firsName ||
-      !lastname ||
+      !lastName ||
       !idcard ||
       !telephone ||
       !email ||
@@ -263,7 +263,7 @@ exports.createUser = async (req, res) => {
       // Crear el objeto para eviar que al funcion reciba mas de 7 parametros
       data = {
       firsName,
-      lastname,
+      lastName,
       idcard,
       telephone,
       email,
@@ -279,7 +279,7 @@ exports.createUser = async (req, res) => {
     if (role === "funcionario") {
       data={
         firsName,
-        lastname,
+        lastName,
         idcard,
         telephone,
         email,
@@ -339,7 +339,7 @@ exports.createUser = async (req, res) => {
       // Objeto para pasarle los parametros
       data={
         firsName,
-        lastname,
+        lastName,
         idcard,
         telephone,
         email,

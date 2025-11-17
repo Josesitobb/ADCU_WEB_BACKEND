@@ -11,7 +11,9 @@ require("dotenv").config({path:path.resolve(__dirname,'../../../.env')});
 exports.generateFilingLetter = async (data) => {
     try{
     // Constantes
-    const { firsName, lastName, idcard, telephone,email,typeofcontract,residentialAddress,startDate,endDate,contractNumber,periodValue,_id,documentManagement } = data;
+    const { firsName, lastName, idcard, telephone,email} = data.user;
+    const {typeofcontract,startDate,endDate,contractNumber,periodValue} = data.contract;
+    const {residentialAddress,_id,documentManagement}=data;
     // Imagen constante para la comparacion
     const imageConstantPath = path.join(__dirname,FILINGLETTER);
     // Buscar las imaganes en la carpeta File
@@ -35,7 +37,12 @@ exports.generateFilingLetter = async (data) => {
         messages:[
             {
                 "role": "system",
-                "content": "Eres un experto en validación de documentos visuales y contractuales."
+                "content": ` "Eres un asistente experto en la verificación de documentos legales. "
+            "Tu tarea es analizar imágenes de contratos y el texto extraído por OCR "
+            "para determinar si el documento es auténtico o ha sido alterado. "
+            "Debes verificar estructura, diseño, logos, sellos, coherencia de datos, "
+            "y consistencia entre texto y formato oficial se te va a pasar una imaganes de guia para que veas como son los logos etc..."
+        `,
             },
             {
             "role": "user",

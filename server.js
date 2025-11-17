@@ -3,30 +3,25 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
-const { MongoClient, ObjecId } = require("mongodb");
 const path = require("node:path");
 
 // Llamar funcion para inactivar los contratos
 require("./controllers/Contracto/inactivarContratos");
 
-//Importar ruta Jose
-
 // Inicio de sesion
 const authRoutes = require("./routes/Login/authRoutes");
 // Usuarios
 const UserRoutes = require("./routes/Users/userRoutes");
-
 // Contratos
 const ContractManagementRoutes = require("./routes/Contracto/ContractManagementRoutes");
-
 // Gestion Documental
 const DocumentManagementRoutes = require("./routes/DocumentManagement/DocumentManagementRouter");
-
 //Gestion de datos
 const DataManagement = require("./routes/DataManagement/DataManagementRouter");
-
 // Verificacion de la gestion de datos
 const VerificationOfContractData = require("./routes/VerificationOfContractData/VerificationOfContractData");
+// Infor de la api
+const infoApi = require("./utils/infoApi");
 
 const app = express();
 
@@ -56,43 +51,8 @@ app.use("./Files", express.static(path.join(__dirname, "uploads")));
 app.use("/api/Data", DataManagement);
 // Verificacion de datos
 app.use("/api/Verification", VerificationOfContractData);
-
-
-//   // Data api
-//   app.use("/", (req, res) => {
-//     res.send(`
-
-//    Bienvenido a la API de ADCU
-//    <br>
-
-//    Endpoints:
-//   // Inicio de sesion
-//    Post: /api/auth/signin 
-//    <br>
-
-//   //  Gestion de usuarios:
-//   Get: /api/users  
-//   <br>
-
-//   //  Gestion de contratos:
-//   Get: /api/Contracts   
-//    <br>
-
-//   // Gestion documental:
-//   Get: /api/Documents  
-//    <br>
-
-//   // Gestion de datos
-//   Get: /api/Data 
-//   <br>
-
-//   // Verificacion de datos:
-//   Get:/api/Verification  
-//    <br>
-   
-
-//     `);
-//   });
+// Info de la API
+app.use("/", infoApi);
 
 app.use(express.json());
 

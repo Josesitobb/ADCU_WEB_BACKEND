@@ -6,10 +6,10 @@ const Functionary = require("../../models/Users/Functionary");
 const createAdmin = async (data) => {
   try {
 
-    const {  firsName, lastname, idcard, telephone, email, password, state, post, role}=data;
+    const {  firsName, lastName, idcard, telephone, email, password, state, post, role}=data;
     const admin = new User({
       firsName,
-      lastname,
+      lastName,
       idcard,
       telephone,
       email,
@@ -64,7 +64,7 @@ const createContractor = async (data) => {
   try {
 
     const { firsName,lastName,idcard,telephone,email,password,stateContract,post,role,contractId,residentialAddress,institutionalEmail,EconomicaActivityNumber} = data
-    const contractorSaved = await new User({
+    const contractorSaved = new User({
       firsName,
       lastName,
       idcard,
@@ -78,7 +78,7 @@ const createContractor = async (data) => {
 
     await contractorSaved.save();
 
-    const contractor = await new Contractor({
+    const contractor =  new Contractor({
       post,
       user: contractorSaved._id,
       contract: contractId,

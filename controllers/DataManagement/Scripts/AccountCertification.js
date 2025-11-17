@@ -16,6 +16,8 @@ exports.generateAccountCertification = async (data) => {
       idcard,
      email,
      telephone,
+    } = data.user;
+    const {
       _id,
       documentManagement,
     } = data;

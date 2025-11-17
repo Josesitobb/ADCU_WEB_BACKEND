@@ -70,7 +70,6 @@ userSchemna.pre("save", async function (next) {
 
 // Metodo para comparar contraseña
 userSchemna.methods.VerifyPassword = async function (candidatePassword) {
-  console.log("Candidata:", candidatePassword, "\nDel modelo:", this.password);
   return await bcrypt.compare(candidatePassword, this.password);
 };
 

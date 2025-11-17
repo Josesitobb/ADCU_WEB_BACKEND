@@ -1,16 +1,22 @@
 const DataManagement = require("../../models/DataManagements/DataManagements");
 const VerificationOfContractData = require("../../models/VerificationOfContractData/VerificationOfContractData");
 const Contractor = require("../../models/Users/Contractor");
+const  mongoose  = require("mongoose");
 
 // Obtener una comparacion de datos por id y validar que todos los campos este en true, si no dar una descripcion
 exports.getDataVerificactionById = async (req, res) => {
   try {
     const dataManagemntsId = req.params.dataManagemntsId;
 
+    if(mongoose.Types.ObjectId.isValid(dataManagemntsId) === false){
+      return res.status(400).json({
+        success: false,
+        message: "ID de gestión de datos no válido",
+      });
+    }
+
     // Verifica si existe un gestion de datos con ese contractor
-    const existinDataManagement = await DataManagement.findById(
-      dataManagemntsId
-    );
+    const existinDataManagement = await DataManagement.findById(dataManagemntsId);
 
     if (!existinDataManagement) {
       return res.status(404).json({
@@ -58,9 +64,7 @@ exports.getDataVerificactionById = async (req, res) => {
           .join(", ")}`;
 
     // Verificar si ya existe una verificación asociada a esta gestión
-    let verification = await VerificationOfContractData.findOne({
-      dataManagemnts: existinDataManagement._id,
-    });
+    let verification = await VerificationOfContractData.findOne({dataManagemnts: existinDataManagement._id});
 
     if (verification) {
       verification.state = state;
@@ -91,9 +95,7 @@ exports.getDataVerificactionById = async (req, res) => {
 
 exports.getAllDataVerificaction = async (req, res) => {
   try {
-    const allVerifications = await VerificationOfContractData.find().populate({
-      path: "dataManagemnts"
-    });
+    const allVerifications = await VerificationOfContractData.find().populate({path: "dataManagemnts"});
 
     return res.status(200).json({
       success: true,

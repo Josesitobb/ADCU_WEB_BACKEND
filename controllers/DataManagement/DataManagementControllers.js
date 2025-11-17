@@ -16,6 +16,7 @@ const {generateAccountCertification} = require('./Scripts/AccountCertification')
 
 
 
+
 exports.getAllDataManagemente = async (req, res) => {
   try {
     const dataMagemente = await DataManagements.find();
@@ -199,11 +200,7 @@ exports.updatedData = async (req, res) => {
     };
 
     //Datos del contratista
-    const ContractUser = await Contractor.findById(
-      exitingdocumentManagement.userContract
-    )
-      .populate("user", "firsName lastName idcard telephone email")
-      .populate(
+    const ContractUser = await Contractor.findById(exitingdocumentManagement.userContract).populate("user", "firsName lastName idcard telephone email").populate(
         "contract",
         "typeofcontract  startDate endDate contractNumber periodValue totalValue objectiveContract extension addiction suspension"
       );
@@ -402,7 +399,39 @@ exports.updatedData = async (req, res) => {
 
 exports.deleteData = async (req, res) => {
   try {
-    const newDelete = await DataManagements.findByIdAndDelete(req.params.id);
+    const { management } = req.params;
+
+    if(!mongoose.Types.ObjectId.isValid(management) ){
+      return res.status(400).json({
+        success:false,
+        message:'El id de la gestion documental no es valido'
+      });
+    }
+
+    const safeManagement = management.trim();
+
+    
+    // Verificar si existe una gestion documental
+    const documentManagementExisting = await DocumentManagement.findById(safeManagement);
+    if(!documentManagementExisting){
+      return res.status(404).json({
+        success:false,
+        message:'No existe una gestion documental con ese id'
+      });
+    }
+
+    // Borrar la gestion de datos
+    const query = {documentManagement:documentManagementExisting._id};
+
+    const newDelete = await DataManagements.findOneAndDelete(query);
+
+
+    if(!newDelete){
+      return res.status(404).json({
+        success:false,
+        message:'No se encontro una comparacion con ese id'
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -427,7 +456,6 @@ exports.toogleStateData = async(req,res)=>{
   try{
 
   const {management,field} = req.params;
-  console.log(management)
 
   const existinDocumentManagement = await DocumentManagement.findById(management);
 

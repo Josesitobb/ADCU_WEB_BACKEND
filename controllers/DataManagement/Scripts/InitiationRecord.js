@@ -14,14 +14,19 @@ exports.generateInitiationRecord = async (data) => {
       firsName,
       lastName,
       idcard,
+    } = data.user;
+    const {
       contractNumber,
       startDate,
       endDate,
       totalValue,
-      objectiveContract,
+      objectiveContract
+    } = data.contract;
+    const {
       _id,
-      documentManagement,
+      documentManagement
     } = data;
+
     // Imagen constante para la comparacion
     const imageConstantPath1 = path.join(__dirname, INITIATIONRECORD);
 
