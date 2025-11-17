@@ -10,8 +10,8 @@ services:
       - JWT_SECRET=AxOp1Yuero91202kdh12
       - JWT_EXPIRATION=86400
       - PORT=5001
-      - HOST=localhost
-      - KEYCHATGPT=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
+      - HOST=0.0.0.0
+      - KEYCHATGPT=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
     volumes:
       - adcu-data:/app
     networks:
