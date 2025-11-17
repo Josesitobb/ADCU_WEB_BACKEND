@@ -33,11 +33,11 @@ exports.generateTaxQuanlityCertificate = async (data) => {
     // Buscar las imaganes en la carpeta File
     const imagesDir1 = path.join(
       __dirname,
-      `${FILE}${_id}img/taxQualityCertificate1.jpg`
+      `${FILE}${_id}/Img/taxQualityCertificate1.jpg`
     );
     const imagesDir2 = path.join(
       __dirname,
-      `${FILE}${_id}img/taxQualityCertificate2.jpg`
+      `${FILE}${_id}/Img/taxQualityCertificate2.jpg`
     );
     // Verificar que todas las imaganes esten
     if (!fs.existsSync(imagesDir1) || !fs.existsSync(imagesDir2)) {

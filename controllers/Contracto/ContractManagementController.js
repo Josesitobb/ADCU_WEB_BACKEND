@@ -89,9 +89,10 @@ exports.getStateContracts = async (req, res) => {
   return res.status(200).json({
     success: true,
     message: `El numero de contrato activos es ${contracAtive.length}`,
-    data: contracAtive.length === 0 ? contracAtive : "No hay contratos",
+    data: contracAtive.length === 0 ?"No hay contratos"  :  contracAtive,
   });
 };
+
 
 // Obtener un contrato especifico
 exports.getContractById = async (req, res) => {

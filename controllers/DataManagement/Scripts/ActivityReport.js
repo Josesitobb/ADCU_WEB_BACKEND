@@ -19,11 +19,11 @@ exports.generateActivityReports = async (data) => {
         const imageConstantPath5 = path.join(__dirname, ACTIVITYREPORT5);
 
         // Buscar las imaganes en la carpeta File
-        const imagesDir1 = path.join(__dirname, `${FILE}${_id}img/activityReport1.jpg`);
-        const imagesDir2 = path.join(__dirname, `${FILE}${_id}img/activityReport2.jpg`);
-        const imagesDir3 = path.join(__dirname, `${FILE}${_id}img/activityReport3.jpg`);
-        const imagesDir4 = path.join(__dirname, `${FILE}${_id}img/activityReport4.jpg`);
-        const imagesDir5 = path.join(__dirname, `${FILE}${_id}img/activityReport5.jpg`);
+        const imagesDir1 = path.join(__dirname, `${FILE}${_id}/Img/activityReport1.jpg`);
+        const imagesDir2 = path.join(__dirname, `${FILE}${_id}/Img/activityReport2.jpg`);
+        const imagesDir3 = path.join(__dirname, `${FILE}${_id}/Img/activityReport3.jpg`);
+        const imagesDir4 = path.join(__dirname, `${FILE}${_id}/Img/activityReport4.jpg`);
+        const imagesDir5 = path.join(__dirname, `${FILE}${_id}/Img/activityReport5.jpg`);
 
         // Verificar que todas las imaganes esten
         if (!fs.existsSync(imagesDir1) || !fs.existsSync(imagesDir2) || !fs.existsSync(imagesDir3) || !fs.existsSync(imagesDir4) || !fs.existsSync(imagesDir5)) {

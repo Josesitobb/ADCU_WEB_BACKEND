@@ -15,7 +15,8 @@ exports.generateFilingLetter = async (data) => {
     // Imagen constante para la comparacion
     const imageConstantPath = path.join(__dirname,FILINGLETTER);
     // Buscar las imaganes en la carpeta File
-    const imagesDir = path.join(__dirname,`${FILE}${_id}img/filingLetter1.jpg`);
+    const imagesDir = path.join(__dirname,`${FILE}${_id}/Img/filingLetter1.jpg`);
+    
 
     if(!fs.existsSync(imagesDir)){
         throw new Error('La carta de archivo no ha sido generada aún.');

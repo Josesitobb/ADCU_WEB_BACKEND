@@ -52,16 +52,12 @@ exports.getAllAdmin = async (req, res) => {
       }).select("-password");
 
     // Consulta a la base de datos
-    if (state == undefined)
-      userAllAdmin = await User.find({ role: "admin" }).select("-password");
+    if (state == undefined)userAllAdmin = await User.find({ role: "admin" }).select("-password");
 
     return res.status(200).json({
       success: true,
       message: `Usuarios admis encontrados con el estado: ${state} son: ${userAllAdmin.length}`,
-      data:
-        userAllAdmin.length === 0
-          ? userAllAdmin
-          : `No hay usuarios admins con el estado: ${state}`,
+      data:userAllAdmin.length === 0 ? `No hay usuarios admins con el estado: ${state}`:userAllAdmin,
     });
   } catch (err) {
     console.log(err);
@@ -109,8 +105,8 @@ exports.getAllFuncionary = async (req, res) => {
           : `Usuarios funcionarios encontrados con el estado: ${state} son: ${userAllFuncionary.length}`,
       data:
         userAllFuncionary.length === 0
-          ? userAllFuncionary
-          : `No existe funcionarios con el estado que selecciono`,
+          ? `No existe funcionarios con el estado que selecciono`
+          :  userAllFuncionary,
     });
   } catch (err) {
     console.log(err);
@@ -156,8 +152,8 @@ exports.getAllContractor = async (req, res) => {
           : `Usuarios contratista  encontrados con el estado: ${state} son: ${userAllContractor.length}`,
       data:
         userAllContractor.length === 0
-          ? userAllContractor
-          : `No existe contratista  con el estado que selecciono`,
+          ? `No existe contratista  con el estado que selecciono`
+          : userAllContractor,
     });
   } catch (err) {
     console.log(err);

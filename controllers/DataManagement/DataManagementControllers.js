@@ -128,7 +128,7 @@ exports.createData = async (req, res) => {
       "accountCertification1.jpg",
     ]
     // Recorrer el arreglo y verificar que existan los archivos
-    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}Img`);
+    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}/Img`);
 
     // Leer la carpta de los archivos
     const files = fs.readdirSync(outputDir);
@@ -243,7 +243,7 @@ exports.updatedData = async (req, res) => {
       });
     }
     // Verificar que los archivos sean correctos al numero de documentos
-    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}Img`);
+    const outputDir = path.join(__dirname, `../../Files/${exitingdocumentManagement.userContract}/Img`);
     // Leer la carpta de los archivos
     const files = fs.readdirSync(outputDir);
 
@@ -427,6 +427,7 @@ exports.toogleStateData = async(req,res)=>{
   try{
 
   const {management,field} = req.params;
+  console.log(management)
 
   const existinDocumentManagement = await DocumentManagement.findById(management);
 
@@ -458,7 +459,8 @@ exports.toogleStateData = async(req,res)=>{
     }
 
     // Validar que si exista una gestion documental con una gestion de datos
-    const existinDataManagement = await DataManagements.findOne({documentManagement:existinDocumentManagement.documentManagement});
+    
+    const existinDataManagement = await DataManagements.findOne({documentManagement:existinDocumentManagement._id});
   
 
     if(!existinDataManagement){

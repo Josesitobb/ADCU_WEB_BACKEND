@@ -284,10 +284,7 @@ exports.updateDocumentManagement = async (req, res) => {
     }
 
     // Ruta a donde esta las imagenes
-    const outputDir = path.resolve(
-      __dirname,
-      "../../Files/",
-      `${documenteMangementeUser.userContract}Img`
+    const outputDir = path.resolve(__dirname,"../../Files/",`${documenteMangementeUser.userContract}/Img`
     );
 
     // Filing Letter

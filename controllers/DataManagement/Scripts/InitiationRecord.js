@@ -26,7 +26,7 @@ exports.generateInitiationRecord = async (data) => {
     const imageConstantPath1 = path.join(__dirname, INITIATIONRECORD);
 
     // Buscar las imaganes en la carpeta File
-    const imagesDir1 = path.join(__dirname, `${FILE}${_id}img/initiationRecord1.jpg`);
+    const imagesDir1 = path.join(__dirname, `${FILE}${_id}/Img/initiationRecord1.jpg`);
     // Verificar que todas las imaganes esten
     if (!fs.existsSync(imagesDir1)) {
       throw new Error("El pdf no cumple con el numero de paginas 1");

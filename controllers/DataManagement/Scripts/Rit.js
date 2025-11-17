@@ -30,7 +30,7 @@ exports.generateRit = async (data) => {
     // Buscar las imaganes en la carpeta File
     const imagesDir1 = path.join(
       __dirname,
-      `${FILE}${_id}img/rit1.jpg`
+      `${FILE}${_id}/Img/rit1.jpg`
     );
     // Verificar que todas las imaganes esten
     if (!fs.existsSync(imagesDir1)) {

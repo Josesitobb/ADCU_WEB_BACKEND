@@ -15,7 +15,7 @@ exports.generateCertificateOfCompliance = async(data)=>{
     const imageConstantPath = path.join(__dirname,CERTIFICATEOFCOMPLIANCE);
 
     // Buscar las imaganes en la carpeta File
-    const imagesDir = path.join(__dirname,`${FILE}${_id}img/certificateOfCompliance1.jpg`);
+    const imagesDir = path.join(__dirname,`${FILE}${_id}/Img/certificateOfCompliance1.jpg`);
 
     // Verifica si la ruta del path existe
     if(!fs.existsSync(imagesDir)){

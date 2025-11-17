@@ -22,7 +22,7 @@ exports.generateAccountCertification = async (data) => {
     
 
     // Buscar las imaganes en la carpeta File
-    const imagesDir1 = path.join(__dirname, `${FILE}${_id}img/accountCertification1.jpg`);
+    const imagesDir1 = path.join(__dirname, `${FILE}${_id}/Img/accountCertification1.jpg`);
     // Verificar que todas las imaganes esten
     if (!fs.existsSync(imagesDir1)) {
       throw new Error("El pdf no cumple con el numero de paginas 1");
