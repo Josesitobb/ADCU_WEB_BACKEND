@@ -23,8 +23,21 @@ exports.signin = async (req, res) => {
       });
     }
 
+    // Sanitizar: permitir solo emails normales
+    const safeEmail = String(email).trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(safeEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: "Email inválido",
+      });
+    }
+
+    const query = {email:safeEmail}
+    
+
     // Buscar el usuario y  la contraseña
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne(query).select("+password");
     // Si el usuario no existe lansa mensaje de error
     if (!user) {
       return res.status(404).json({
@@ -32,7 +45,6 @@ exports.signin = async (req, res) => {
         message: "Usuario no encontrado",
       });
     }
-    console.log("[AuthController] Usuario encontrado", email);
 
     if (!user.state) {
       return res.status(400).json({

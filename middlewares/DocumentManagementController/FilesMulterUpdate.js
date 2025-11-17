@@ -1,6 +1,7 @@
 const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
+const mongoose = require("mongoose");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -10,7 +11,14 @@ const storage = multer.diskStorage({
       return cb(new Error("Falta el ID del contratista"), null);
     }
 
-    const dir = path.join(__dirname, `../../Files/${userId}`);
+    // Validar id
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return cb(new Error("Id invalida"), null);
+    }
+
+    const safeuserContract = path.basename(userId.trim());
+
+    const dir = path.join(__dirname, "../../Files", safeuserContract);
     fs.mkdirSync(dir, { recursive: true });
     cb(null, dir);
   },
@@ -26,7 +34,7 @@ const storage = multer.diskStorage({
     // Renombrar al nombre del campo del input + .pdf
     const newName = `${file.fieldname}${extension}`;
     cb(null, newName);
-  }
+  },
 });
 
 const upload = multer({ storage });

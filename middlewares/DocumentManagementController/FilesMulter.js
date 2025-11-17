@@ -1,13 +1,21 @@
 const multer = require("multer");
-const fs = require("fs");
-const path = require("path");
-const Contractors = require("../../models/Contracto/ContractManagement");
+const fs = require("node:fs");
+const path = require("node:path");
+const mongoose = require("mongoose");
 const storage = multer.diskStorage({
   destination: (req, file, cd) => {
     const userId = req.params.userContract;
     if (!userId) {
       return cb(new Error("Falta el ID del contratista"), null);
     }
+
+    // Validar id
+    if(!mongoose.Types.ObjectId.isValid(userId)){
+      return cb(new Error("Id invalida"),null)
+    }
+
+    const safeuserContract = path.basename(userId.trim());
+
     // Verificar si vienen los campos completos
     const nameFiles = [
       "filingLetter",
@@ -26,7 +34,8 @@ const storage = multer.diskStorage({
       return cd(new Error("Faltan archivos"));
     }
     // Verificar crear el directorio absoluta
-    const directorio = path.join(__dirname, `../../Files/${userId}`);
+    const directorio = path.join(__dirname, "../../Files", safeuserContract);
+ 
     try {
       //Crear la carpeta
       fs.mkdirSync(directorio, { recursive: true });
