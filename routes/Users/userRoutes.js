@@ -32,8 +32,8 @@ router.get("/stats", verifyToken, getUserStats);
 //POST /API/Users
 router.post(
   "/",
-  // verifyToken,
-  // checkRole('admin','funcionario'),
+  verifyToken,
+  checkRole('admin','funcionario'),
   createUser
 );
 

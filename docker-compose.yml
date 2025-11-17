@@ -1,0 +1,27 @@
+services:
+  ADCU:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    image: adcu-app:latest
+    container_name: ADCU-CONTAINER
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGODB_URI=mongodb://adcuUser:adcuPass123@mongo-adcu:27017/ADCU
+      - JWT_SECRET=AxOp1Yuero91202kdh12
+      - JWT_EXPIRATION=86400
+      - PORT=5001
+      - HOST=localhost
+      - KEYCHATGPT=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
+    volumes:
+      - adcu-data:/app
+    networks:
+      - adcu-network
+
+volumes:
+  adcu-data:
+
+networks:
+  adcu-network: 
+    external: true

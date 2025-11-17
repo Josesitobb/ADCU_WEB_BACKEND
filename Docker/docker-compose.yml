@@ -1,0 +1,24 @@
+services:
+  mongoAdcu:
+    build: . 
+    restart: always
+    container_name: mongo-Adcu
+    image: mongo-adcu
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: "adcunumber1"
+      MONGO_INITDB_DATABASE: adcu_db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - adcu-network
+
+volumes:
+  mongo-data:
+
+networks:
+  adcu-network: 
+    external: true
+  
