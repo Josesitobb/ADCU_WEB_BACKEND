@@ -512,7 +512,7 @@ exports.deleteDocumentByContractor = async (req, res) => {
       "Img"
     );
 
-    //Leer todo los archivos de la carpeta del usuario
+    //Leer todos los archivos de la carpeta del usuario
     fs.readdir(outputDir, (err, files) => {
       if (err) return console.log("Error", err);
 

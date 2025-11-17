@@ -47,7 +47,7 @@ exports.getAllAdmin = async (req, res) => {
     // Consulta a la base de datos
     if (state)
       userAllAdmin = await User.find({
-        state: state == "true" ? true : false,
+        state: state === "true",
         role: "admin",
       }).select("-password");
 
@@ -94,7 +94,7 @@ exports.getAllFuncionary = async (req, res) => {
       );
     }
 
-    // Si no viene state motrar todo los usuarios sin umportar el state
+    // Si no viene state motrar todos los usuarios sin umportar el state
     if (state == undefined)
       userAllFuncionary = await Functionary.find().populate({
         path: "user",
@@ -142,7 +142,7 @@ exports.getAllContractor = async (req, res) => {
       );
     }
 
-    // Si no viene state motrar todo los usuarios sin umportar el state
+    // Si no viene state motrar todos los usuarios sin umportar el state
     if (state == undefined)
       userAllContractor = await Contractor.find()
         .populate({ path: "user", select: "-password" })
