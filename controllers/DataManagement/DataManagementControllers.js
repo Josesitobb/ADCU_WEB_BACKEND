@@ -498,8 +498,7 @@ exports.getDataStats = async (req, res) => {
     // consulta todos los contratistas
     const contractors = await Contractor.find();
     const contractorsWithDocs = contractors.length - totalCount;  
-    // Contratos sin gestion documental
-    const ContractsWithoutDocumentManagement = contractors.length - totalCount;
+    
     stats = {
       'total de documentos':totalCount,
       'Usuario contratista sin gestion de datos': contractorsWithDocs

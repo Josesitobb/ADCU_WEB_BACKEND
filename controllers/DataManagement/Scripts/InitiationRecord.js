@@ -14,7 +14,6 @@ exports.generateInitiationRecord = async (data) => {
       firsName,
       lastName,
       idcard,
-      typeofcontract,
       contractNumber,
       startDate,
       endDate,

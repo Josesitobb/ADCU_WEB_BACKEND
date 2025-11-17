@@ -3,21 +3,13 @@ const Contractor = require("../../models/Users/Contractor");
 const Functionary = require("../../models/Users/Functionary");
 
 // Crear el adminitrador
-const createAdmin = async (
-  firsName,
-  lastName,
-  idcard,
-  telephone,
-  email,
-  password,
-  state,
-  post,
-  role
-) => {
+const createAdmin = async (data) => {
   try {
+
+    const {  firsName, lastname, idcard, telephone, email, password, state, post, role}=data;
     const admin = new User({
       firsName,
-      lastName,
+      lastname,
       idcard,
       telephone,
       email,
@@ -35,18 +27,10 @@ const createAdmin = async (
 };
 
 // Crear funcionario
-const createFuncionary = async (
-  firsName,
-  lastName,
-  idcard,
-  telephone,
-  email,
-  password,
-  state,
-  post,
-  role
-) => {
+const createFuncionary = async (data) => {
   try {
+    const {firsName,lastName,idcard,telephone,email,password,state,post,role}=data;
+
     const funcionarySaved = new User({
       firsName,
       lastName,
@@ -76,22 +60,10 @@ const createFuncionary = async (
 };
 
 // Crear contratista
-const createContractor = async (
-  firsName,
-  lastName,
-  idcard,
-  telephone,
-  email,
-  password,
-  state,
-  post,
-  role,
-  contractId,
-  residentialAddress,
-  institutionalEmail,
-  EconomicaActivityNumber
-) => {
+const createContractor = async (data) => {
   try {
+
+    const { firsName,lastName,idcard,telephone,email,password,stateContract,post,role,contractId,residentialAddress,institutionalEmail,EconomicaActivityNumber} = data
     const contractorSaved = await new User({
       firsName,
       lastName,
@@ -99,7 +71,7 @@ const createContractor = async (
       telephone,
       email,
       password,
-      state,
+      state:stateContract,
       post,
       role,
     });

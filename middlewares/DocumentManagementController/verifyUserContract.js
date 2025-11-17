@@ -12,7 +12,6 @@ exports.VerifyUserContract = async (req, res, next) => {
       });
     }
 
-    // req.userContract = userId; // Para seguir usándolo más adelante
     next();
   } catch (error) {
     return res.status(500).json({

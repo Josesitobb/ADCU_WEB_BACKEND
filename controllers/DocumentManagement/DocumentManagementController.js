@@ -577,8 +577,6 @@ exports.getDocumentManagementStats = async (req, res) => {
       (doc) => doc.state === false
     ).length;
 
-    const contractor = (await Contractor.find()).length;
-
     // Contratos sin gestion documental
     let ContractsWithoutDocumentManagement = 0;
 

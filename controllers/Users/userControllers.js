@@ -261,23 +261,27 @@ exports.createUser = async (req, res) => {
     }
 
     let usercreate;
+    let data;
     // Verificar que que rol tomo el usuario
     if (role === "admin") {
-      usercreate = await createAdmin(
-        firsName,
-        lastname,
-        idcard,
-        telephone,
-        email,
-        password,
-        state,
-        post,
-        role
-      );
+      // Crear el objeto para eviar que al funcion reciba mas de 7 parametros
+      data = {
+      firsName,
+      lastname,
+      idcard,
+      telephone,
+      email,
+      password,
+      state,
+      post,
+      role
+
+      }
+      usercreate = await createAdmin(data);
     }
 
     if (role === "funcionario") {
-      usercreate = await createFuncionary(
+      data={
         firsName,
         lastname,
         idcard,
@@ -287,7 +291,8 @@ exports.createUser = async (req, res) => {
         state,
         post,
         role
-      );
+      }
+      usercreate = await createFuncionary(data);
     }
 
     if (role === "contratista") {
@@ -335,7 +340,8 @@ exports.createUser = async (req, res) => {
       //Pasar el estado del contrato a el contratista
       const stateContract = verifyContract.state;
 
-      usercreate = await createContractor(
+      // Objeto para pasarle los parametros
+      data={
         firsName,
         lastname,
         idcard,
@@ -349,7 +355,10 @@ exports.createUser = async (req, res) => {
         residentialAddress,
         institutionalEmail,
         EconomicaActivityNumber
-      );
+
+      }
+
+      usercreate = await createContractor(data);
     }
 
     res.status(200).json({
