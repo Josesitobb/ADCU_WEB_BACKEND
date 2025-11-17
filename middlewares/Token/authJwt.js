@@ -49,6 +49,7 @@ const AuthJWT = (req,res,next)=>{
         req.user = decoded;
         next();
     }catch(error){
+        console.error("[AUTH] Error al validar token:", error);
         return res.status(401).json({
             success:false,
             message:'Token invalido'

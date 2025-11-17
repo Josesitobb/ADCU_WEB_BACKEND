@@ -138,7 +138,12 @@ exports.createDocumentManagement = async (req, res) => {
     const safeuserContract = path.basename(userContract);
 
     // Verificar el directorio
-    const directory = path.join(__dirname, "../../Files", safeuserContract, "Img");
+    const directory = path.join(
+      __dirname,
+      "../../Files",
+      safeuserContract,
+      "Img"
+    );
 
     // Si el directorio no existe crea la carpeta
     fs.mkdirSync(directory, { recursive: true });
@@ -460,16 +465,16 @@ exports.deleteDocumentByContractor = async (req, res) => {
     const { userContract, file } = req.params;
 
     // Validar que sea un id de mongo
-    if(!mongoose.Types.ObjectId.isValid(userContract)){
+    if (!mongoose.Types.ObjectId.isValid(userContract)) {
       return res.status(400).json({
-        success:false,
-        message:'Id invalido'
+        success: false,
+        message: "Id invalido",
       });
     }
 
     // Evitar noSqlInyeccion
     const safeuserContract = path.basename(userContract.trim());
-    const query = {userContract:safeuserContract}
+    const query = { userContract: safeuserContract };
 
     const exitingdocumentManagement = await DocumentManagement.findOne(query);
     if (!exitingdocumentManagement) {
@@ -499,10 +504,13 @@ exports.deleteDocumentByContractor = async (req, res) => {
       });
     }
 
-
-
     // Ruta a donde esta las imagenes
-    const outputDir = path.join(__dirname, "../../Files", safeuserContract, "Img");
+    const outputDir = path.join(
+      __dirname,
+      "../../Files",
+      safeuserContract,
+      "Img"
+    );
 
     //Leer todo los archivos de la carpeta del usuario
     fs.readdir(outputDir, (err, files) => {
@@ -517,10 +525,14 @@ exports.deleteDocumentByContractor = async (req, res) => {
       }
     });
 
-    
     // Borrar el pdf
-    const outputDirPdf = path.join( __dirname, "../../Files", safeuserContract, file + ".pdf");
-    
+    const outputDirPdf = path.join(
+      __dirname,
+      "../../Files",
+      safeuserContract,
+      file + ".pdf"
+    );
+
     // Ejecutar la promesa para eliminar
     fs.promises.unlink(outputDirPdf).catch((err) => {
       if (err === "ENOENT")
@@ -580,7 +592,7 @@ exports.getDocumentManagementStats = async (req, res) => {
     // Contratos sin gestion documental
     let ContractsWithoutDocumentManagement = 0;
 
-    totalDocuments.forEach((d) => {
+    for (const d of totalDocuments) {
       if (d.filingLetter) ContractsWithoutDocumentManagement++;
       if (d.certificateOfCompliance) ContractsWithoutDocumentManagement++;
       if (d.signedCertificateOfCompliance) ContractsWithoutDocumentManagement++;
@@ -592,7 +604,7 @@ exports.getDocumentManagementStats = async (req, res) => {
       if (d.trainings) ContractsWithoutDocumentManagement++;
       if (d.initiationRecord) ContractsWithoutDocumentManagement++;
       if (d.accountCertification) ContractsWithoutDocumentManagement++;
-    });
+    }
 
     stats = {
       "total de documentos": totalCount,

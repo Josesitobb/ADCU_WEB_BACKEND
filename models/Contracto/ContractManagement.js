@@ -60,7 +60,7 @@ const ContracSchema = new mongoose.Schema({
 ContracSchema.pre("save", function (next) {
   if (new Date(this.startDate) > new Date(this.endDate)) {
     throw next(
-      Error("La fecha de fin no puede ser menor a la fecha de inicio")
+      new Error("La fecha de fin no puede ser menor a la fecha de inicio")
     );
   }
   next();

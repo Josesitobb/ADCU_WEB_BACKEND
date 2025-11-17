@@ -59,7 +59,7 @@ exports.getAllAdmin = async (req, res) => {
       success: true,
       message: `Usuarios admis encontrados con el estado: ${state} son: ${userAllAdmin.length}`,
       data:
-        userAllAdmin.length !== 0
+        userAllAdmin.length === 0
           ? userAllAdmin
           : `No hay usuarios admins con el estado: ${state}`,
     });
@@ -90,7 +90,7 @@ exports.getAllFuncionary = async (req, res) => {
       });
       // Filtrar por state
       userAllFuncionary = userFuncionary.filter(
-        (u) => u.user.state === (state == "true" ? true : false)
+        (u) => u.user.state === (state === "true" )
       );
     }
 
@@ -108,7 +108,7 @@ exports.getAllFuncionary = async (req, res) => {
           ? `Usuario funcionario encontrados : ${userAllFuncionary.length}`
           : `Usuarios funcionarios encontrados con el estado: ${state} son: ${userAllFuncionary.length}`,
       data:
-        userAllFuncionary.length !== 0
+        userAllFuncionary.length === 0
           ? userAllFuncionary
           : `No existe funcionarios con el estado que selecciono`,
     });
@@ -138,7 +138,7 @@ exports.getAllContractor = async (req, res) => {
         .populate("contract");
       // Filtrar por state
       userAllContractor = userContractor.filter(
-        (u) => u.user.state === (state == "true" ? true : false)
+        (u) => u.user.state === (state ==="true")
       );
     }
 
@@ -155,7 +155,7 @@ exports.getAllContractor = async (req, res) => {
           ? `Usuario contratista encontrados : ${userAllContractor.length}`
           : `Usuarios contratista  encontrados con el estado: ${state} son: ${userAllContractor.length}`,
       data:
-        userAllContractor.length !== 0
+        userAllContractor.length === 0
           ? userAllContractor
           : `No existe contratista  con el estado que selecciono`,
     });
