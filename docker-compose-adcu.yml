@@ -1,19 +1,16 @@
 services:
   adcu:
-    image: josegamen/app-adcu
+    image: josegamen/app-adcu:latest
     container_name: app-adcu
     restart: always
     ports:
-      - "5001:5001"
+      - "5000:5000"
     environment:
       - MONGODB_URI=mongodb://adcuUser:adcuPass123@mongo-adcu:27017/ADCU
       - JWT_SECRET=AxOp1Yuero91202kdh12
-      - JWT_EXPIRATION=86400
-      - PORT=5001
+      - PORT=5000
       - HOST=0.0.0.0
-      - KEYCHATGPT=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
-    volumes:
-      - adcu-data:/app
+      - KEYCHATGPT=api-key-placeholder
     networks:
       - adcu-network
 
