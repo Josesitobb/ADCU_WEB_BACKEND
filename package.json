@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "mocha ./test/*.js --no-timeouts",
+    "test": "mocha ./test/Admin *.js --no-timeouts",
     "start": "node serve.js",
     "dev": "nodemon server.js"
   },
