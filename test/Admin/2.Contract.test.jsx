@@ -40,7 +40,10 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
             // Esperar el mensae
             const alertOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/div/h2')), 20000);
 
-            if (!alertOk) throw new Error('Error no inicia con la clave del adminitrador')
+            if (!alertOk) throw new Error('Error no inicia con la clave del adminitrador');
+
+            await driver.sleep(2000);
+
 
         } catch (e) {
             console.log(e)
@@ -58,7 +61,7 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
             buttonInicio.click();
 
 
-            const buttonContract = await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div[2]/nav/a[2]'));
+            const buttonContract = await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div/nav/a[2]'));
             await driver.wait(until.elementIsVisible(buttonContract), 2000);
             buttonContract.click();
 
@@ -102,7 +105,10 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
             await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[3]/button[2]')).click();
 
             // Esperar a la alerta que confirme la creacion
-            await driver.wait(until.elementsLocated(By.xpath('//*[@id="root"]/section/ol/li/div[2]/div')), 20000)
+            await driver.wait(until.elementsLocated(By.xpath('//*[@id="root"]/section/ol/li/div[2]/div')), 20000);
+
+            await driver.sleep(2000);
+
 
         } catch (e) {
             console.log(e)
@@ -130,7 +136,10 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
 
             await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[3]/button[2]')).click();
 
-            await driver.wait(until.elementsLocated(By.xpath('//*[@id="root"]/section/ol/li/div[2]/div[2]')))
+            await driver.wait(until.elementsLocated(By.xpath('//*[@id="root"]/section/ol/li/div[2]/div[2]')));
+
+            await driver.sleep(2000);
+
 
         } catch (e) {
             console.log(e)
@@ -149,7 +158,8 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
 
             await driver.switchTo().alert().accept();
 
-            // await driver.findElement(until.elementsLocated(By.xpath('/ol/li/div[2]/div[2]')));
+            await driver.sleep(2000);
+
         } catch (e) {
             console.log(e)
         }

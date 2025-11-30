@@ -5,14 +5,14 @@ const DataManagements = require("../../models/DataManagements/DataManagements");
 const DocumentManagement = require("../../models/DocumentManagement/DocumentManagement");
 const mongoose = require("mongoose");
 // Funciones para la comparacion
-const {generateFilingLetter} = require("./Scripts/FilingLetter");
-const {generateCertificateOfCompliance}= require('./Scripts/CertificateOfCompliance');
-const {generateActivityReports}= require('./Scripts/ActivityReport');
-const {generateTaxQuanlityCertificate} = require('./Scripts/TaxQuanlityCertificate');
-const {generateRut}=require('./Scripts/Rut');
-const {generateRit}= require('./Scripts/Rit');
-const {generateInitiationRecord}= require('./Scripts/InitiationRecord');
-const {generateAccountCertification} = require('./Scripts/AccountCertification');
+const { generateFilingLetter } = require("./Scripts/FilingLetter");
+const { generateCertificateOfCompliance } = require('./Scripts/CertificateOfCompliance');
+const { generateActivityReports } = require('./Scripts/ActivityReport');
+const { generateTaxQuanlityCertificate } = require('./Scripts/TaxQuanlityCertificate');
+const { generateRut } = require('./Scripts/Rut');
+const { generateRit } = require('./Scripts/Rit');
+const { generateInitiationRecord } = require('./Scripts/InitiationRecord');
+const { generateAccountCertification } = require('./Scripts/AccountCertification');
 
 
 
@@ -35,7 +35,7 @@ exports.getAllDataManagemente = async (req, res) => {
 
 exports.getDataById = async (req, res) => {
   try {
-    const{management} = req.params;
+    const { management } = req.params;
     const existinDataManagement = await DocumentManagement.findById(management);
     if (!existinDataManagement) {
       return res.status(404).json({
@@ -43,21 +43,21 @@ exports.getDataById = async (req, res) => {
         message: "No existe una gestion documental con ese id",
       });
     }
-const dataManagementeId = await DataManagements.findOne({
-  $or: [
-    { "filingLetter.contractorId": existinDataManagement.userContract },
-    { "certificateOfCompliance.contractorId": existinDataManagement.userContract },
-    { "signedCertificateOfCompliance.contractorId": existinDataManagement.userContract },
-    { "activityReport.contractorId": existinDataManagement.userContract },
-    { "taxQualityCertificate.contractorId": existinDataManagement.userContract },
-    { "socialSecurity.contractorId": existinDataManagement.userContract },
-    { "rut.contractorId": existinDataManagement.userContract },
-    { "rit.contractorId": existinDataManagement.userContract },
-    { "trainings.contractorId": existinDataManagement.userContract },
-    { "initiationRecord.contractorId": existinDataManagement.userContract },
-    { "accountCertification.contractorId": existinDataManagement.userContract }
-  ]
-});
+    const dataManagementeId = await DataManagements.findOne({
+      $or: [
+        { "filingLetter.contractorId": existinDataManagement.userContract },
+        { "certificateOfCompliance.contractorId": existinDataManagement.userContract },
+        { "signedCertificateOfCompliance.contractorId": existinDataManagement.userContract },
+        { "activityReport.contractorId": existinDataManagement.userContract },
+        { "taxQualityCertificate.contractorId": existinDataManagement.userContract },
+        { "socialSecurity.contractorId": existinDataManagement.userContract },
+        { "rut.contractorId": existinDataManagement.userContract },
+        { "rit.contractorId": existinDataManagement.userContract },
+        { "trainings.contractorId": existinDataManagement.userContract },
+        { "initiationRecord.contractorId": existinDataManagement.userContract },
+        { "accountCertification.contractorId": existinDataManagement.userContract }
+      ]
+    });
 
     return res.status(200).json({
       success: true,
@@ -79,7 +79,7 @@ exports.createData = async (req, res) => {
 
     // Buscar la gestion documetal
     const exitingdocumentManagement = await DocumentManagement.findById(management);
-  
+
 
     // Si no existe mensaje de respuesta
     if (!exitingdocumentManagement) {
@@ -135,48 +135,68 @@ exports.createData = async (req, res) => {
     const files = fs.readdirSync(outputDir);
 
     // Verificar que los archivos existan
-    for(const field of FieldAll){
-      if(!files.includes(field)){
+    for (const field of FieldAll) {
+      if (!files.includes(field)) {
         return res.status(400).json({
-          success:false,
-          message:`Falta el archivo ${field} en la carpeta ${exitingdocumentManagement.userContract}Img`
+          success: false,
+          message: `Falta el archivo ${field} en la carpeta ${exitingdocumentManagement.userContract}Img`
         });
       }
     }
 
-    // Carta de radicacion FilingLetter
-    await generateFilingLetter(UserContractAll);
-  
-    //Certificado de cumplimiento no firmado
-    await generateCertificateOfCompliance(UserContractAll);
-
-    // Certificado de cumplimiento firmado
-    //await ThreeFile("signedCertificateOfCompliance", UserContractAll);
-
-    // Informe de actividad
-    await generateActivityReports(UserContractAll);
-
-    // Certificado de calidad tributaria
-    await generateTaxQuanlityCertificate(UserContractAll);
-
-    // Rut
-     await generateRut(UserContractAll);
-
-   // RIT
-      await generateRit(UserContractAll);
-
-    // Acta de inicio
-     await generateInitiationRecord(UserContractAll);
-
-    // Certificacion bancaria
-     await generateAccountCertification(UserContractAll);
- 
-
-    return res.status(200).json({
+    res.status(201).json({
       success: true,
-      message: "Analisis completo, Verifica los resultados",
-      data: files
+      message: 'Se esta ejecutando el analisis en 2 plano'
     });
+
+    setImmediate(async () => {
+
+      try {
+        // Carta de radicacion FilingLetter
+        await generateFilingLetter(UserContractAll);
+        console.log("[BackgroundJob] FilingLetter OK");
+
+        //Certificado de cumplimiento no firmado
+        await generateCertificateOfCompliance(UserContractAll);
+        console.log("[BackgroundJob] Certificate OK");
+
+        //await ThreeFile("signedCertificateOfCompliance", UserContractAll);
+
+        // Informe de actividad
+        await generateActivityReports(UserContractAll);
+        console.log("[BackgroundJob] Activity Reports OK");
+
+        // Certificado de cumplimiento firmado
+
+        // Certificado de calidad tributaria
+        await generateTaxQuanlityCertificate(UserContractAll);
+        console.log("[BackgroundJob] Tax OK");
+
+
+        // Rut
+        await generateRut(UserContractAll);
+        console.log("[BackgroundJob] RUT OK");
+
+        // RIT
+        await generateRit(UserContractAll);
+        console.log("[BackgroundJob] RIT OK");
+
+        // Acta de inicio
+        await generateInitiationRecord(UserContractAll);
+        console.log("[BackgroundJob] Initiation Record OK");
+
+
+        // Certificacion bancaria
+        await generateAccountCertification(UserContractAll);
+        console.log("[BackgroundJob] Bank OK");
+
+        console.log("[BackgroundJob] Análisis COMPLETADO ✔");
+      } catch (e) {
+        console.error("[BackgroundJob] Error:", e);
+      }
+
+    })
+
   } catch (error) {
     console.error("[CreateData] Error al crear una comparacion:", error);
     return res.status(500).json({
@@ -201,9 +221,9 @@ exports.updatedData = async (req, res) => {
 
     //Datos del contratista
     const ContractUser = await Contractor.findById(exitingdocumentManagement.userContract).populate("user", "firsName lastName idcard telephone email").populate(
-        "contract",
-        "typeofcontract  startDate endDate contractNumber periodValue totalValue objectiveContract extension addiction suspension"
-      );
+      "contract",
+      "typeofcontract  startDate endDate contractNumber periodValue totalValue objectiveContract extension addiction suspension"
+    );
 
     // Si no existe mensaje de respuesta
     if (!ContractUser) {
@@ -219,7 +239,7 @@ exports.updatedData = async (req, res) => {
     // Se agregar el document management al usuario para enviarlo al python
     UserContractAll.documentManagement = exitingdocumentManagement._id;
 
-    
+
     //Arreglo de todos los nombres de los documentos
     const FieldAll = [
       "filingLetter",
@@ -247,10 +267,10 @@ exports.updatedData = async (req, res) => {
     // Verificar si quiere editar cada documentos
     if (field == "filingLetter") {
       // Verificar que el archivo exista
-      const fieldFilingLetter =['filingLetter1.jpg'];
+      const fieldFilingLetter = ['filingLetter1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldFilingLetter){
-        if(!files.includes(file)){
+      for (const file of fieldFilingLetter) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -259,15 +279,15 @@ exports.updatedData = async (req, res) => {
       }
 
       await generateFilingLetter(UserContractAll);
-      
-    } 
 
-    if(field =="certificateOfCompliance"){
+    }
+
+    if (field == "certificateOfCompliance") {
       // Verificar que el archivo exista
-      const fieldCertificateOfCompliance =['certificateOfCompliance1.jpg'];
+      const fieldCertificateOfCompliance = ['certificateOfCompliance1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldCertificateOfCompliance){
-        if(!files.includes(file)){
+      for (const file of fieldCertificateOfCompliance) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -275,14 +295,14 @@ exports.updatedData = async (req, res) => {
         }
       }
       await generateCertificateOfCompliance(UserContractAll);
-    } 
+    }
 
-    if(field =="signedCertificateOfCompliance") {
+    if (field == "signedCertificateOfCompliance") {
       // Verificar que el archivo exista
-      const fieldSignedCertificateOfCompliance =['signedCertificateOfCompliance1.jpg'];
+      const fieldSignedCertificateOfCompliance = ['signedCertificateOfCompliance1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldSignedCertificateOfCompliance){
-        if(!files.includes(file)){
+      for (const file of fieldSignedCertificateOfCompliance) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -292,12 +312,12 @@ exports.updatedData = async (req, res) => {
       await ThreeFile("signedCertificateOfCompliance", UserContractAll);
     }
 
-    if(field =="activityReport") {
+    if (field == "activityReport") {
       // Verificar que el archivo exista
-      const fieldActivityReport =['activityReport1.jpg','activityReport2.jpg','activityReport3.jpg','activityReport4.jpg','activityReport5.jpg'];
+      const fieldActivityReport = ['activityReport1.jpg', 'activityReport2.jpg', 'activityReport3.jpg', 'activityReport4.jpg', 'activityReport5.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldActivityReport){
-        if(!files.includes(file)){
+      for (const file of fieldActivityReport) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -308,12 +328,12 @@ exports.updatedData = async (req, res) => {
       await generateActivityReports(UserContractAll);
     }
 
-    if(field =="taxQualityCertificate") {
+    if (field == "taxQualityCertificate") {
       // Verificar que el archivo exista
-      const fieldTaxQualityCertificate =['taxQualityCertificate1.jpg','taxQualityCertificate2.jpg'];
+      const fieldTaxQualityCertificate = ['taxQualityCertificate1.jpg', 'taxQualityCertificate2.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldTaxQualityCertificate){
-        if(!files.includes(file)){
+      for (const file of fieldTaxQualityCertificate) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -323,12 +343,12 @@ exports.updatedData = async (req, res) => {
       await generateTaxQuanlityCertificate(UserContractAll);
     }
 
-    if(field =="rut") {
+    if (field == "rut") {
       // Verificar que el archivo exista
-      const fieldRut =['rut1.jpg'];
+      const fieldRut = ['rut1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldRut){
-        if(!files.includes(file)){
+      for (const file of fieldRut) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -338,12 +358,12 @@ exports.updatedData = async (req, res) => {
       await generateRut(UserContractAll);
     }
 
-    if(field =="rit") {
+    if (field == "rit") {
       // Verificar que el archivo exista
-      const fieldRit =['rit1.jpg'];
+      const fieldRit = ['rit1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldRit){
-        if(!files.includes(file)){
+      for (const file of fieldRit) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -353,12 +373,12 @@ exports.updatedData = async (req, res) => {
       await generateRit(UserContractAll);
     }
 
-    if(field =="initiationRecord") {
+    if (field == "initiationRecord") {
       // Verificar que el archivo exista
-      const fieldInitiationRecord =['initiationRecord1.jpg'];
+      const fieldInitiationRecord = ['initiationRecord1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldInitiationRecord){
-        if(!files.includes(file)){
+      for (const file of fieldInitiationRecord) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -368,12 +388,12 @@ exports.updatedData = async (req, res) => {
       await generateInitiationRecord(UserContractAll);;
     }
 
-    if(field =="accountCertification") {
+    if (field == "accountCertification") {
       // Verificar que el archivo exista
-      const fieldAccountCertification =['accountCertification1.jpg'];
+      const fieldAccountCertification = ['accountCertification1.jpg'];
       // Verificar que los archivos existan
-      for(const file of fieldAccountCertification){
-        if(!files.includes(file)){
+      for (const file of fieldAccountCertification) {
+        if (!files.includes(file)) {
           return res.status(400).json({
             success: false,
             message: `El archivo ${file} no existe en la carpeta de salida`,
@@ -384,9 +404,9 @@ exports.updatedData = async (req, res) => {
     }
 
     return res.status(200).json({
-      success:true,
-      message:`Archivo ${field} Actualizado correctamente verifica los resultados`,
-    });                              
+      success: true,
+      message: `Archivo ${field} Actualizado correctamente verifica los resultados`,
+    });
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -401,35 +421,35 @@ exports.deleteData = async (req, res) => {
   try {
     const { management } = req.params;
 
-    if(!mongoose.Types.ObjectId.isValid(management) ){
+    if (!mongoose.Types.ObjectId.isValid(management)) {
       return res.status(400).json({
-        success:false,
-        message:'El id de la gestion documental no es valido'
+        success: false,
+        message: 'El id de la gestion documental no es valido'
       });
     }
 
     const safeManagement = management.trim();
 
-    
+
     // Verificar si existe una gestion documental
     const documentManagementExisting = await DocumentManagement.findById(safeManagement);
-    if(!documentManagementExisting){
+    if (!documentManagementExisting) {
       return res.status(404).json({
-        success:false,
-        message:'No existe una gestion documental con ese id'
+        success: false,
+        message: 'No existe una gestion documental con ese id'
       });
     }
 
     // Borrar la gestion de datos
-    const query = {documentManagement:documentManagementExisting._id};
+    const query = { documentManagement: documentManagementExisting._id };
 
     const newDelete = await DataManagements.findOneAndDelete(query);
 
 
-    if(!newDelete){
+    if (!newDelete) {
       return res.status(404).json({
-        success:false,
-        message:'No se encontro una comparacion con ese id'
+        success: false,
+        message: 'No se encontro una comparacion con ese id'
       });
     }
 
@@ -452,22 +472,22 @@ exports.deleteData = async (req, res) => {
 };
 
 
-exports.toogleStateData = async(req,res)=>{
-  try{
+exports.toogleStateData = async (req, res) => {
+  try {
 
-  const {management,field} = req.params;
+    const { management, field } = req.params;
 
-  const existinDocumentManagement = await DocumentManagement.findById(management);
+    const existinDocumentManagement = await DocumentManagement.findById(management);
 
-  if(!existinDocumentManagement){
-    return res.status(404).json({
-      success:false,
-      message:'No existe una gestion documental'
-    });
-  }
+    if (!existinDocumentManagement) {
+      return res.status(404).json({
+        success: false,
+        message: 'No existe una gestion documental'
+      });
+    }
 
-  // Verificar que venga el documento correctos
-    const FieldSelect =[
+    // Verificar que venga el documento correctos
+    const FieldSelect = [
       "filingLetter",
       "certificateOfCompliance",
       // "signedCertificateOfCompliance",
@@ -487,19 +507,19 @@ exports.toogleStateData = async(req,res)=>{
     }
 
     // Validar que si exista una gestion documental con una gestion de datos
-    
-    const existinDataManagement = await DataManagements.findOne({documentManagement:existinDocumentManagement._id});
-  
 
-    if(!existinDataManagement){
+    const existinDataManagement = await DataManagements.findOne({ documentManagement: existinDocumentManagement._id });
+
+
+    if (!existinDataManagement) {
       return res.status(404).json({
-        success:false,
-        message:'No hay una gestion de datos asociada a esta gestion documental'
+        success: false,
+        message: 'No hay una gestion de datos asociada a esta gestion documental'
       })
     }
 
     existinDataManagement[field].status = !existinDataManagement[field].status;
-    existinDataManagement[field].description ="ok"
+    existinDataManagement[field].description = "ok"
 
     await existinDataManagement.save();
 
@@ -527,10 +547,10 @@ exports.getDataStats = async (req, res) => {
     // Contratista sin gestion documental
     // consulta todos los contratistas
     const contractors = await Contractor.find();
-    const contractorsWithDocs = contractors.length - totalCount;  
-    
+    const contractorsWithDocs = contractors.length - totalCount;
+
     stats = {
-      'total de documentos':totalCount,
+      'total de documentos': totalCount,
       'Usuario contratista sin gestion de datos': contractorsWithDocs
     };
     return res.status(200).json({ success: true, message: "Estadísticas de gestión de datos obtenidas correctamente", data: stats });
