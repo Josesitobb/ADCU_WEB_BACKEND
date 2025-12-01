@@ -13,7 +13,8 @@ describe('Crear toda la gestion de un contrato en la aplicacion de adcu en admin
     it('Abrir navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('https://adcu.giize.com/login');
+            await driver.get('http://localhost:3000/login');
+            // await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)

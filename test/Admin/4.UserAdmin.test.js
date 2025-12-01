@@ -2,8 +2,8 @@ const { Builder, Browser, By, XS, Key, Select, until } = require('selenium-webdr
 
 let driver;
 
+describe('Crear toda la gestion de usuario admin', function () {
 
-describe('Crear toda la gestion de Funcionario', function () {
 
     // Abrir el navegador
     it('Abrir el navegador', async function () {
@@ -17,8 +17,7 @@ describe('Crear toda la gestion de Funcionario', function () {
     });
 
 
-
-    it('Login para crear un usuario funcionario ', async function () {
+    it('Login para crear un usuario admin ', async function () {
         try {
             const emailInput = await driver.wait(until.elementLocated(By.id('formBasicEmail')), 5000);
             const passwordInput = await driver.wait(until.elementLocated(By.id('formBasicPassword')), 5000);
@@ -63,7 +62,7 @@ describe('Crear toda la gestion de Funcionario', function () {
             await driver.manage().setTimeouts({ implicit: 2000 });
 
             // Boton del menu de usuario
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div/nav/div/a[2]')).click();
+            await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div/nav/div/a[1]')).click();
 
             // Crear el usuario
             await driver.manage().setTimeouts({ implicit: 2000 });
@@ -77,12 +76,12 @@ describe('Crear toda la gestion de Funcionario', function () {
             // Esperar el campo 
             await driver.wait(until.elementsLocated(By.xpath('/html/body/div[3]/div/div/div[2]/form/div/div[1]/div/label')));
 
-            await driver.findElement(By.xpath('//*[@id="firsName"]')).sendKeys('PruebasBotSeleniumFuncionario');
-            await driver.findElement(By.xpath('//*[@id="lastName"]')).sendKeys('PruebasBotSeleniumFuncionario');
-            await driver.findElement(By.xpath('//*[@id="idcard"]')).sendKeys(321321321321);
-            await driver.findElement(By.xpath('//*[@id="telephone"]')).sendKeys(9192892783992);
-            await driver.findElement(By.xpath('//*[@id="email"]')).sendKeys('PruebasSeleniumFuncionario@gmail.com');
-            await driver.findElement(By.xpath('//*[@id="password"]')).sendKeys('PruebasFuncionario');
+            await driver.findElement(By.xpath('//*[@id="firsName"]')).sendKeys('PruebasBotSelenium');
+            await driver.findElement(By.xpath('//*[@id="lastName"]')).sendKeys('PruebasBotSelenium');
+            await driver.findElement(By.xpath('//*[@id="idcard"]')).sendKeys(123123123123);
+            await driver.findElement(By.xpath('//*[@id="telephone"]')).sendKeys(300100200300);
+            await driver.findElement(By.xpath('//*[@id="email"]')).sendKeys('PruebasSeleniumAdmin@gmail.com');
+            await driver.findElement(By.xpath('//*[@id="password"]')).sendKeys('PruebasContraseña');
             await driver.findElement(By.xpath('//*[@id="post"]')).sendKeys('Bot de pruebas');
 
             // Click al boton
@@ -101,12 +100,11 @@ describe('Crear toda la gestion de Funcionario', function () {
 
         }
 
-    });
-
+    })
 
     it('Editar un usuario admin', async function () {
 
-        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[4]/td[9]/div/button[1]')).click();
+        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[3]/td[9]/div/button[1]')).click();
 
 
         // Esperar que que aparezca el titulo 
@@ -116,15 +114,15 @@ describe('Crear toda la gestion de Funcionario', function () {
         // Llenar los campos
         const idcard = await driver.findElement(By.xpath('//*[@id="idcard"]'))
         idcard.clear();
-        idcard.sendKeys(0);
+        idcard.sendKeys(101012020032);
 
         const telephone = await driver.findElement(By.xpath('//*[@id="telephone"]'))
         telephone.clear();
-        telephone.sendKeys(0);
+        telephone.sendKeys(1202002);
 
         const email = await driver.findElement(By.xpath('//*[@id="email"]'));
         email.clear();
-        email.sendKeys('EditaSeleniumBotFuncionario@gmail.com')
+        email.sendKeys('EditaSeleniumBot@gmail.com')
 
         await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[3]/button[2]')).click();
 
@@ -136,9 +134,10 @@ describe('Crear toda la gestion de Funcionario', function () {
 
     });
 
+
     it('Borrar un usuario admin', async function () {
 
-        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[4]/td[9]/div/button[2]')).click();
+        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[3]/td[9]/div/button[2]')).click();
 
         await driver.switchTo().alert().accept();
 
@@ -147,9 +146,5 @@ describe('Crear toda la gestion de Funcionario', function () {
         await driver.sleep(2000);
 
     });
-
-
-
-
 
 })

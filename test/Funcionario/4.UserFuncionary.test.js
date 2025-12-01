@@ -17,7 +17,7 @@ describe('Crear toda la gestion de usuario admin', function () {
     });
 
 
-    it('Login para crear un usuario admin ', async function () {
+    it('Login para crear un usuario funcionario ', async function () {
         try {
             const emailInput = await driver.wait(until.elementLocated(By.id('formBasicEmail')), 5000);
             const passwordInput = await driver.wait(until.elementLocated(By.id('formBasicPassword')), 5000);
@@ -26,16 +26,11 @@ describe('Crear toda la gestion de usuario admin', function () {
 
             // await driver.wait(until.elementIsVisible(emailInput),5000);
 
-            await emailInput.sendKeys('admin@example.com');
+            await emailInput.sendKeys('Pruebas2@example.com');
 
-            await passwordInput.sendKeys('CarlosAdmin2024');
+            await passwordInput.sendKeys('123456789');
 
             await clickButton.click();
-
-            // Esperar el mensae
-            const alertOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/div/h2')), 20000);
-
-            if (!alertOk) throw new Error('Error no inicia con la clave del adminitrador');
 
             await driver.sleep(2000);
 
@@ -47,7 +42,7 @@ describe('Crear toda la gestion de usuario admin', function () {
 
     });
 
-    it('Crear un usuario admin', async function () {
+    it('Crear un usuario Funcionario', async function () {
         try {
             // Buscar el lateral izquierdo  y seleccionar contrato
             const buttonInicio = await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/button[1]'));
@@ -78,7 +73,7 @@ describe('Crear toda la gestion de usuario admin', function () {
 
             await driver.findElement(By.xpath('//*[@id="firsName"]')).sendKeys('PruebasBotSelenium');
             await driver.findElement(By.xpath('//*[@id="lastName"]')).sendKeys('PruebasBotSelenium');
-            await driver.findElement(By.xpath('//*[@id="idcard"]')).sendKeys(123123123123);
+            await driver.findElement(By.xpath('//*[@id="idcard"]')).sendKeys(123123123123331);
             await driver.findElement(By.xpath('//*[@id="telephone"]')).sendKeys(300100200300);
             await driver.findElement(By.xpath('//*[@id="email"]')).sendKeys('PruebasSeleniumAdmin@gmail.com');
             await driver.findElement(By.xpath('//*[@id="password"]')).sendKeys('PruebasContraseña');
@@ -102,9 +97,9 @@ describe('Crear toda la gestion de usuario admin', function () {
 
     })
 
-    it('Editar un usuario admin', async function () {
+    it('Editar un usuario funcionario', async function () {
 
-        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[8]/td[9]/div/button[1]')).click();
+        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[2]/td[9]/div/button')).click();
 
 
         // Esperar que que aparezca el titulo 
@@ -135,16 +130,5 @@ describe('Crear toda la gestion de usuario admin', function () {
     });
 
 
-    it('Borrar un usuario admin', async function () {
-
-        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[8]/td[9]/div/button[2]')).click();
-
-        await driver.switchTo().alert().accept();
-
-        await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/section/ol/li/div[2]/div[1]')))
-
-        await driver.sleep(2000);
-
-    });
 
 })

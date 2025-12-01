@@ -13,7 +13,6 @@ require("dotenv").config({ path: path.resolve(__dirname, "../../../.env") });
 
 exports.generateTaxQuanlityCertificate = async (data) => {
   try {
-    console.log(data);
     // Constantes
     const { contractNumber } = data.contract;
     const { firsName, lastName, idcard, email, telephone } = data.user;

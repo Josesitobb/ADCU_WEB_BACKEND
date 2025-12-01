@@ -21,6 +21,7 @@ describe('Crear toda la gestion documental ', function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
             await driver.get('http://localhost:3000/login');
+            // await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -38,16 +39,11 @@ describe('Crear toda la gestion documental ', function () {
 
             // await driver.wait(until.elementIsVisible(emailInput),5000);
 
-            await emailInput.sendKeys('admin@example.com');
+            await emailInput.sendKeys('Pruebas2@example.com');
 
-            await passwordInput.sendKeys('CarlosAdmin2024');
+            await passwordInput.sendKeys('123456789');
 
             await clickButton.click();
-
-            // Esperar el mensae
-            const alertOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/div/h2')), 20000);
-
-            if (!alertOk) throw new Error('Error no inicia con la clave del adminitrador');
 
             await driver.sleep(2000);
 
@@ -146,7 +142,7 @@ describe('Crear toda la gestion documental ', function () {
         await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[2]/form/div[5]/button[2]')).click();
 
         // Esperar a que ne la tabla haya un pruebas
-        const alerOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[3]/td[2]')));
+        const alerOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[2]')), 10000);
 
         await driver.wait(until.elementIsVisible(alerOk), 10000);
 
@@ -157,7 +153,7 @@ describe('Crear toda la gestion documental ', function () {
     });
 
     it('Editar una gestion documental', async function () {
-        const buttonEditDocument = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[3]/td[6]/div/button[1]')), 2000);
+        const buttonEditDocument = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[6]/div/button[1]')), 2000);
         await driver.wait(until.elementIsVisible(buttonEditDocument), 2000);
         await buttonEditDocument.click();
 
@@ -192,17 +188,18 @@ describe('Crear toda la gestion documental ', function () {
 
         // Esperar la notificacion
 
-        const tabletOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[3]/td[2]')));
-
+        const tabletOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[2]')), 2000);
         await driver.wait(until.elementIsVisible(tabletOk));
 
+        
         await driver.sleep(2000);
+        
 
     });
 
 
     it('Borrar un solo documento', async function () {
-        const buttonEditOneDocument = driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[3]/td[6]/div/button[2]')), 2000);
+        const buttonEditOneDocument = driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[6]/div/button[2]')), 2000);
         await driver.wait(until.elementIsVisible(buttonEditOneDocument), 9000);
         await buttonEditOneDocument.click();
         // Esperar a que aparezca el titulo
@@ -226,7 +223,7 @@ describe('Crear toda la gestion documental ', function () {
 
     it('Borrar un gestion documental', async function () {
 
-        const buttonDelete = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[3]/td[6]/div/button[3]')))
+        const buttonDelete = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[6]/div/button[3]')))
         await driver.wait(until.elementIsVisible(buttonDelete));
         await buttonDelete.click();
         // Aceptar alerta

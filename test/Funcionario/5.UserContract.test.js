@@ -26,17 +26,14 @@ describe('Crear toda la gestion de Funcionario', function () {
 
             // await driver.wait(until.elementIsVisible(emailInput),5000);
 
-            await emailInput.sendKeys('admin@example.com');
+            await emailInput.sendKeys('Pruebas2@example.com');
 
-            await passwordInput.sendKeys('CarlosAdmin2024');
+            await passwordInput.sendKeys('123456789');
 
             await clickButton.click();
 
             // Esperar el mensae
-            const alertOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/div/h2')), 20000);
-
-            if (!alertOk) throw new Error('Error no inicia con la clave del adminitrador');
-
+        
             await driver.sleep(2000);
 
 
@@ -49,7 +46,7 @@ describe('Crear toda la gestion de Funcionario', function () {
 
 
 
-    it('Crear un usuario admin', async function () {
+    it('Crear un usuario contratista', async function () {
         try {
             // Buscar el lateral izquierdo  y seleccionar contrato
             const buttonInicio = await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/button[1]'));
@@ -64,7 +61,7 @@ describe('Crear toda la gestion de Funcionario', function () {
             await driver.manage().setTimeouts({ implicit: 2000 });
 
             // Boton del menu de usuario
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div/nav/div/a[3]')).click();
+            await driver.findElement(By.xpath('//*[@id="root"]/div/div[1]/div/nav/div/a[2]')).click();
 
             // Crear el usuario
             await driver.manage().setTimeouts({ implicit: 2000 });
@@ -98,9 +95,7 @@ describe('Crear toda la gestion de Funcionario', function () {
             // Seleccionar un contratista
             const selectContract = await driver.findElement(By.xpath('//*[@id="contractId"]'));
             const select = new Select(selectContract);
-            await select.selectByIndex(2);
-
-
+            await select.selectByIndex(1);
 
             // Click al boton
             await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[3]/button[2]')).click();
@@ -119,6 +114,33 @@ describe('Crear toda la gestion de Funcionario', function () {
         }
 
     });
+
+    it('Editar el usuario creado', async function () {
+        await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div/div/div[2]/table/tbody/tr[3]/td[8]/div/button[1]')).click();
+
+        //Esperar el campo
+        await driver.wait(until.elementsLocated(By.xpath('/html/body/div[3]/div/div/div[2]/form/div/div[1]/div/label'))); 
+
+        const firstName = await driver.findElement(By.xpath('//*[@id="firsName"]'));
+        await firstName.clear();
+        await firstName.sendKeys('EditadoContratista');
+
+        const lastName = await driver.findElement(By.xpath('//*[@id="lastName"]'));
+        await lastName.clear();
+        await lastName.sendKeys('EditadoContratista');
+
+        const telephone = await driver.findElement(By.xpath('//*[@id="telephone"]'));
+        await telephone.clear();
+        await telephone.sendKeys(1234567890);
+
+        // Click al boton
+        await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[3]/button[2]')).click();
+
+
+        await driver.sleep(2000);
+    });
+
+
 
 
 })

@@ -14,7 +14,8 @@ describe('Login in aplication ADCU', function () {
     it('Abrir Navegador', async function () {
         try {
             driver = await new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('https://adcu.giize.com/login');
+            await driver.get('http://localhost:3000/login');
+            // await driver.get('https://adcu.giize.com/login');
 
         } catch (e) {
             console.log(e)
