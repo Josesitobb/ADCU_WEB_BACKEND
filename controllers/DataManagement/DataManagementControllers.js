@@ -43,21 +43,7 @@ exports.getDataById = async (req, res) => {
         message: "No existe una gestion documental con ese id",
       });
     }
-    const dataManagementeId = await DataManagements.findOne({
-      $or: [
-        { "filingLetter.contractorId": existinDataManagement.userContract },
-        { "certificateOfCompliance.contractorId": existinDataManagement.userContract },
-        { "signedCertificateOfCompliance.contractorId": existinDataManagement.userContract },
-        { "activityReport.contractorId": existinDataManagement.userContract },
-        { "taxQualityCertificate.contractorId": existinDataManagement.userContract },
-        { "socialSecurity.contractorId": existinDataManagement.userContract },
-        { "rut.contractorId": existinDataManagement.userContract },
-        { "rit.contractorId": existinDataManagement.userContract },
-        { "trainings.contractorId": existinDataManagement.userContract },
-        { "initiationRecord.contractorId": existinDataManagement.userContract },
-        { "accountCertification.contractorId": existinDataManagement.userContract }
-      ]
-    });
+    const dataManagementeId = await DataManagements.findOne({documentManagement: management});
 
     return res.status(200).json({
       success: true,
