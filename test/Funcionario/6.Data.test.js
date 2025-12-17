@@ -9,7 +9,7 @@ describe('Gestion de Datos Administrativos', function () {
     it('Abrir el navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('http://localhost:3000/login');
+            await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -28,7 +28,7 @@ describe('Gestion de Datos Administrativos', function () {
             
             await driver.sleep(2000);
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
     });
 
@@ -73,7 +73,7 @@ describe('Gestion de Datos Administrativos', function () {
 
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
     });
 
@@ -107,7 +107,7 @@ describe('Gestion de Datos Administrativos', function () {
 
         }
         catch (e) {
-            console.log(e)
+            // console.log(e)
         }
     });
 
@@ -134,7 +134,7 @@ describe('Gestion de Datos Administrativos', function () {
 
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
 

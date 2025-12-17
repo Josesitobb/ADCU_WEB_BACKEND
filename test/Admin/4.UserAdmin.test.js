@@ -9,7 +9,7 @@ describe('Crear toda la gestion de usuario admin', function () {
     it('Abrir el navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('http://localhost:3000/login');
+            await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -145,6 +145,10 @@ describe('Crear toda la gestion de usuario admin', function () {
 
         await driver.sleep(2000);
 
+    });
+
+    it('Cerrar Navegador', async function () {
+        await driver.quit();
     });
 
 })

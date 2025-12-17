@@ -9,7 +9,7 @@ describe('Gestion de Datos Administrativos', function () {
     it('Abrir el navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('http://localhost:3000/login');
+            await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -59,7 +59,7 @@ describe('Gestion de Datos Administrativos', function () {
             // DALR CLICK A ESE PIROBO SELECTOR
             await driver.sleep(5000);
 
-           await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/button[3]')).click();
+            await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[1]/div/button[3]')).click();
 
 
             const selectContractId = await driver.findElement(By.xpath('/html/body/div[3]/div/div/div[2]/form/div[1]/select'));
@@ -84,9 +84,9 @@ describe('Gestion de Datos Administrativos', function () {
     it('Gestion de dato boton de ver', async function () {
         try {
             // Click en el boton de ver
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[2]/td[3]/div/button[1]')).click();
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[2]/td[3]/div/button[1]')).click();
-            await driver.manage().setTimeouts({ implicit: 2000 });
+            // await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[2]/td[3]/div/button[1]')).click();
+            // await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[2]/td[3]/div/button[1]')).click();
+            // await driver.manage().setTimeouts({ implicit: 2000 });
 
             await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[3]/td[3]/div/button[1]')).click();
             await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[3]/td[3]/div/button[1]')).click();
@@ -104,19 +104,16 @@ describe('Gestion de Datos Administrativos', function () {
             await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[6]/td[3]/div/button[1]')).click();
             await driver.manage().setTimeouts({ implicit: 2000 });
 
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[7]/td[3]/div/button[1]')).click();
-            await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[7]/td[3]/div/button[1]')).click();
+            // await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[7]/td[3]/div/button[1]')).click();
+            // await driver.findElement(By.xpath('//*[@id="root"]/div/div[2]/div[4]/div[2]/div/table/tbody/tr[7]/td[3]/div/button[1]')).click();
 
             await driver.sleep(5000);
 
         }
         catch (e) {
-            console.log(e)
+            // console.log(e)
         }
     });
-
-
-
 
     it('Gestion de datos Cambiar estado del analisis', async function () {
 
@@ -158,8 +155,13 @@ describe('Gestion de Datos Administrativos', function () {
             await driver.sleep(2000);
 
         } catch (e) {
-            console.log(e)
+            // console.log(e)
         }
 
+    });
+
+
+    it('Cerrar Navegador', async function () {
+        await driver.quit();
     });
 });

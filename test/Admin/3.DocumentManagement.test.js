@@ -20,8 +20,7 @@ describe('Crear toda la gestion documental ', function () {
     it('Abrir navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('http://localhost:3000/login');
-            // await driver.get('https://adcu.giize.com/login');
+            await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -196,9 +195,9 @@ describe('Crear toda la gestion documental ', function () {
         const tabletOk = await driver.wait(until.elementLocated(By.xpath('//*[@id="root"]/div/div[2]/div[3]/div[2]/div/table/tbody/tr[2]/td[2]')), 2000);
         await driver.wait(until.elementIsVisible(tabletOk));
 
-        
+
         await driver.sleep(2000);
-        
+
 
     });
 
@@ -235,6 +234,10 @@ describe('Crear toda la gestion documental ', function () {
         await driver.switchTo().alert().accept();
 
         await driver.sleep(2000);
-    })
+    });
+
+    it('Cerrar Navegador', async function () {
+        await driver.quit();
+    });
 
 })

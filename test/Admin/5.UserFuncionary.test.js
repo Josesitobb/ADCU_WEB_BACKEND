@@ -9,7 +9,7 @@ describe('Crear toda la gestion de Funcionario', function () {
     it('Abrir el navegador', async function () {
         try {
             driver = new Builder().forBrowser(Browser.EDGE).build();
-            await driver.get('http://localhost:3000/login');
+            await driver.get('https://adcu.giize.com/login');
             await driver.manage().window().maximize();
         } catch (e) {
             console.log(e)
@@ -149,7 +149,9 @@ describe('Crear toda la gestion de Funcionario', function () {
     });
 
 
-
+    it('Cerrar Navegador', async function () {
+        await driver.quit();
+    });
 
 
 })
