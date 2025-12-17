@@ -43,7 +43,13 @@ exports.getDataById = async (req, res) => {
         message: "No existe una gestion documental con ese id",
       });
     }
-    const dataManagementeId = await DataManagements.findOne({documentManagement: management});
+    // Sanitizar
+    const safeManagement = management.trim();
+
+    // Query
+    const query = { documentManagement: safeManagement }
+
+    const dataManagementeId = await DataManagements.findOne(query);
 
     return res.status(200).json({
       success: true,
@@ -145,8 +151,6 @@ exports.createData = async (req, res) => {
         //Certificado de cumplimiento no firmado
         await generateCertificateOfCompliance(UserContractAll);
         console.log("[BackgroundJob] Certificate OK");
-
-        //await ThreeFile("signedCertificateOfCompliance", UserContractAll);
 
         // Informe de actividad
         await generateActivityReports(UserContractAll);
